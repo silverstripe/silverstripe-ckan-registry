@@ -1,0 +1,8 @@
+en:
+  SilverStripe\CKANRegistry\Page\CKANRegistryPage:
+    ItemsPerPage: 'Items per page'
+    PLURALNAME: 'CKAN Registry Pages'
+    PLURALS:
+      one: 'A CKAN Registry Page'
+      other: '{count} CKAN Registry Pages'
+    SINGULARNAME: 'CKAN Registry Page'
