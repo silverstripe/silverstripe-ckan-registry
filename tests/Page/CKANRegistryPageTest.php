@@ -7,9 +7,13 @@ use SilverStripe\Dev\SapphireTest;
 
 class CKANRegistryPageTest extends SapphireTest
 {
+    protected static $fixture_file = 'CKANRegistryPageTest.yml';
+
     public function testHasItemsPerPageSetting()
     {
-        $page = new CKANRegistryPage();
+        /** @var CKANRegistryPage $page */
+        $page = $this->objFromFixture(CKANRegistryPage::class, 'animal_centers');
+
         $this->assertNotNull($page->getSettingsFields()->fieldByName('Root.Settings.ItemsPerPage'));
     }
 }
