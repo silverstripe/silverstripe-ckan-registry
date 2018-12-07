@@ -22,7 +22,8 @@
     "require": {
         "silverstripe/cms": "^4.3",
         "silverstripe/admin": "^1.3",
-        "silverstripe/vendor-plugin": "^1"
+        "silverstripe/vendor-plugin": "^1",
+        "symbiote/silverstripe-gridfieldextensions": "^3.2"
     },
     "require-dev": {
         "phpunit/phpunit": "^5",

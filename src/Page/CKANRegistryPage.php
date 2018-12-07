@@ -4,7 +4,10 @@ namespace SilverStripe\CKANRegistry\Page;
 
 use Page;
 use SilverStripe\CKANRegistry\Forms\ResourceLocatorField;
+use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\TextField;
 
 /**
@@ -19,6 +22,10 @@ class CKANRegistryPage extends Page
         'ItemsPerPage' => 'Int',
     ];
 
+    private static $has_one = [
+        'DataResource' => Resource::class,
+    ];
+
     private static $defaults = [
         'ItemsPerPage' => 20,
     ];
@@ -29,8 +36,18 @@ class CKANRegistryPage extends Page
 
     public function getCMSFields()
     {
-        $this->beforeUpdateCMSFields(function (FieldList $fields) {
-            $fields->addFieldToTab('Root.Data', ResourceLocatorField::create('Thing'));
+        $resource = $this->DataResource();
+        $this->beforeUpdateCMSFields(function (FieldList $fields) use ($resource) {
+            $fields->addFieldToTab('Root.Data', ResourceLocatorField::create('DataSourceURL'));
+            if ($resource && $resource->Identifier) {
+                $columnsConfig = GridFieldConfig_RecordEditor::create();
+                $resourceFields = GridField::create('DataColumns', 'Columns', $resource->Fields(), $columnsConfig);
+                $fields->addFieldToTab('Root.Data', $resourceFields);
+
+                $filtersConfig = GridFieldConfig_RecordEditor::create();
+                $resourceFilters = GridField::create('DataFilters', 'Filters', $resource->Filters(), $filtersConfig);
+                $fields->addFieldToTab('Root.Filters', $resourceFilters);
+            }
         });
 
         return parent::getCMSFields();
