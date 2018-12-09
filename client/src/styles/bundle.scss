@@ -1,1 +1,10 @@
-/* todo */
+// Core variables
+@import "variables";
+
+// Thirdparty
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/variables";
+
+// Components
+@import '../components/CKANResouceLocator';

@@ -3,6 +3,8 @@
 namespace SilverStripe\CKANRegistry\Page;
 
 use Page;
+use SilverStripe\CKANRegistry\Forms\ResourceLocatorField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
 
 /**
@@ -24,6 +26,15 @@ class CKANRegistryPage extends Page
     private static $singular_name = 'CKAN Registry Page';
 
     private static $plural_name = 'CKAN Registry Pages';
+
+    public function getCMSFields()
+    {
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $fields->addFieldToTab('Root.Data', ResourceLocatorField::create('Thing'));
+        });
+
+        return parent::getCMSFields();
+    }
 
     public function getSettingsFields()
     {
