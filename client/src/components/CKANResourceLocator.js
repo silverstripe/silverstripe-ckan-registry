@@ -52,7 +52,7 @@ class CKANResourceLocator extends Component {
     // Return a generic "catch all" response
     message.value = i18n._t(
       'CKANResourceLocator.INVALID_DATASET_URL',
-      'The provided data source URL does not appear to be a valid CKAN data set'
+      'The provided data source URL does not appear to be a valid CKAN data set.'
     );
 
     return message;
@@ -105,6 +105,13 @@ class CKANResourceLocator extends Component {
     // If an endpoint could not be parsed there's an optional default that can be used.
     if (spec && !spec.endpoint && defaultEndpoint) {
       spec.endpoint = defaultEndpoint;
+
+      // If are working with a provided dataset we should also update the URI now.
+      if (spec.dataset) {
+        this.setState({
+          uri: CKANApi.generateURI(spec),
+        });
+      }
     }
 
     // If there's no spec or _still_ no endpoint then we can't continue.
@@ -198,13 +205,18 @@ class CKANResourceLocator extends Component {
       return <Field {...sharedProps} type="text" disabled />;
     }
 
+    const unavailableMessage = i18n._t(
+      'CKANResourceLocator.INVALID_RESOURCE_SELECTION',
+      'Datastore is not available for the selected resource.'
+    );
+
     // Parse the resources out of the current dataset into a list of options
     const resources = currentDataset.resources.map(resource => ({
       value: resource.id,
       title: resource.name || resource.description || null,
       disabled: !resource.datastore_active,
       // Support the possibility that option titles are supported by the admin component (in 1.4)
-      description: !resource.datastore_active ? 'Data searching is unavailable for this resource' : null,
+      description: !resource.datastore_active ? unavailableMessage : null,
     }));
 
     // Find the current resource that might be selected
@@ -214,10 +226,7 @@ class CKANResourceLocator extends Component {
     if (selectedResource && selectedResource.disabled) {
       message = {
         type: 'error',
-        value: i18n._t(
-          'CKANResourceLocator.INVALID_RESOURCE_SELECTION',
-          'Datastore is not available for the selected resource'
-        ),
+        value: unavailableMessage,
       };
     }
 

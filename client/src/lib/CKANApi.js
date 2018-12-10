@@ -22,21 +22,32 @@ class CKANApi {
       return false;
     }
 
+    let preppedUri = uri;
+
+    // Strip the protocol if one's available (or assume https)
+    let protocol = 'https://';
+
+    let match = preppedUri.match(/^https?:\/\//);
+    if (match) {
+      protocol = match[0];
+      preppedUri = preppedUri.substr(protocol.length);
+    }
+
     // Assume a full spec
-    let match = uri.match(/(^.*\/)[^\/]+\/([^\/]+)\/[^\/]+\/([\da-f-]+)$/i);
+    match = preppedUri.match(/(^[^\/]+\/)[^\/]+\/([^\/]+)\/[^\/]+\/([\da-f-]+)\/?$/i);
     if (match) {
       return {
-        endpoint: match[1],
+        endpoint: `${protocol}${match[1]}`,
         dataset: match[2],
         resource: match[3],
       };
     }
 
     // Try without a resource
-    match = uri.match(/(^.*\/)[^\/]+\/([^\/]+)\/?$/i);
+    match = preppedUri.match(/(^[^\/]+\/)[^\/]+\/([^\/]+)\/?$/i);
     if (match) {
       return {
-        endpoint: match[1],
+        endpoint: `${protocol}${match[1]}`,
         dataset: match[2],
         resource: null,
       };
@@ -44,19 +55,19 @@ class CKANApi {
 
     // Otherwise if the given string matches a guid, assume it's a resource
     // UUID v4
-    if (uri.match(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)) {
+    if (preppedUri.match(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)) {
       return {
         endpoint: null,
         dataset: null,
-        resource: uri,
+        resource: preppedUri,
       };
     }
 
     // If there's no slashes then maybe it's a dataset ID?
-    if (!uri.includes('/')) {
+    if (!preppedUri.includes('/')) {
       return {
         endpoint: null,
-        dataset: uri,
+        dataset: preppedUri,
         resource: null,
       };
     }
@@ -80,6 +91,14 @@ class CKANApi {
     }
 
     let { endpoint } = spec;
+
+    // Check that the endpoint is a valid URL
+    try {
+      // eslint-disable-next-line no-new
+      new URL(endpoint);
+    } catch (e) {
+      return false;
+    }
 
     // Add a trailing slash if one does not exist
     if (endpoint.slice(-1) !== '/') {
