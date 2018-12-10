@@ -1,7 +1,9 @@
 <?php
 namespace SilverStripe\CKANRegistry\Forms;
 
+use InvalidArgumentException;
 use SilverStripe\Forms\FormField;
+use SilverStripe\ORM\DataObjectInterface;
 
 class ResourceLocatorField extends FormField
 {
@@ -28,6 +30,27 @@ class ResourceLocatorField extends FormField
      * @var string|null
      */
     protected $siteName = null;
+
+    /**
+     * The name of the subfield to save the endpoint value of this field into
+     *
+     * @var string
+     */
+    protected $endpointFieldName = 'Endpoint';
+
+    /**
+     * The name of the subfield to save the dataset value of this field into
+     *
+     * @var string
+     */
+    protected $datasetFieldName = 'DataSet';
+
+    /**
+     * The name of the subfield to save the resource value of this field into
+     *
+     * @var string
+     */
+    protected $resourceFieldName = 'Resource';
 
     /**
      * @param string $name
@@ -58,6 +81,49 @@ class ResourceLocatorField extends FormField
         $schemaData['defaultEndpoint'] = $this->getDefaultEndpoint();
 
         return $schemaData;
+    }
+
+    public function setSubmittedValue($value, $data = null)
+    {
+        return $this->setValue(json_decode($value, true));
+    }
+
+    public function saveInto(DataObjectInterface $dataObject)
+    {
+        // Duplicate existing logic where the field is skipped given there's no name on this field.
+        if (!$this->name) {
+            return;
+        }
+
+        // Find what we're actually saving into
+        $child = $this->getSaveTarget($dataObject);
+
+        if (!$child || !$child instanceof DataObjectInterface) {
+            throw new InvalidArgumentException('Could not determine where to save the value of ' . __CLASS__);
+        }
+
+        // Pull the value that'll be null or an associative array of our specification
+        $value = $this->Value();
+        $child->setCastedField($this->getEndpointFieldName(), $value ? $value['endpoint'] : null);
+        $child->setCastedField($this->getDatasetFieldName(), $value ? $value['dataset'] : null);
+        $child->setCastedField($this->getResourceFieldName(), $value ? $value['resource'] : null);
+    }
+
+    /**
+     * Provide the object that this field actually saves into.
+     * By default this is a relation access with __get. Eg. given $dataObject is a page; $page->CKANResource where
+     * "CKANResource" is the name of this field.
+     *
+     * @param DataObjectInterface $dataObject
+     * @return mixed
+     */
+    public function getSaveTarget(DataObjectInterface $dataObject)
+    {
+        $target = $dataObject->{$this->name};
+
+        $this->extend('updateSaveTarget', $target);
+
+        return $target;
     }
 
     /**
@@ -104,6 +170,60 @@ class ResourceLocatorField extends FormField
     public function setSiteName($siteName)
     {
         $this->siteName = $siteName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEndpointFieldName()
+    {
+        return $this->endpointFieldName;
+    }
+
+    /**
+     * @param string $endpointFieldName
+     * @return $this
+     */
+    public function setEndpointFieldName($endpointFieldName)
+    {
+        $this->endpointFieldName = $endpointFieldName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDatasetFieldName()
+    {
+        return $this->datasetFieldName;
+    }
+
+    /**
+     * @param string $datasetFieldName
+     * @return $this
+     */
+    public function setDatasetFieldName($datasetFieldName)
+    {
+        $this->datasetFieldName = $datasetFieldName;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResourceFieldName()
+    {
+        return $this->resourceFieldName;
+    }
+
+    /**
+     * @param string $resourceFieldName
+     * @return $this
+     */
+    public function setResourceFieldName($resourceFieldName)
+    {
+        $this->resourceFieldName = $resourceFieldName;
         return $this;
     }
 }
