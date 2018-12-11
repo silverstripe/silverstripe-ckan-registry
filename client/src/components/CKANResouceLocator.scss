@@ -1,0 +1,61 @@
+.ckan-resource-locator {
+  display: flex;
+
+  &__uri-input {
+    flex: 2;
+
+    &--loading .form__field-holder::after {
+      $loading-size: 1.125rem;
+      content: " ";
+      width: $loading-size;
+      height: $loading-size;
+      border: 2px solid lightgray;
+      display: block;
+      position: absolute;
+      right: $input-padding-x + $grid-gutter-width / 2;
+      top: $input-padding-y + ($input-line-height * $font-size-base - $loading-size) / 2;
+      border-radius: $loading-size / 2;
+      border-left-color: black;
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  &__container {
+    .form__field-description {
+      margin-top: 0;
+    }
+  }
+
+  &__big-slash {
+    flex: 0;
+    font-size: 2.3rem;
+    height: $input-height;
+    margin-top: $label-margin-bottom + $line-height-base * $font-size-base - .35rem;
+    margin-left: $btn-icon-spacing;
+    margin-right: $btn-icon-spacing;
+
+    @include media-breakpoint-up(lg) {
+      margin-top: $input-padding-y * 2 + $line-height-base * $font-size-base - .35rem;
+    }
+  }
+
+  &__resource-select {
+    flex: 1;
+  }
+}
+
+// Specificity for overwriting form width styles needs to be high:
+.cms-edit-form .ckan-resource-locator__container .form-group .form__field-holder {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
