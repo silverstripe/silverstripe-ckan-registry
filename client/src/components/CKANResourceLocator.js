@@ -35,7 +35,10 @@ class CKANResourceLocator extends Component {
   }
 
   /**
-   * Gets a message to show for an invalid URL input.
+   * Indicates the URL inpit field is invalid and provides a localised message indicating the issue
+   * Currently this shows a single message in cases where the field is invalid but it could be
+   * expanded to provide varying messages.
+   * The existence of this message implies the field is invalid.
    *
    * @returns {string|null}
    */
@@ -146,6 +149,7 @@ class CKANResourceLocator extends Component {
             // Create a new spec with the updated dataset
             const newSpec = {
               ...spec,
+              // "package" is the word for "dataset" in CKAN apis
               dataset: resource.package_id,
             };
 
@@ -164,23 +168,27 @@ class CKANResourceLocator extends Component {
         // We're revalidating so we'll just breakout here
         return;
       }
-
-      // We strip off the resource from the URL
-      const newUri = uri.substring(0, uri.lastIndexOf('/', uri.lastIndexOf('/') - 1));
-
-      this.setState({
-        uri: newUri,
-      });
     }
 
     // Now we load the dataset from the CKAN api
     CKANApi.loadDataset(spec.endpoint, spec.dataset).then(
-      dataset => this.setState({
-        validationPending: false,
-        spec,
-        currentDataset: dataset || null,
-      }),
-      handleErrorResponse
+      dataset => {
+        let newUri = uri;
+        if (dataset.name) {
+          spec.dataset = dataset.name;
+          newUri = CKANApi.generateURI(spec);
+        }
+
+        // We strip off the resource from the URL
+        newUri = newUri.substring(0, newUri.lastIndexOf('/', newUri.lastIndexOf('/') - 1));
+
+        this.setState({
+          uri: newUri,
+          validationPending: false,
+          spec,
+          currentDataset: dataset || null,
+        });
+      }, handleErrorResponse
     );
   }
 
@@ -300,6 +308,8 @@ class CKANResourceLocator extends Component {
 CKANResourceLocator.propTypes = {
   // The field name
   name: PropTypes.string.isRequired,
+  // The value of this field - A JSON object with `endpoint`, `dataset` and `resource` keys.
+  value: PropTypes.object.isRequired,
   // A default endpoint to be used in the case that the URL pasted does not provide one
   // This allows things like putting package names and resource names in the URL field
   defaultEndpoint: PropTypes.string,

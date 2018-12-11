@@ -10,10 +10,12 @@ jQuery.entwine('ss', ($) => {
       const CKANResourceLocator = loadComponent('CKANResourceLocator', context);
       const schemaData = this.data('schema');
 
+      const value = this.val();
       const props = {
         name: this.attr('name'),
         defaultEndpoint: schemaData.defaultEndpoint || null,
         description: schemaData.description.html || '',
+        value: value ? JSON.parse(value) : undefined,
       };
 
       ReactDOM.render(

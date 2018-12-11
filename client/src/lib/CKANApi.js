@@ -27,28 +27,34 @@ class CKANApi {
     // Strip the protocol if one's available (or assume https)
     let protocol = 'https://';
 
-    let match = preppedUri.match(/^https?:\/\//);
-    if (match) {
-      protocol = match[0];
+    const protocolMatch = preppedUri.match(/^https?:\/\//);
+    if (protocolMatch) {
+      protocol = protocolMatch[0];
       preppedUri = preppedUri.substr(protocol.length);
     }
 
-    // Assume a full spec
-    match = preppedUri.match(/(^[^\/]+\/)[^\/]+\/([^\/]+)\/[^\/]+\/([\da-f-]+)\/?$/i);
-    if (match) {
+    // Remove any trailing slash...
+    if (preppedUri.endsWith('/')) {
+      preppedUri = preppedUri.substring(0, preppedUri.length - 1);
+    }
+
+    // Split by `/` and deal with the parts as an array
+    const parts = preppedUri.split('/');
+
+    // 5 parts assumes [endpoint]/dataset/[dataset_id]/resource/[resource_id]
+    if (parts.length === 5) {
       return {
-        endpoint: `${protocol}${match[1]}`,
-        dataset: match[2],
-        resource: match[3],
+        endpoint: `${protocol}${parts[0]}/`,
+        dataset: parts[2],
+        resource: parts[4],
       };
     }
 
-    // Try without a resource
-    match = preppedUri.match(/(^[^\/]+\/)[^\/]+\/([^\/]+)\/?$/i);
-    if (match) {
+    // 3 parts means /resource/[resource_id]
+    if (parts.length === 3) {
       return {
-        endpoint: `${protocol}${match[1]}`,
-        dataset: match[2],
+        endpoint: `${protocol}${parts[0]}/`,
+        dataset: parts[2],
         resource: null,
       };
     }
@@ -61,6 +67,11 @@ class CKANApi {
         dataset: null,
         resource: preppedUri,
       };
+    }
+
+    // If we matched a protocol the assume it's an endpoint only
+    if (protocolMatch) {
+      return false;
     }
 
     // If there's no slashes then maybe it's a dataset ID?
@@ -195,7 +206,7 @@ class CKANApi {
   }
 
   /**
-   * Validate a give CKAN endpoint by calling the most simple action available
+   * Validate a given CKAN endpoint by calling the most simple action available
    *
    * The returned promise resolves to a simple boolean, true if the given endpoint is valid.
    *

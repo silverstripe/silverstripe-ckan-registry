@@ -83,10 +83,53 @@ class ResourceLocatorField extends FormField
         return $schemaData;
     }
 
+    public function setValue($value, $data = null)
+    {
+        // $value should be the child DataObject but if it isn't we can use `getSaveTarget`
+        if (!$value instanceof DataObjectInterface) {
+            $value = $this->getSaveTarget($data);
+
+            // If it's still not valid we'll just run with an empty value (assume the relation isn't created)
+            if (!$value instanceof DataObjectInterface) {
+                $this->value = null;
+                return $this;
+            }
+        }
+
+        $endpoint = $value->{$this->getEndpointFieldName()};
+        $dataset = $value->{$this->getDatasetFieldName()};
+        $resource = $value->{$this->getResourceFieldName()};
+
+        // Validate we have a dataset
+        if (!$dataset) {
+            $this->value = null;
+            return $this;
+        }
+
+        // Validate we have an endpoint (or a default to fall back upon)
+        if (!$endpoint) {
+            $endpoint = $this->getDefaultEndpoint();
+            if (!$endpoint) {
+                $this->value = null;
+                return $this;
+            }
+        }
+
+        $this->value = compact('endpoint', 'dataset', 'resource');
+    }
+
     public function setSubmittedValue($value, $data = null)
     {
         return $this->setValue(json_decode($value, true));
     }
+
+    public function dataValue()
+    {
+        // Although by default this "saves into" a child object we provide a JSON encoded value in case this method is
+        // used.
+        return json_encode($this->Value());
+    }
+
 
     public function saveInto(DataObjectInterface $dataObject)
     {
@@ -121,7 +164,7 @@ class ResourceLocatorField extends FormField
     {
         $target = $dataObject->{$this->name};
 
-        $this->extend('updateSaveTarget', $target);
+        $this->extend('updateSaveTarget', $target, $dataObject);
 
         return $target;
     }
