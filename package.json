@@ -51,6 +51,14 @@
       "vendor/silverstripe/admin/client/src",
       "vendor/silverstripe/admin/node_modules"
     ],
+    "collectCoverageFrom": [
+      "**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/boot/**",
+      "!**/bundles/**",
+      "!**/legacy/**",
+      "!**/*-test.{js,jsx}"
+    ],
     "testMatch": [
       "**/tests/**/*-test.js?(x)"
     ],
