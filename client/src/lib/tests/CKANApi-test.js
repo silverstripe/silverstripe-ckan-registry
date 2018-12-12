@@ -93,6 +93,21 @@ describe('CKANApi', () => {
         });
     });
 
+    it('supports endpoints that might not be the base URL of the site', () => {
+      expect('https://data.sa.gov.au/data/dataset/eadad203-d498-43d1-a4d5-fb3a90393a39')
+        .toParseAs({
+          endpoint: 'https://data.sa.gov.au/data/',
+          dataset: 'eadad203-d498-43d1-a4d5-fb3a90393a39',
+          resource: null,
+        });
+      expect('https://data.sa.gov.au/data/dataset/enrolments-in-each-sa-government-school-by-gender-and-year-level/resource/bc949969-54be-4389-8610-11a73a9cbda7')
+        .toParseAs({
+          endpoint: 'https://data.sa.gov.au/data/',
+          dataset: 'enrolments-in-each-sa-government-school-by-gender-and-year-level',
+          resource: 'bc949969-54be-4389-8610-11a73a9cbda7',
+        });
+    });
+
     it('can handle some weird URL combinations', () => {
       const tests = [
         {
@@ -113,7 +128,11 @@ describe('CKANApi', () => {
         },
         {
           url: 'https://catalogue.data.govt.nz/a/b/c/',
-          assertion: false
+          assertion: {
+            endpoint: 'https://catalogue.data.govt.nz/a/',
+            dataset: 'c',
+            resource: null,
+          }
         },
         {
           url: 'https://catalogue.data.govt.nz/a/b',
