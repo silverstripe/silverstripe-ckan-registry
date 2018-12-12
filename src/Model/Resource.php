@@ -27,9 +27,14 @@ class Resource extends DataObject
         'Filters' => ResourceFilter::class,
     ];
 
+    /**
+     * Whenever the CKAN resource identifier is changed we should clear any existing field and filter configurations
+     *
+     * {@inheritdoc}
+     */
     public function onAfterWrite()
     {
-        if ($this->changed('Identifier')) {
+        if ($this->isChanged('Identifier')) {
             $this->Fields()->removeAll();
             $this->Filters()->removeAll();
         }
