@@ -55,21 +55,26 @@ class ResourceFilter extends DataObject
 
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
-        $typeTitle = $fields->dataFieldByName('Type')->Title();
-        $fields->replaceField('Type', DropdownField::create(
-            'Type',
-            $typeTitle,
-            $this->config()->get('filter_types')
-        ));
-        $fields->replaceField('TypeOptions', HiddenField::create('TypeOptions'));
-        $fields->push(ListboxField::create(
-            'FilterFields',
-            'Columns to search',
-            $this->FilterFor()->Fields()->map('ID', 'ReadableName')
-        ));
-        $fields->removeByName('FilterForID');
-        return $fields;
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $typeTitle = $fields->dataFieldByName('Type')->Title();
+            $fields->replaceField('Type', DropdownField::create(
+                'Type',
+                $typeTitle,
+                $this->config()->get('filter_types')
+            ));
+
+            $fields->replaceField('TypeOptions', HiddenField::create('TypeOptions'));
+
+            $fields->push(ListboxField::create(
+                'FilterFields',
+                _t(__CLASS__ . '.ColumnsToSearch', 'Columns to search'),
+                $this->FilterFor()->Fields()->map('ID', 'ReadableName')
+            ));
+
+            $fields->removeByName('FilterForID');
+        });
+
+        return parent::getCMSFields();
     }
 
     public function forTemplate()

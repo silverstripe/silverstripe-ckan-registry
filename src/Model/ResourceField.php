@@ -52,22 +52,22 @@ class ResourceField extends DataObject
 
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $fields->removeByName('Name');
 
-        $fields->removeByName('Name');
+            $fields->removeByName('Type');
+            $fields->dataFieldByName('ReadableName')
+                ->setAttribute('placeholder', $this->Name);
 
-        $fields->removeByName('Type');
-        $fields->dataFieldByName('ReadableName')
-            ->setAttribute('placeholder', $this->Name);
+            $summary = $fields->dataFieldByName('ShowInSummaryView');
+            $detail = $fields->dataFieldByName('ShowInDetailView');
+            $duplicates = $fields->dataFieldByName('RemoveDuplicates');
 
-        $summary = $fields->dataFieldByName('ShowInSummaryView');
-        $detail = $fields->dataFieldByName('ShowInDetailView');
-        $duplicates = $fields->dataFieldByName('RemoveDuplicates');
+            $fields->removeByName(['ShowInSummaryView', 'ShowInDetailView', 'RemoveDuplicates',]);
+            $fields->insertBefore(FieldGroup::create('Visibility', [$summary, $detail, $duplicates]), 'Order');
 
-        $fields->removeByName(['ShowInSummaryView', 'ShowInDetailView', 'RemoveDuplicates',]);
-        $fields->insertBefore(FieldGroup::create('Visibility', [$summary, $detail, $duplicates]), 'Order');
-
-        $fields->removeByName('ResourceID');
-        return $fields;
+            $fields->removeByName('ResourceID');
+        });
+        return parent::getCMSFields();
     }
 }
