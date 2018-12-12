@@ -21,9 +21,14 @@ class CKANResourceLocator extends Component {
       spec: props.value || null,
       // Whether the loading indicator should show in the URL input
       validationPending: false,
+      // Force an invalid message to show on the data source URL field. This is usually updated
+      // after a timeout - a reference to this is held in the below `forceInvalidTimeout`
+      forceInvalid: false,
       // The current dataset that's found through the given URL (containing the packages that can
       // be selected)
       currentDataset: null,
+      // A reference to a `setTimeout` that will set `forceInvalid` (above) after a longer delay
+      forceInvalidTimeout: null,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -43,12 +48,12 @@ class CKANResourceLocator extends Component {
    * @returns {string|null}
    */
   getInvalidURLMessage() {
-    const { currentDataset, spec } = this.state;
+    const { currentDataset, spec, forceInvalid } = this.state;
     const message = { type: 'error' };
 
     // If there's no "spec" then there's no URL that looks valid yet
     // Or if there's a "currentDataset" then the field is valid
-    if (!spec || currentDataset) {
+    if (!forceInvalid && (!spec || currentDataset)) {
       return null;
     }
 
@@ -69,8 +74,13 @@ class CKANResourceLocator extends Component {
   handleChange(event) {
     const uri = event.target.value;
 
+    // Cancel any timeout on forcing invalid state
+    clearTimeout(this.state.forceInvalidTimeout);
+
     this.setState({
       uri,
+      forceInvalid: false,
+      forceInvalidTimeout: null,
     });
 
     // Run the debounced validation for the URL input.
@@ -121,6 +131,10 @@ class CKANResourceLocator extends Component {
     if (!spec || !spec.endpoint) {
       this.setState({
         spec: null,
+        // Show the field as invalid after an amount of time
+        forceInvalidTimeout: setTimeout(() => this.setState({
+          forceInvalid: true,
+        }), 2000)
       });
 
       return;
@@ -179,8 +193,11 @@ class CKANResourceLocator extends Component {
           newUri = CKANApi.generateURI(spec);
         }
 
-        // We strip off the resource from the URL
-        newUri = newUri.substring(0, newUri.lastIndexOf('/', newUri.lastIndexOf('/') - 1));
+        // We strip off the resource from the URL provided we have a resource and the dataset
+        // is valid
+        if (spec.resource && dataset) {
+          newUri = newUri.substring(0, newUri.lastIndexOf('/', newUri.lastIndexOf('/') - 1));
+        }
 
         this.setState({
           uri: newUri,

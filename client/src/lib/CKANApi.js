@@ -42,12 +42,21 @@ class CKANApi {
     const parts = preppedUri.split('/');
 
     // 5 parts assumes [endpoint]/dataset/[dataset_id]/resource/[resource_id]
-    if (parts.length === 5) {
+    if (parts.length >= 5) {
+      // Make sure that any parts before the last 4 are joined again by a forward slash.
+      // This supports endpoints that might not be a base URL (eg. data.org/data)
+      parts.splice(0, parts.length - 4, parts.slice(0, parts.length - 4).join('/'));
       return {
         endpoint: `${protocol}${parts[0]}/`,
         dataset: parts[2],
         resource: parts[4],
       };
+    }
+
+    // If we have 4 parts then assume the 2nd part is part of the endpoint
+    // eg. data.org/data/resource/[resource_id]
+    if (parts.length === 4) {
+      parts.splice(0, 2, parts.slice(0, 2).join('/'));
     }
 
     // 3 parts means /resource/[resource_id]
