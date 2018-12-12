@@ -5,18 +5,21 @@ namespace SilverStripe\CKANRegistry\Model;
 use InvalidArgumentException;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormField;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\ListboxField;
 use SilverStripe\Forms\TextField;
-use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\ValidationResult;
+use SilverStripe\ORM\ManyManyList;
 
 /**
  * Represents a filter for a data resource, which accepts user inputted data and generates a query string (?key=value)
  * to use in a request against a CKAN API for that particular resource in order to filter the results shown in a
  * representation of that data.
+ *
+ * @method Resource FilterFor
+ * @method ManyManyList FilterFields
  */
 class ResourceFilter extends DataObject
 {

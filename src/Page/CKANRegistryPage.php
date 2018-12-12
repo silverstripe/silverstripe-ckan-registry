@@ -13,6 +13,8 @@ use SilverStripe\Forms\TextField;
 /**
  * A CKANRegistryPage will render a chosen CKAN data set on the frontend, provide the user with configurable filters
  * and display a set of CMS configured columns.
+ *
+ * @method Resource DataResource
  */
 class CKANRegistryPage extends Page
 {

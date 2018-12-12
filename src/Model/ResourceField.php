@@ -2,15 +2,16 @@
 
 namespace SilverStripe\CKANRegistry\Model;
 
-use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldGroup;
-use SilverStripe\i18n\i18n;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBString;
 
 /**
  * Represents a generic field on a CKAN Resource, e.g. a column in a spreadsheet.
  * It is intentionally generic, as the resource may not be a tabular one, e.g. geospatal data to be rendered in a map.
+ *
+ * @method Resource Resource
  */
 class ResourceField extends DataObject
 {
