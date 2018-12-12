@@ -13,6 +13,8 @@ use SilverStripe\Forms\TextField;
 /**
  * A CKANRegistryPage will render a chosen CKAN data set on the frontend, provide the user with configurable filters
  * and display a set of CMS configured columns.
+ *
+ * @method Resource DataResource
  */
 class CKANRegistryPage extends Page
 {
@@ -36,9 +38,10 @@ class CKANRegistryPage extends Page
 
     public function getCMSFields()
     {
-        $resource = $this->DataResource();
-        $this->beforeUpdateCMSFields(function (FieldList $fields) use ($resource) {
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $resource = $this->DataResource();
             $fields->addFieldToTab('Root.Data', ResourceLocatorField::create('DataSourceURL'));
+
             if ($resource && $resource->Identifier) {
                 $columnsConfig = GridFieldConfig_RecordEditor::create();
                 $resourceFields = GridField::create('DataColumns', 'Columns', $resource->Fields(), $columnsConfig);

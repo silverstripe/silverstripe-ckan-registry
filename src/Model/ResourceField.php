@@ -2,15 +2,16 @@
 
 namespace SilverStripe\CKANRegistry\Model;
 
-use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldGroup;
-use SilverStripe\i18n\i18n;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBString;
 
 /**
  * Represents a generic field on a CKAN Resource, e.g. a column in a spreadsheet.
  * It is intentionally generic, as the resource may not be a tabular one, e.g. geospatal data to be rendered in a map.
+ *
+ * @method Resource Resource
  */
 class ResourceField extends DataObject
 {
@@ -40,33 +41,46 @@ class ResourceField extends DataObject
         'ShowInDetailView',
     ];
 
-    /**
-     * Always display the 'ReadableName' unless it's unset, then display the name that is returned by CKAN
-     * @return string|DBString
-     */
-    public function getReadableName()
-    {
-        return $this->getField('ReadableName') ?: $this->Name;
-    }
-
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
+        $this->beforeUpdateCMSFields(function (FieldList $fields) {
+            $fields->removeByName('Name');
 
-        $fields->removeByName('Name');
+            $fields->removeByName('Type');
+            $fields->dataFieldByName('ReadableName')
+                ->setAttribute('placeholder', $this->Name);
 
-        $fields->removeByName('Type');
-        $fields->dataFieldByName('ReadableName')
-            ->setAttribute('placeholder', $this->Name);
+            $summary = $fields->dataFieldByName('ShowInSummaryView');
+            $detail = $fields->dataFieldByName('ShowInDetailView');
+            $duplicates = $fields->dataFieldByName('RemoveDuplicates');
 
-        $summary = $fields->dataFieldByName('ShowInSummaryView');
-        $detail = $fields->dataFieldByName('ShowInDetailView');
-        $duplicates = $fields->dataFieldByName('RemoveDuplicates');
+            $fields->removeByName(['ShowInSummaryView', 'ShowInDetailView', 'RemoveDuplicates',]);
+            $fields->insertBefore(FieldGroup::create('Visibility', [$summary, $detail, $duplicates]), 'Order');
 
-        $fields->removeByName(['ShowInSummaryView', 'ShowInDetailView', 'RemoveDuplicates',]);
-        $fields->insertBefore(FieldGroup::create('Visibility', [$summary, $detail, $duplicates]), 'Order');
+            $fields->removeByName('ResourceID');
+        });
+        return parent::getCMSFields();
+    }
 
-        $fields->removeByName('ResourceID');
-        return $fields;
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+
+        if (empty($this->ReadableName) && !empty($this->Name)) {
+            $this->generateReadableName();
+        }
+    }
+
+    /**
+     * Generate a readable name from the Name
+     *
+     * @return $this
+     */
+    protected function generateReadableName()
+    {
+        $readableName = str_replace(['_', '-'], ' ', $this->Name);
+        $readableName = ucfirst(strtolower($readableName));
+        $this->ReadableName = $readableName;
+        return $this;
     }
 }
