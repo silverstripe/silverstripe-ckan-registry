@@ -77,11 +77,16 @@ class ResourceFilter extends DataObject
         return parent::getCMSFields();
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @throws InvalidArgumentException If the provided Type is not an instance of FormField
+     */
     public function forTemplate()
     {
         $options = json_decode($this->TypeOptions, true);
         $field = Injector::inst()->createWithArgs($this->Type, $options);
-        if ($field instanceof FormField) {
+        if (!$field instanceof FormField) {
             throw new InvalidArgumentException("$this->Type is not a FormField");
         }
         return $field;
