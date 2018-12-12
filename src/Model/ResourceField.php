@@ -41,15 +41,6 @@ class ResourceField extends DataObject
         'ShowInDetailView',
     ];
 
-    /**
-     * Always display the 'ReadableName' unless it's unset, then display the name that is returned by CKAN
-     * @return string|DBString
-     */
-    public function getReadableName()
-    {
-        return $this->getField('ReadableName') ?: $this->Name;
-    }
-
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
@@ -69,5 +60,27 @@ class ResourceField extends DataObject
             $fields->removeByName('ResourceID');
         });
         return parent::getCMSFields();
+    }
+
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+
+        if (empty($this->ReadableName) && !empty($this->Name)) {
+            $this->generateReadableName();
+        }
+    }
+
+    /**
+     * Generate a readable name from the Name
+     *
+     * @return $this
+     */
+    protected function generateReadableName()
+    {
+        $readableName = str_replace(['_', '-'], ' ', $this->Name);
+        $readableName = ucfirst(strtolower($readableName));
+        $this->ReadableName = $readableName;
+        return $this;
     }
 }
