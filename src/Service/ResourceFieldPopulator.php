@@ -96,7 +96,7 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
     /**
      * Parse given column ID for a more readable version
      *
-     * @param $id
+     * @param string $id
      * @return string
      */
     protected function parseName($id)

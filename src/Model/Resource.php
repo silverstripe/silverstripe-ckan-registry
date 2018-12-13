@@ -2,7 +2,8 @@
 
 namespace SilverStripe\CKANRegistry\Model;
 
-use SilverStripe\CKANRegistry\Service\ResourceFieldPopulator;
+use SilverStripe\CKANRegistry\Service\ResourceFieldPopulatorInterface;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 
@@ -41,7 +42,7 @@ class Resource extends DataObject
     {
         if ($this->isChanged('Identifier')) {
             $this->Fields()->removeAll();
-            ResourceFieldPopulator::singleton()->populateFields($this);
+            Injector::inst()->get(ResourceFieldPopulatorInterface::class)->populateFields($this);
             $this->Filters()->removeAll();
         }
     }
