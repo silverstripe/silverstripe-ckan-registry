@@ -41,7 +41,7 @@ class ResourceFieldPopulatorTest extends SapphireTest
                 'type' => 'text',
             ],
             [
-                'id' => 'field_bar-captain',
+                'id' => 'field_bar-^captain',
                 'type' => 'select',
             ]
         ]);
