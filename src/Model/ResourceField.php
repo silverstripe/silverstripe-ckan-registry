@@ -12,6 +12,15 @@ use SilverStripe\ORM\FieldType\DBString;
  * It is intentionally generic, as the resource may not be a tabular one, e.g. geospatal data to be rendered in a map.
  *
  * @method Resource Resource
+ * @method static ResourceField create()
+ * @property string Name
+ * @property string Type
+ * @property string ReadableName
+ * @property bool ShowInSummaryView
+ * @property bool ShowInDetailView
+ * @property bool RemoveDuplicates
+ * @property int Order
+ * @property string DisplayConditions
  */
 class ResourceField extends DataObject
 {

@@ -40,7 +40,7 @@ class CKANRegistryPage extends Page
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $resource = $this->DataResource();
-            $fields->addFieldToTab('Root.Data', ResourceLocatorField::create('DataSourceURL'));
+            $fields->addFieldToTab('Root.Data', ResourceLocatorField::create('DataResource'));
 
             if ($resource && $resource->Identifier) {
                 $columnsConfig = GridFieldConfig_RecordEditor::create();

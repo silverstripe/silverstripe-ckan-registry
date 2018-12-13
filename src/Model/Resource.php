@@ -2,12 +2,17 @@
 
 namespace SilverStripe\CKANRegistry\Model;
 
+use SilverStripe\CKANRegistry\Service\ResourceFieldPopulator;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 
 /**
  * A CKAN Resource that belongs to a DataSet/Package, as to be accessed via the CKAN API.
  *
+ * @property string Name
+ * @property string Endpoint
+ * @property string DataSet
+ * @property string Identifier
  * @method HasManyList Fields
  * @method HasManyList Filters
  */
@@ -36,6 +41,7 @@ class Resource extends DataObject
     {
         if ($this->isChanged('Identifier')) {
             $this->Fields()->removeAll();
+            ResourceFieldPopulator::create()->populateFields($this);
             $this->Filters()->removeAll();
         }
     }

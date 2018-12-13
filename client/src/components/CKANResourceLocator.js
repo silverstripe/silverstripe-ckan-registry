@@ -39,6 +39,14 @@ class CKANResourceLocator extends Component {
     this.delayedValidateInput = debounce(this.validateInput.bind(this), 500);
   }
 
+  componentDidMount() {
+    const { uri } = this.state;
+
+    if (uri.length) {
+      this.validateInput();
+    }
+  }
+
   /**
    * Indicates the URL inpit field is invalid and provides a localised message indicating the issue
    * Currently this shows a single message in cases where the field is invalid but it could be
