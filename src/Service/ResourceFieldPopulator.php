@@ -107,6 +107,9 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
         // Swap out certain characters with spaces
         $name = str_replace(['_', '-'], ' ', $name);
 
+        // Remove non-alphanumeric characters
+        $name = trim(preg_replace('/[^\w\s]/', '', $name));
+
         return ucfirst($name);
     }
 
