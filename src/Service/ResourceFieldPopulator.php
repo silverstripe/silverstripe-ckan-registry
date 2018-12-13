@@ -36,6 +36,7 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
 
         $newFields = [];
         $fields = $resource->Fields();
+        $order = 1;
 
         foreach ($fieldSpecs as $fieldSpec) {
             $id = $fieldSpec['id'];
@@ -48,6 +49,7 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
             // Create a new field
             $newFields[] = $field = ResourceField::create();
             $field->Name = $id;
+            $field->Order = $order++;
             // Attempt to parse a readable name
             $field->ReadableName = $this->parseName($id);
             $field->Type = $fieldSpec['type'];

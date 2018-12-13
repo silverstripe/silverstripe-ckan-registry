@@ -52,6 +52,8 @@ class ResourceFieldPopulatorTest extends SapphireTest
 
         // Test that the readable names were generated correctly
         $this->assertSame('Field a', $resource->Fields()->first()->ReadableName);
+        $this->assertEquals(1, $resource->Fields()->first()->Order);
         $this->assertSame('Field bar captain', $resource->Fields()->last()->ReadableName);
+        $this->assertEquals(2, $resource->Fields()->last()->Order);
     }
 }
