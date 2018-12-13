@@ -1,1 +1,7 @@
-{}
+{
+  "CKANResourceLocator.DATA_SOURCE_URL": "Data source URL",
+  "CKANResourceLocator.INVALID_DATASET_URL": "The provided data source URL does not appear to be a valid CKAN data set."
+  "CKANResourceLocator.INVALID_RESOURCE_SELECTION": "Datastore is not available for the selected resource.",
+  "CKANResultConditions.MUST_MATCH": "Must match",
+  "CKANResultConditions.MUST_NOT_MATCH": "Must not match"
+}

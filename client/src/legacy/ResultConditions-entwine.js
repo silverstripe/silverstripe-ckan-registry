@@ -4,24 +4,26 @@ import ReactDOM from 'react-dom';
 import { loadComponent } from 'lib/Injector';
 
 jQuery.entwine('ss', ($) => {
-  $('.js-injector-boot .ckan-resource-locator__container').entwine({
+  $('.js-injector-boot .ckan-result-conditions__container').entwine({
     onmatch() {
       const context = {};
-      const CKANResourceLocator = loadComponent('CKANResourceLocator', context);
-      const schemaData = this.data('schema');
+      const ResultConditions = loadComponent('ResultConditions', context);
 
       const value = this.children('input:first').val();
       const props = {
         name: this.attr('name'),
-        defaultEndpoint: schemaData.defaultEndpoint || null,
-        description: schemaData.description.html || '',
         value: value ? JSON.parse(value) : undefined,
+        ...this.data('schema'),
       };
 
       ReactDOM.render(
-        <CKANResourceLocator {...props} />,
+        <ResultConditions {...props} />,
         this[0]
       );
-    }
+    },
+
+    onunmatch() {
+      ReactDOM.unmountComponentAtNode(this[0]);
+    },
   });
 });
