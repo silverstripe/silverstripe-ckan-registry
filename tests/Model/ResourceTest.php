@@ -3,11 +3,21 @@
 namespace SilverStripe\CKANRegistry\Tests\Model;
 
 use SilverStripe\CKANRegistry\Model\Resource;
+use SilverStripe\CKANRegistry\Service\ResourceFieldPopulator;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 
 class ResourceTest extends SapphireTest
 {
     protected static $fixture_file = 'ResourceTest.yml';
+
+    protected function setUp()
+    {
+        $populator = $this->createMock(ResourceFieldPopulator::class);
+        Injector::inst()->registerService($populator, ResourceFieldPopulator::class);
+
+        parent::setUp();
+    }
 
     public function testFieldsAndFiltersAreRemovedAfterChangingIdentifier()
     {

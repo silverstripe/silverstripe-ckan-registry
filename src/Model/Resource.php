@@ -41,7 +41,7 @@ class Resource extends DataObject
     {
         if ($this->isChanged('Identifier')) {
             $this->Fields()->removeAll();
-            ResourceFieldPopulator::create()->populateFields($this);
+            ResourceFieldPopulator::singleton()->populateFields($this);
             $this->Filters()->removeAll();
         }
     }
