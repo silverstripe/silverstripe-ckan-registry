@@ -5,13 +5,21 @@ namespace SilverStripe\CKANRegistry\Model;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\FieldType\DBString;
 
 /**
  * Represents a generic field on a CKAN Resource, e.g. a column in a spreadsheet.
  * It is intentionally generic, as the resource may not be a tabular one, e.g. geospatal data to be rendered in a map.
  *
  * @method Resource Resource
+ * @method static ResourceField create()
+ * @property string Name
+ * @property string Type
+ * @property string ReadableName
+ * @property bool ShowInSummaryView
+ * @property bool ShowInDetailView
+ * @property bool RemoveDuplicates
+ * @property int Order
+ * @property string DisplayConditions
  */
 class ResourceField extends DataObject
 {
@@ -60,27 +68,5 @@ class ResourceField extends DataObject
             $fields->removeByName('ResourceID');
         });
         return parent::getCMSFields();
-    }
-
-    public function onBeforeWrite()
-    {
-        parent::onBeforeWrite();
-
-        if (empty($this->ReadableName) && !empty($this->Name)) {
-            $this->generateReadableName();
-        }
-    }
-
-    /**
-     * Generate a readable name from the Name
-     *
-     * @return $this
-     */
-    protected function generateReadableName()
-    {
-        $readableName = str_replace(['_', '-'], ' ', $this->Name);
-        $readableName = ucfirst(strtolower($readableName));
-        $this->ReadableName = $readableName;
-        return $this;
     }
 }

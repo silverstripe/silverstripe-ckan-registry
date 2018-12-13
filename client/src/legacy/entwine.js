@@ -10,7 +10,7 @@ jQuery.entwine('ss', ($) => {
       const CKANResourceLocator = loadComponent('CKANResourceLocator', context);
       const schemaData = this.data('schema');
 
-      const value = this.val();
+      const value = this.children('input:first').val();
       const props = {
         name: this.attr('name'),
         defaultEndpoint: schemaData.defaultEndpoint || null,

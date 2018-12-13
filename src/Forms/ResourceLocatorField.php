@@ -50,7 +50,7 @@ class ResourceLocatorField extends FormField
      *
      * @var string
      */
-    protected $resourceFieldName = 'Resource';
+    protected $resourceFieldName = 'Identifier';
 
     /**
      * @param string $name
@@ -85,15 +85,16 @@ class ResourceLocatorField extends FormField
 
     public function setValue($value, $data = null)
     {
-        // $value should be the child DataObject but if it isn't we can use `getSaveTarget`
-        if (!$value instanceof DataObjectInterface) {
-            $value = $this->getSaveTarget($data);
+        // Handle the case where this is being set as a legitimate "spec" containing endpoint, dataset and resource
+        if (is_array($value)) {
+            $this->value = $value;
+            return $this;
+        }
 
-            // If it's still not valid we'll just run with an empty value (assume the relation isn't created)
-            if (!$value instanceof DataObjectInterface) {
-                $this->value = null;
-                return $this;
-            }
+        // If it's still not valid we'll just run with an empty value (assume the relation isn't created)
+        if (!$value instanceof DataObjectInterface) {
+            $this->value = null;
+            return $this;
         }
 
         $endpoint = $value->{$this->getEndpointFieldName()};
@@ -116,6 +117,7 @@ class ResourceLocatorField extends FormField
         }
 
         $this->value = compact('endpoint', 'dataset', 'resource');
+        return $this;
     }
 
     public function setSubmittedValue($value, $data = null)
@@ -139,34 +141,23 @@ class ResourceLocatorField extends FormField
         }
 
         // Find what we're actually saving into
-        $child = $this->getSaveTarget($dataObject);
+        $resource = $dataObject->{$this->name};
 
-        if (!$child || !$child instanceof DataObjectInterface) {
+        if (!$resource || !$resource instanceof DataObjectInterface) {
             throw new InvalidArgumentException('Could not determine where to save the value of ' . __CLASS__);
         }
 
         // Pull the value that'll be null or an associative array of our specification
         $value = $this->Value();
-        $child->setCastedField($this->getEndpointFieldName(), $value ? $value['endpoint'] : null);
-        $child->setCastedField($this->getDatasetFieldName(), $value ? $value['dataset'] : null);
-        $child->setCastedField($this->getResourceFieldName(), $value ? $value['resource'] : null);
-    }
+        $resource->setCastedField($this->getEndpointFieldName(), $value ? $value['endpoint'] : null);
+        $resource->setCastedField($this->getDatasetFieldName(), $value ? $value['dataset'] : null);
+        $resource->setCastedField($this->getResourceFieldName(), $value ? $value['resource'] : null);
 
-    /**
-     * Provide the object that this field actually saves into.
-     * By default this is a relation access with __get. Eg. given $dataObject is a page; $page->CKANResource where
-     * "CKANResource" is the name of this field.
-     *
-     * @param DataObjectInterface $dataObject
-     * @return mixed
-     */
-    public function getSaveTarget(DataObjectInterface $dataObject)
-    {
-        $target = $dataObject->{$this->name};
+        // Now set the updated resource back on the parent
+        $dataObject->setCastedField($this->name, $resource);
 
-        $this->extend('updateSaveTarget', $target, $dataObject);
-
-        return $target;
+        // Ensure changes are persisted as this is not saved on page save if the ID of the resource did not change.
+        $resource->write();
     }
 
     /**
