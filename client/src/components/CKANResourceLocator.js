@@ -16,7 +16,7 @@ class CKANResourceLocator extends Component {
 
     this.state = {
       // Current value of the URL field
-      uri: CKANApi.generateURI(props.value) || '',
+      uri: CKANApi.generateURI(props.value || {}) || '',
       // Current parsed CKAN resource specification and the value of this whole field
       spec: props.value || null,
       // Whether the loading indicator should show in the URL input
