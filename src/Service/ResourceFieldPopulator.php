@@ -12,7 +12,7 @@ use SilverStripe\Core\Injector\Injectable;
 /**
  * This service will take a CKAN Resource and populate its Fields `has_many` relationship from the CKAN API
  */
-class ResourceFieldPopulator
+class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
 {
     use Extensible;
     use Injectable;
@@ -26,13 +26,6 @@ class ResourceFieldPopulator
      */
     protected $guzzleClient;
 
-    /**
-     * Populate fields from the CKAN API endpoint specified on this given resource.
-     * Throws an exception when the CKAN API is unreachable or responds with an error or if the resource is not properly
-     *
-     * @param Resource $resource
-     * @throws \GuzzleHttp\Exception\GuzzleException|RuntimeException
-     */
     public function populateFields(Resource $resource)
     {
         if (!$resource->Endpoint && !$resource->Identifier) {
@@ -68,7 +61,7 @@ class ResourceFieldPopulator
      * Perform a request to the CKAN endpoint provided by the given resource to fetch field definitons
      *
      * @param Resource $resource
-     * @return mixed
+     * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException|RuntimeException
      */
     protected function doFieldRequest(Resource $resource)
