@@ -9,7 +9,14 @@ jQuery.entwine('ss', ($) => {
       const context = {};
       const ResultConditions = loadComponent('ResultConditions', context);
 
-      const value = this.children('input:first').val();
+      const temporaryInput = this.children('input:first');
+
+      if (!temporaryInput.length) {
+        // Work around for a bug where onmatch is called on the existing field
+        return;
+      }
+
+      const value = temporaryInput.val();
       const props = {
         name: this.attr('name'),
         value: value ? JSON.parse(value) : undefined,

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { inject } from 'lib/Injector';
 import { Row, Col } from 'reactstrap';
 import fieldHolder from 'components/FieldHolder/FieldHolder';
-import i18n from 'i18n';
 
 /**
  * Result conditions allow a CMS user to set one condition for displaying the column if the contents
@@ -83,7 +82,7 @@ class ResultConditions extends Component {
    * @returns {SelectComponent}
    */
   renderSelect() {
-    const { SelectComponent } = this.props;
+    const { SelectComponent, data: { source } } = this.props;
 
     return (
       <SelectComponent
@@ -92,18 +91,7 @@ class ResultConditions extends Component {
           'ckan-result-conditions__match-select',
         ]}
         name={this.getFieldName('match-select')}
-        source={[
-          {
-            value: 1,
-            title: i18n._t('CKANResultConditions.MUST_MATCH', 'Must match'),
-            disabled: false,
-          },
-          {
-            value: 0,
-            title: i18n._t('CKANResultConditions.MUST_NOT_MATCH', 'Must not match'),
-            disabled: false,
-          }
-        ]}
+        source={source}
         value={this.getSelectValue()}
         onChange={this.handleChange}
       />

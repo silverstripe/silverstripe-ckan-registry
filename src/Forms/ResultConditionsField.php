@@ -40,6 +40,26 @@ class ResultConditionsField extends TextField
         return 'ckan-result-conditions';
     }
 
+    public function getSchemaDataDefaults()
+    {
+        $data = parent::getSchemaDataDefaults();
+        $data['data']['source'] = static::getMatchOptions();
+        return $data;
+    }
+
+    /**
+     * Get a list of options for filtering with a human readable (translated) label
+     *
+     * @return array
+     */
+    public static function getMatchOptions()
+    {
+        return [
+            ['value' => self::MATCH_TYPE_MUST, 'title' => _t(__CLASS__ . '.MUST_MATCH', 'Must match')],
+            ['value' => self::MATCH_TYPE_MUST_NOT, 'title' => _t(__CLASS__ . '.MUST_NOT_MATCH', 'Must not match')],
+        ];
+    }
+
     /**
      * Return the match condition
      *
