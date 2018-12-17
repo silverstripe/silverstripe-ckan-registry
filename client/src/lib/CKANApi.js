@@ -14,11 +14,7 @@ class CKANApi {
    *                       Returns false if the given URI does not appear to be valid
    */
   static parseURI(uri) {
-    if (typeof uri !== 'string') {
-      throw new Error('URI provided must be of type string');
-    }
-
-    if (!uri.length) {
+    if (typeof uri !== 'string' || !uri.length) {
       return false;
     }
 
@@ -84,7 +80,7 @@ class CKANApi {
     }
 
     // If there's no slashes then maybe it's a dataset ID?
-    if (!preppedUri.includes('/')) {
+    if (preppedUri.match(/^[\d\w-]+$/i)) {
       return {
         endpoint: null,
         dataset: preppedUri,
@@ -189,7 +185,7 @@ class CKANApi {
       }
 
       return json.result;
-    }));
+    }), () => Promise.resolve(false));
   }
 
   /**
