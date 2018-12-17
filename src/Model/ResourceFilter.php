@@ -4,10 +4,8 @@ namespace SilverStripe\CKANRegistry\Model;
 
 use InvalidArgumentException;
 use SilverStripe\Core\Injector\Injector;
-use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\ListboxField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataObject;
@@ -23,26 +21,11 @@ use SilverStripe\ORM\ManyManyList;
  */
 class ResourceFilter extends DataObject
 {
-    /**
-     * Types of FormFields that a filter could display as on the user facing side. Generally a list of
-     * {@see SilverStripe\Forms\FormField} mapped to human readable identifiers such as would be passed to a
-     * {@see DropDownField} as the source constructor parameter
-     *
-     * @config
-     * @var array
-     */
-    private static $filter_types = [
-        TextField::class => 'Text',
-        DropdownField::class => 'Select one from list',
-    ];
-
-    private static $table_name = 'CKANFilter';
+    private static $table_name = 'CKANFilter_Text';
 
     private static $db = [
         'Name' => 'Varchar',
-        'Type' => 'Varchar',
         'AllFields' => 'Boolean',
-        'TypeOptions' => 'Text',
     ];
 
     private static $has_one = [
@@ -53,18 +36,24 @@ class ResourceFilter extends DataObject
         'FilterFields' => ResourceField::class,
     ];
 
+    private static $summary_fields = [
+        'Name',
+        'Type',
+    ];
+
+    private static $singular_name = 'Text Filter';
+
+    /**
+     * Defines the type of {@link FormField} that will be used to render the filter in the CMS. This is defined
+     * in subclasses. Filters will render as TextFields by default.
+     *
+     * @var FormField
+     */
+    protected $fieldType = TextField::class;
+
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
-            $typeTitle = $fields->dataFieldByName('Type')->Title();
-            $fields->replaceField('Type', DropdownField::create(
-                'Type',
-                $typeTitle,
-                $this->config()->get('filter_types')
-            ));
-
-            $fields->replaceField('TypeOptions', HiddenField::create('TypeOptions'));
-
             $fields->push(ListboxField::create(
                 'FilterFields',
                 _t(__CLASS__ . '.ColumnsToSearch', 'Columns to search'),
@@ -84,11 +73,20 @@ class ResourceFilter extends DataObject
      */
     public function forTemplate()
     {
-        $options = json_decode($this->TypeOptions, true);
-        $field = Injector::inst()->createWithArgs($this->Type, $options);
+        $field = Injector::inst()->createWithArgs($this->fieldType, [$this->Name]);
         if (!$field instanceof FormField) {
-            throw new InvalidArgumentException("$this->Type is not a FormField");
+            throw new InvalidArgumentException("$this->fieldType is not a FormField");
         }
         return $field;
+    }
+
+    /**
+     * Returns the type of the filter, used for summary fields
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->singular_name();
     }
 }

@@ -4,20 +4,33 @@ namespace SilverStripe\CKANRegistry\Tests\Model;
 
 use InvalidArgumentException;
 use SilverStripe\CKANRegistry\Model\ResourceFilter;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Dev\SapphireTest;
 
 class ResourceFilterTest extends SapphireTest
 {
+    protected $usesDatabase = true;
+
     /**
      * @expectedException InvalidArgumentException
      * @expectedExceptionMessage SilverStripe\Control\HTTPResponse is not a FormField
      */
     public function testForTemplateThrowsExceptionWithNonFormFieldType()
     {
-        $filter = new ResourceFilter();
-        $filter->TypeOptions = '{}';
-        $filter->Type = 'SilverStripe\\Control\\HTTPResponse';
+        $filter = new ResourceFilterTest\InvalidResourceFilter();
         $filter->forTemplate();
+    }
+
+    public function testGetType()
+    {
+        $filter = new ResourceFilter();
+        $this->assertSame('Text Filter', $filter->getType());
+    }
+
+    public function testGetCMSFields()
+    {
+        $filter = new ResourceFilter();
+        $fields = $filter->getCMSFields();
+
+        $this->assertNull($fields->dataFieldByName('FilterForID'), 'FilterForID should be removed');
     }
 }

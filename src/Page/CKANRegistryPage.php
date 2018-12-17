@@ -5,10 +5,14 @@ namespace SilverStripe\CKANRegistry\Page;
 use Page;
 use SilverStripe\CKANRegistry\Forms\ResourceLocatorField;
 use SilverStripe\CKANRegistry\Model\Resource;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\TextField;
+use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
 
 /**
  * A CKANRegistryPage will render a chosen CKAN data set on the frontend, provide the user with configurable filters
@@ -48,6 +52,11 @@ class CKANRegistryPage extends Page
                 $fields->addFieldToTab('Root.Data', $resourceFields);
 
                 $filtersConfig = GridFieldConfig_RecordEditor::create();
+                $filtersConfig->removeComponentsByType([
+                    GridFieldAddExistingAutocompleter::class,
+                    GridFieldAddNewButton::class
+                ])
+                    ->addComponent(Injector::inst()->create(GridFieldAddNewMultiClass::class));
                 $resourceFilters = GridField::create('DataFilters', 'Filters', $resource->Filters(), $filtersConfig);
                 $fields->addFieldToTab('Root.Filters', $resourceFilters);
             }
