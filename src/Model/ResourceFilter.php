@@ -21,7 +21,7 @@ use SilverStripe\ORM\ManyManyList;
  */
 class ResourceFilter extends DataObject
 {
-    private static $table_name = 'CKANFilter';
+    private static $table_name = 'CKANFilter_Text';
 
     private static $db = [
         'Name' => 'Varchar',
@@ -38,6 +38,12 @@ class ResourceFilter extends DataObject
 
     private static $singular_name = 'Text Filter';
 
+    /**
+     * Defines the type of {@link FormField} that will be used to render the filter in the CMS. This is defined
+     * in subclasses. Filters will render as TextFields by default.
+     *
+     * @var FormField
+     */
     protected $fieldType = TextField::class;
 
     public function getCMSFields()
@@ -62,7 +68,7 @@ class ResourceFilter extends DataObject
      */
     public function forTemplate()
     {
-        $field = Injector::inst()->createWithArgs($this->fieldType);
+        $field = Injector::inst()->createWithArgs($this->fieldType, []);
         if ($field instanceof FormField) {
             throw new InvalidArgumentException("$this->fieldType is not a FormField");
         }

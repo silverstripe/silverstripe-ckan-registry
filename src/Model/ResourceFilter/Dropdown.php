@@ -1,16 +1,22 @@
 <?php
 
-namespace SilverStripe\CKANRegistry\Model;
+namespace SilverStripe\CKANRegistry\Model\ResourceFilter;
 
+use SilverStripe\CKANRegistry\Model\ResourceFilter;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
 
-class ResourceDropdownFilter extends ResourceFilter
+/**
+ * Provides a single select option for CKAN resources to be filtered by
+ */
+class Dropdown extends ResourceFilter
 {
     private static $db = [
-        'Options' => 'Varchar'
+        'Options' => 'Varchar',
     ];
+
+    private static $table_name = 'CKANFilter_Dropdown';
 
     private static $singular_name = 'Dropdown Filter';
 
