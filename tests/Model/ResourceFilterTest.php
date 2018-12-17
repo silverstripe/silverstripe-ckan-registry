@@ -3,8 +3,6 @@
 namespace SilverStripe\CKANRegistry\Tests\Model;
 
 use InvalidArgumentException;
-use SilverStripe\CKANRegistry\Model\ResourceFilter;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Dev\SapphireTest;
 
 class ResourceFilterTest extends SapphireTest
@@ -15,9 +13,7 @@ class ResourceFilterTest extends SapphireTest
      */
     public function testForTemplateThrowsExceptionWithNonFormFieldType()
     {
-        $filter = new ResourceFilter();
-        $filter->TypeOptions = '{}';
-        $filter->Type = 'SilverStripe\\Control\\HTTPResponse';
+        $filter = new ResourceFilterTest\InvalidResourceFilter();
         $filter->forTemplate();
     }
 }

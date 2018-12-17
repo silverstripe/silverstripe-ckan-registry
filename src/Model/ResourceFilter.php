@@ -68,8 +68,8 @@ class ResourceFilter extends DataObject
      */
     public function forTemplate()
     {
-        $field = Injector::inst()->createWithArgs($this->fieldType, []);
-        if ($field instanceof FormField) {
+        $field = Injector::inst()->createWithArgs($this->fieldType, [$this->Name]);
+        if (!$field instanceof FormField) {
             throw new InvalidArgumentException("$this->fieldType is not a FormField");
         }
         return $field;
