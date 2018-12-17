@@ -146,49 +146,27 @@ class CKANApi {
    * @returns {Promise}
    */
   static loadDataset(endpoint, dataset) {
-    // Define a function to handle the response from the API (for re-use)
-    const handleResponse = json => {
-      // Vet out the response being invalid or empty
-      if (!json.success || !json.result.count) {
-        return false;
-      }
-
-      // Pull the first result
-      const result = json.result.results[0];
-
-      // Ensure the name or ID matches as we're looking for an exact
-      if (result.name !== dataset && result.id !== dataset) {
-        return false;
-      }
-
-      // Return the dataset
-      return result;
-    };
-
-    // TODO Replace with package_show once data.govt.nz fixes their bug
-    // package_show makes sense here but it doesn't actually work with data.govt.nz because of CORS
-
-    // We look for a dataset (package) matching first the name, and then the ID if nothing is found
-    return this.makeRequest(endpoint, 'package_search', {
-      fq: `name:${dataset}`,
+    // We look for a dataset (package) using the "package_show" endpoint. This supports the ID or
+    // the name/slug of the dataset as the "id" parameter
+    return this.makeRequest(endpoint, 'package_show', {
+      id: dataset,
     }).then(
-      // isomorphic-fetch returns a promise when the headers a loaded and provides the content as
-      // another promise
-      response => response.json().then(handleResponse),
-      () => Promise.resolve(false)
-    ).then(
-      response => {
-        if (response) {
-          return response;
+      response => response.json().then(json => {
+        // Vet out the response being invalid or empty
+        if (!json.success || !json.result) {
+          return false;
         }
 
-        return this.makeRequest(endpoint, 'package_search', {
-          fq: `id:${dataset}`,
-        }).then(
-          secondaryResponse => secondaryResponse.json().then(handleResponse),
-          () => Promise.resolve(false)
-        );
-      }
+        // Ensure the name or ID matches as we're looking for an exact
+        const { result } = json;
+        if (result.name !== dataset && result.id !== dataset) {
+          return false;
+        }
+
+        // Return the dataset
+        return result;
+      }),
+      () => Promise.resolve(false)
     );
   }
 
