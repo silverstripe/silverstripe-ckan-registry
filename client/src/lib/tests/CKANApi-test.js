@@ -1,5 +1,8 @@
 /* global jest, describe, it, expect */
 
+jest.mock('isomorphic-fetch');
+
+import fetch from 'isomorphic-fetch';
 import CKANApi from 'lib/CKANApi';
 import chalk from 'chalk';
 
@@ -34,6 +37,10 @@ expect.extend({
 
 describe('CKANApi', () => {
   describe('parseURI', () => {
+    it('should return false when parameters are not the correct type', () => {
+      expect(null).toParseAs(false);
+    });
+
     it('should return a full spec for a full URI', () => {
       expect('https://catalogue.data.govt.nz/dataset/benefit-fact-sheets-june-2018/resource/34a3653b-64cb-4997-8714-dd5149eda5af')
         .toParseAs({
@@ -154,6 +161,18 @@ describe('CKANApi', () => {
           url: 'https://catalogue.data.govt.nz/a',
           assertion: false
         },
+        {
+          url: 'https://catalogue.data.govt.nz/',
+          assertion: false
+        },
+        {
+          url: 'catalogue.data.govt.nz/',
+          assertion: false
+        },
+        {
+          url: 'something/weird',
+          assertion: false
+        },
       ];
 
       tests.forEach(spec => {
@@ -178,6 +197,152 @@ describe('CKANApi', () => {
         .toBe('https://google.com/dataset/x/resource/y');
       expect(CKANApi.generateURI({ endpoint: 'https://google.com', dataset: 'x', resource: null }))
         .toBe('https://google.com/dataset/x');
+      expect(CKANApi.generateURI({ endpoint: 'https://google.com/', dataset: 'x', resource: null }))
+        .toBe('https://google.com/dataset/x');
     });
-});
+  });
+
+  describe('loadDataset', () => {
+    it('should handle rejected fetch promises', (done) => {
+      fetch.mockImplementation(() => Promise.reject('It broke'));
+
+      CKANApi.loadDataset('', '').then(response => {
+        expect(response).toBe(false);
+        done();
+      });
+    });
+
+    it('should handle invalid responses', (done) => {
+      fetch.mockImplementation(() => Promise.resolve({
+        ok: false,
+        json: () => Promise.resolve(false),
+      }));
+
+      CKANApi.loadDataset('', '').then(response => {
+        expect(response).toBe(false);
+        done();
+      });
+    });
+
+    it('should parse a CKAN response and return the "result"', (done) => {
+      fetch.mockImplementation(() => Promise.resolve({
+        json: () => Promise.resolve({
+          success: true,
+          result: {
+            name: 'my-dataset',
+            thing: 'this is the result'
+          },
+        }),
+      }));
+
+      CKANApi.loadDataset('', 'my-dataset').then(response => {
+        expect(response).toMatchObject({
+          thing: 'this is the result',
+        });
+        done();
+      });
+
+      fetch.mockImplementation(() => Promise.resolve({
+        json: () => Promise.resolve({
+          success: true,
+          result: {
+            id: 'c69a2d0b-5156-4285-9255-958262a945fd',
+            thing: 'this is the result'
+          },
+        }),
+      }));
+
+      CKANApi.loadDataset('', 'c69a2d0b-5156-4285-9255-958262a945fd').then(response => {
+        expect(response).toMatchObject({
+          thing: 'this is the result',
+        });
+        done();
+      });
+    });
+
+    it('should return false if the given package doesn\'t appear to match', (done) => {
+      fetch.mockImplementation(() => Promise.resolve({
+        json: () => Promise.resolve({
+          success: true,
+          result: {
+            id: 'c69a2d0b-5156-4285-9255-958262a945fd',
+            name: 'some-strangely-different-dataset-than-expected',
+            thing: 'this is the result'
+          },
+        }),
+      }));
+
+      CKANApi.loadDataset('', 'my-dataset').then(response => {
+        expect(response).toBe(false);
+        done();
+      });
+    });
+  });
+
+  describe('loadResource', () => {
+    it('should handle rejected fetch promises', (done) => {
+      fetch.mockImplementation(() => Promise.reject('It broke'));
+
+      CKANApi.loadResource('', '').then(response => {
+        expect(response).toBe(false);
+        done();
+      });
+    });
+
+    it('should handle invalid responses', (done) => {
+      fetch.mockImplementation(() => Promise.resolve({
+        ok: false,
+        json: () => Promise.resolve(false),
+      }));
+
+      CKANApi.loadResource('', '4eedab7c-6a1c-42bf-875c-2bcc92535e60').then(response => {
+        expect(response).toBe(false);
+        done();
+      });
+    });
+    it('should parse a CKAN response and return the "result"', (done) => {
+      fetch.mockImplementation(() => Promise.resolve({
+        json: () => Promise.resolve({
+          success: true,
+          result: 'thing',
+        }),
+      }));
+
+      CKANApi.loadResource('', '4eedab7c-6a1c-42bf-875c-2bcc92535e60').then(response => {
+        expect(response).toBe('thing');
+        done();
+      });
+    });
+  });
+
+  describe('validateEndpoint', () => {
+    it('should handle rejected fetch promises', (done) => {
+      fetch.mockImplementation(() => Promise.reject('It broke'));
+
+      CKANApi.validateEndpoint('').then(response => {
+        expect(response).toBe(false);
+        done();
+      });
+    });
+
+    it('should return the result of response.ok', (done) => {
+      fetch.mockImplementation(() => Promise.resolve({
+        ok: false,
+      }));
+
+      CKANApi.validateEndpoint('').then(response => {
+        expect(response).toBe(false);
+        done();
+      });
+
+      fetch.mockImplementation(() => Promise.resolve({
+        ok: true,
+      }));
+
+      CKANApi.validateEndpoint('').then(response => {
+        expect(response).toBe(true);
+        done();
+      });
+    });
+  });
 });
