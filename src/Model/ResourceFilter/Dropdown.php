@@ -29,8 +29,6 @@ class Dropdown extends ResourceFilter
                 'Options',
                 _t(__CLASS__ . '.Options', 'Dropdown options')
             ));
-
-            $fields->removeByName('FilterForID');
         });
 
         return parent::getCMSFields();

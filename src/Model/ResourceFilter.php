@@ -36,6 +36,11 @@ class ResourceFilter extends DataObject
         'FilterFields' => ResourceField::class,
     ];
 
+    private static $summary_fields = [
+        'Name',
+        'Type',
+    ];
+
     private static $singular_name = 'Text Filter';
 
     /**
@@ -73,5 +78,15 @@ class ResourceFilter extends DataObject
             throw new InvalidArgumentException("$this->fieldType is not a FormField");
         }
         return $field;
+    }
+
+    /**
+     * Returns the type of the filter, used for summary fields
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->singular_name();
     }
 }
