@@ -3,6 +3,7 @@
 namespace SilverStripe\CKANRegistry\Model;
 
 use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
 
 class ResourceDropdownFilter extends ResourceFilter
