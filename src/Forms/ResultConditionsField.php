@@ -44,6 +44,7 @@ class ResultConditionsField extends TextField
     {
         $data = parent::getSchemaDataDefaults();
         $data['data']['source'] = static::getMatchOptions();
+        $data['data']['matchTypeDefault'] = self::MATCH_TYPE_DEFAULT;
         return $data;
     }
 
@@ -58,27 +59,5 @@ class ResultConditionsField extends TextField
             ['value' => self::MATCH_TYPE_MUST, 'title' => _t(__CLASS__ . '.MUST_MATCH', 'Must match')],
             ['value' => self::MATCH_TYPE_MUST_NOT, 'title' => _t(__CLASS__ . '.MUST_NOT_MATCH', 'Must not match')],
         ];
-    }
-
-    /**
-     * Return the match condition
-     *
-     * @returns string
-     */
-    public function getMatchCondition()
-    {
-        $value = json_decode($this->Value(), true);
-        return isset($value['match-select']) ? $value['match-select'] : self::MATCH_TYPE_DEFAULT;
-    }
-
-    /**
-     * Return the condition's text to match against
-     *
-     * @return string
-     */
-    public function getMatchText()
-    {
-        $value = json_decode($this->Value(), true);
-        return isset($value['match-text']) ? $value['match-text'] : '';
     }
 }

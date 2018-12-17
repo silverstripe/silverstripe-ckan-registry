@@ -7,17 +7,23 @@ import fieldHolder from 'components/FieldHolder/FieldHolder';
 /**
  * Result conditions allow a CMS user to set one condition for displaying the column if the contents
  * of it match or do not match a given string.
+ *
+ * Note that the state structure is designed for compatibility with a future version which supports
+ * multiple conditions to be stored in the state and field value. In the interim, values are stored
+ * as a specific object index.
  */
 class ResultConditions extends Component {
   constructor(props) {
     super(props);
 
-    const value = props.value || {};
+    const value = props.value ? props.value[0] : {};
 
     // Set initial state values
     this.state = {
-      [this.getFieldName('match-select', props)]: value['match-select'] || 1,
-      [this.getFieldName('match-text', props)]: value['match-text'] || '',
+      0: {
+        [this.getFieldName('match-select', props)]: value['match-select'] || props.matchTypeDefault,
+        [this.getFieldName('match-text', props)]: value['match-text'] || '',
+      },
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -41,7 +47,7 @@ class ResultConditions extends Component {
    * @returns {string}
    */
   getSelectValue() {
-    return this.state[this.getFieldName('match-select')];
+    return this.state[0][this.getFieldName('match-select')];
   }
 
   /**
@@ -50,7 +56,7 @@ class ResultConditions extends Component {
    * @returns {string}
    */
   getInputValue() {
-    return this.state[this.getFieldName('match-text')];
+    return this.state[0][this.getFieldName('match-text')];
   }
 
   /**
@@ -60,8 +66,10 @@ class ResultConditions extends Component {
    */
   getValue() {
     return {
-      'match-select': this.getSelectValue(),
-      'match-text': this.getInputValue(),
+      0: {
+        'match-select': this.getSelectValue(),
+        'match-text': this.getInputValue(),
+      },
     };
   }
 
@@ -71,8 +79,13 @@ class ResultConditions extends Component {
    * @param {object} event
    */
   handleChange(event) {
+    const currentState = this.state;
+
     this.setState({
-      [event.target.name]: event.target.value,
+      0: {
+        ...currentState[0],
+        [event.target.name]: event.target.value,
+      },
     });
   }
 
@@ -158,12 +171,20 @@ export { ResultConditions as Component };
 ResultConditions.propTypes = {
   name: PropTypes.string,
   value: PropTypes.object,
+  data: PropTypes.shape({
+    source: PropTypes.arrayOf(PropTypes.shape({
+      value: PropTypes.string,
+      title: PropTypes.string,
+    })),
+    matchTypeDefault: PropTypes.string,
+  }),
   TextField: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
   SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
 };
 
 ResultConditions.defaultProps = {
   value: {},
+  data: {},
 };
 
 export default fieldHolder(inject(
