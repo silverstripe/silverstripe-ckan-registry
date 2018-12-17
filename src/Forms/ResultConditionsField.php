@@ -51,7 +51,7 @@ class ResultConditionsField extends TextField
     /**
      * Get a list of options for filtering with a human readable (translated) label
      *
-     * @return array
+     * @return array[]
      */
     public static function getMatchOptions()
     {

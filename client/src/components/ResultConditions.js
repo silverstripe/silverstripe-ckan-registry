@@ -16,13 +16,16 @@ class ResultConditions extends Component {
   constructor(props) {
     super(props);
 
-    const value = props.value ? props.value[0] : {};
+    const value = props.value && props.value[0] ? props.value[0] : {
+      'match-select': props.matchTypeDefault,
+      'match-test': '',
+    };
 
     // Set initial state values
     this.state = {
       0: {
-        [this.getFieldName('match-select', props)]: value['match-select'] || props.matchTypeDefault,
-        [this.getFieldName('match-text', props)]: value['match-text'] || '',
+        [this.getFieldName('match-select', props)]: value['match-select'],
+        [this.getFieldName('match-text', props)]: value['match-text'],
       },
     };
 
@@ -114,13 +117,13 @@ class ResultConditions extends Component {
   /**
    * Renders the text input field to enter the string that should or should not be matched
    *
-   * @returns {TextField}
+   * @returns {TextFieldComponent}
    */
   renderTextInput() {
-    const { TextField } = this.props;
+    const { TextFieldComponent } = this.props;
 
     return (
-      <TextField
+      <TextFieldComponent
         name={this.getFieldName('match-text')}
         className={[
           'no-change-track',
@@ -166,8 +169,6 @@ class ResultConditions extends Component {
   }
 }
 
-export { ResultConditions as Component };
-
 ResultConditions.propTypes = {
   name: PropTypes.string,
   value: PropTypes.object,
@@ -178,8 +179,11 @@ ResultConditions.propTypes = {
     })),
     matchTypeDefault: PropTypes.string,
   }),
-  TextField: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
-  SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]),
+  TextFieldComponent: PropTypes.oneOfType([
+    React.PropTypes.string,
+    React.PropTypes.func
+  ]).isRequired,
+  SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]).isRequired,
 };
 
 ResultConditions.defaultProps = {
@@ -187,11 +191,13 @@ ResultConditions.defaultProps = {
   data: {},
 };
 
+export { ResultConditions as Component };
+
 export default fieldHolder(inject(
   ['SingleSelectField', 'TextField'],
-  (SelectComponent, TextField) => ({
+  (SelectComponent, TextFieldComponent) => ({
     SelectComponent,
-    TextField,
+    TextFieldComponent,
   }),
   () => 'CKAN.Column.ResultConditions'
 )(ResultConditions));
