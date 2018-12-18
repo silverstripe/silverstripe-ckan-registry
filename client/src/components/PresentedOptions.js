@@ -17,11 +17,14 @@ class PresentedOptions extends Component {
 
     const value = props.value || {};
     this.state = {
-      ...value,
+      custom_options: '',
+      select_type: props.selectTypeDefault,
       selections: {},
+      ...value,
     };
 
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSelectTypeChange = this.handleSelectTypeChange.bind(this);
   }
 
@@ -35,6 +38,15 @@ class PresentedOptions extends Component {
   getFieldName(fieldName, props = {}) {
     const name = props.name || this.props.name;
     return `${name}-${fieldName}`;
+  }
+
+  /**
+   * Returns the value for the text input from the state
+   *
+   * @returns {string}
+   */
+  getInputValue() {
+    return this.state.custom_options;
   }
 
   /**
@@ -65,6 +77,17 @@ class PresentedOptions extends Component {
         ...prevState.selections,
         [event.target.value]: isAlreadyChecked ? undefined : true,
       },
+    });
+  }
+
+  /**
+   * Sets the current entered value of the freetext textarea for custom options into the state
+   *
+   * @param {object} event
+   */
+  handleInputChange(event) {
+    this.setState({
+      custom_options: event.target.value,
     });
   }
 
@@ -106,6 +129,8 @@ class PresentedOptions extends Component {
       <Input
         type="textarea"
         name={this.getFieldName('options-custom')}
+        onChange={this.handleInputChange}
+        value={this.getInputValue()}
       />
     );
   }
@@ -122,8 +147,7 @@ class PresentedOptions extends Component {
       <input
         type="hidden"
         name={name}
-        // @todo: do this
-        // value={JSON.stringify(this.getValue())}
+        value={JSON.stringify(this.state)}
       />
     );
   }
