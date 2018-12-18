@@ -26,6 +26,7 @@ class ResourceFilter extends DataObject
     private static $db = [
         'Name' => 'Varchar',
         'AllFields' => 'Boolean',
+        'Order' => 'Int',
     ];
 
     private static $has_one = [
