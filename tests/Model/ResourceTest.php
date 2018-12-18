@@ -40,6 +40,10 @@ class ResourceTest extends SapphireTest
         $resource->write();
 
         $this->assertCount(0, $resource->Fields(), 'Changing identifier should clear fields');
-        $this->assertCount(0, $resource->Filters(), 'Changing identifier should clear filters');
+        $this->assertCount(
+            1,
+            $resource->Filters(),
+            'Changing identifier should clear filters (note that a default filter is added again as well)'
+        );
     }
 }
