@@ -43,7 +43,10 @@ class Resource extends DataObject
         if ($this->isChanged('Identifier')) {
             $this->Fields()->removeAll();
             Injector::inst()->get(ResourceFieldPopulatorInterface::class)->populateFields($this);
-            $this->Filters()->removeAll();
+            // Remove the existing filters and add a default text entry to search all ResourceFields
+            $this->Filters()->removeAll()
+                ->add(ResourceFilter::create());
         }
+        parent::onAfterWrite();
     }
 }
