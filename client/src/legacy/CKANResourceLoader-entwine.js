@@ -22,6 +22,10 @@ jQuery.entwine('ss', ($) => {
         <CKANResourceLocator {...props} />,
         this[0]
       );
-    }
+    },
+
+    onunmatch() {
+      ReactDOM.unmountComponentAtNode(this[0]);
+    },
   });
 });

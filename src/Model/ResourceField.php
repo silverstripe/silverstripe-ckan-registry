@@ -2,6 +2,7 @@
 
 namespace SilverStripe\CKANRegistry\Model;
 
+use SilverStripe\CKANRegistry\Forms\ResultConditionsField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataObject;
@@ -66,6 +67,14 @@ class ResourceField extends DataObject
             $fields->insertBefore(FieldGroup::create('Visibility', [$summary, $detail, $duplicates]), 'Order');
 
             $fields->removeByName('ResourceID');
+
+            $fields->replaceField(
+                'DisplayConditions',
+                ResultConditionsField::create(
+                    'DisplayConditions',
+                    _t(__CLASS__ . '.ResultConditions', 'Result conditions')
+                )
+            );
         });
         return parent::getCMSFields();
     }

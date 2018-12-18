@@ -57,6 +57,7 @@
       "!**/boot/**",
       "!**/bundles/**",
       "!**/legacy/**",
+      "!**/vendor/**",
       "!**/*-test.{js,jsx}"
     ],
     "testMatch": [

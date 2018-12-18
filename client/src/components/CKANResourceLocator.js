@@ -77,7 +77,7 @@ class CKANResourceLocator extends Component {
   /**
    * Handle changes in the URL field
    *
-   * @param event
+   * @param {object} event
    */
   handleChange(event) {
     const uri = event.target.value;
@@ -98,8 +98,8 @@ class CKANResourceLocator extends Component {
   /**
    * Handle changes with the resource select field
    *
-   * @param event
-   * @param value
+   * @param {object} event
+   * @param {string} value
    */
   handleResourceSelect(event, { value }) {
     this.setState({
@@ -224,7 +224,7 @@ class CKANResourceLocator extends Component {
    */
   renderResourceSelect() {
     const { uri, currentDataset, spec } = this.state;
-    const { SelectComponent } = this.props;
+    const { SelectComponent, name } = this.props;
 
     // Create some props that'll be shared by the disabled input and the select component
     const sharedProps = {
@@ -267,8 +267,8 @@ class CKANResourceLocator extends Component {
       <SelectComponent
         {...sharedProps}
         message={message}
-        className={{ 'is-invalid': message }}
-        name="now-i-have-a-name"
+        className={{ 'is-invalid': message, 'no-change-track': true }}
+        name={`${name}-resource-name`}
         source={resources}
         value={spec.resource}
         onChange={this.handleResourceSelect}
@@ -349,5 +349,5 @@ export default fieldHolder(inject(
   (SelectComponent) => ({
     SelectComponent,
   }),
-  () => 'ElementEditor.ElementList'
+  () => 'CKAN.ResourceLocator'
 )(CKANResourceLocator));
