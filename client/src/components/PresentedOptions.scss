@@ -1,0 +1,23 @@
+.ckan-presented-options {
+  &__options-list {
+    border: $border-width solid $border-color-light;
+    height: 12rem;
+    overflow: scroll;
+    padding: $panel-padding-x * 0.5;
+
+    // Remove absolute positioning from admin module
+    .form-check-input {
+      position: relative;
+    }
+  }
+
+  // Note: form-group addition required for specificity
+  &__option-group.form-group {
+    margin-left: $panel-padding-x;
+    margin-right: 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

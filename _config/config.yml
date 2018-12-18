@@ -3,6 +3,6 @@ Name: ckanregistryconfig
 ---
 SilverStripe\Admin\LeftAndMain:
   extra_requirements_javascript:
-  - 'silverstripe/ckan-registry:client/dist/js/bundle.js'
+    - 'silverstripe/ckan-registry:client/dist/js/bundle.js'
   extra_requirements_css:
-  - 'silverstripe/ckan-registry:client/dist/styles/bundle.css'
+    - 'silverstripe/ckan-registry:client/dist/styles/bundle.css'
