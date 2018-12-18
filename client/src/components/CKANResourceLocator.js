@@ -206,6 +206,12 @@ class CKANResourceLocator extends Component {
         if (spec.resource && dataset) {
           newUri = newUri.substring(0, newUri.lastIndexOf('/', newUri.lastIndexOf('/') - 1));
         }
+        // If we don't have a resource (but we successfully loaded a dataset) then we'll pre-select
+        // a value for the user. This will just be the first datastore_active resource in the list
+        if (!spec.resource && dataset) {
+          const resource = dataset.resources.find(res => res.datastore_active);
+          spec.resource = resource && resource.package_id;
+        }
 
         this.setState({
           uri: newUri,
