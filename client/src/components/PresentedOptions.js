@@ -44,9 +44,9 @@ class PresentedOptions extends Component {
    */
   getSelectType() {
     if (typeof this.state.select_type !== 'undefined') {
-      return this.state.select_type;
+      return String(this.state.select_type);
     }
-    return this.props.data.selectTypeDefault;
+    return String(this.props.data.selectTypeDefault);
   }
 
   /**
@@ -96,6 +96,12 @@ class PresentedOptions extends Component {
    * @returns {Input}
    */
   renderFreetextInput() {
+    // Don't render the free text input field unless we've chosen to specify a custom list
+    // todo: can we move the value into a constant somewhere? It's already defined in PHP...
+    if (this.getSelectType() !== '1') {
+      return;
+    }
+
     return (
       <Input
         type="textarea"
@@ -128,6 +134,12 @@ class PresentedOptions extends Component {
    * @returns {DOMElement}
    */
   renderCheckboxList() {
+    // Don't render the checkbox list unless we've chosen to select from a list of options
+    // todo: can we move the value into a constant somewhere? It's already defined in PHP...
+    if (this.getSelectType() !== '0') {
+      return;
+    }
+
     const { data: { options } } = this.props;
     const fieldName = this.getFieldName('options');
 
@@ -172,7 +184,7 @@ class PresentedOptions extends Component {
           name={this.getFieldName('select-type')}
           value={option.value}
           onChange={this.handleSelectTypeChange}
-          checked={String(selectedValue) === String(option.value)}
+          checked={selectedValue === String(option.value)}
         />
         <Label for={`option-${option.value}`} check>
           {option.title}
