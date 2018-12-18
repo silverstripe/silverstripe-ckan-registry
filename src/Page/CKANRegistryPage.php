@@ -13,6 +13,7 @@ use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\TextField;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
+use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 
 /**
  * A CKANRegistryPage will render a chosen CKAN data set on the frontend, provide the user with configurable filters
@@ -47,7 +48,10 @@ class CKANRegistryPage extends Page
             $fields->addFieldToTab('Root.Data', ResourceLocatorField::create('DataResource'));
 
             if ($resource && $resource->Identifier) {
-                $columnsConfig = GridFieldConfig_RecordEditor::create();
+                $injector = Injector::inst();
+
+                $columnsConfig = GridFieldConfig_RecordEditor::create()
+                    ->addComponent($injector->createWithArgs(GridFieldOrderableRows::class, ['Order']));
                 $resourceFields = GridField::create('DataColumns', 'Columns', $resource->Fields(), $columnsConfig);
                 $fields->addFieldToTab('Root.Data', $resourceFields);
 
@@ -56,7 +60,10 @@ class CKANRegistryPage extends Page
                     GridFieldAddExistingAutocompleter::class,
                     GridFieldAddNewButton::class
                 ])
-                    ->addComponent(Injector::inst()->create(GridFieldAddNewMultiClass::class));
+                    ->addComponents([
+                        $injector->create(GridFieldAddNewMultiClass::class),
+                        $injector->createWithArgs(GridFieldOrderableRows::class, ['Order']),
+                    ]);
                 $resourceFilters = GridField::create('DataFilters', 'Filters', $resource->Filters(), $filtersConfig);
                 $fields->addFieldToTab('Root.Filters', $resourceFilters);
             }
