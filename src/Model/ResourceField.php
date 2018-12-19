@@ -6,6 +6,7 @@ use SilverStripe\CKANRegistry\Forms\ResultConditionsField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\DataObject;
 
@@ -55,7 +56,14 @@ class ResourceField extends DataObject
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
-            $fields->removeByName('Name');
+            $originalTitle = ReadonlyField::create('Name', i18n::_t(
+                __CLASS__ . '.ORIGINAL_TITLE',
+                'Original title'
+            ))->setDescription(i18n::_t(
+                __CLASS__ . '.ORIGINAL_TITLE_DESCRIPTION',
+                'Title of this field as provided by the CKAN resource'
+            ));
+            $fields->replaceField('Name', $originalTitle);
 
             $fields->removeByName('Type');
             $fields->dataFieldByName('ReadableName')
