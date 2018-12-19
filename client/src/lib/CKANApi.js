@@ -1,4 +1,5 @@
 import fetch from 'isomorphic-fetch';
+import Datastore from './CKANApi/DataStore';
 
 const CKAN_VERSION = 3;
 
@@ -203,6 +204,10 @@ class CKANApi {
       }
       return response.json().then(json => json && json.success);
     }, () => Promise.resolve(false));
+  }
+
+  static loadDatastore(endpoint, resource) {
+    return new Datastore(endpoint, resource);
   }
 
   /**

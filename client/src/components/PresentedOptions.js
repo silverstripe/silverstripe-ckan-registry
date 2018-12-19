@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { inject } from 'lib/Injector';
 import { FormGroup, Input, Label } from 'reactstrap';
 import fieldHolder from 'components/FieldHolder/FieldHolder';
+import CKANApi from 'lib/CKANApi';
 
 /**
  * "Presented options" are a either a selection of checkboxes, or a free text input field
@@ -17,15 +18,43 @@ class PresentedOptions extends Component {
 
     const value = props.value || {};
     this.state = {
-      custom_options: '',
-      select_type: props.selectTypeDefault,
+      customOptions: '',
+      selectType: props.selectTypeDefault,
       selections: {},
+      suggestedOptions: [],
+      suggestedOptionCache: {},
+      loading: false,
       ...value,
     };
 
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSelectTypeChange = this.handleSelectTypeChange.bind(this);
+  }
+
+  componentDidMount() {
+    // Ensure the suggested options are loaded
+    this.loadSuggestedOptions();
+  }
+
+  componentDidUpdate(prevProps) {
+    // Compare if selected fields have changed
+    const newFields = this.props.selectedFields;
+    const oldFields = prevProps.selectedFields;
+
+    // If the type or length doesn't match then they must be different
+    if (typeof newFields !== typeof oldFields || newFields.length !== oldFields.length) {
+      this.loadSuggestedOptions();
+      return;
+    }
+
+    // Otherwise filter out options that appear in both arrays and assert the remaining count is
+    // zero
+    if (oldFields.filter(old => !newFields.includes(old)).length === 0) {
+      return;
+    }
+
+    this.loadSuggestedOptions();
   }
 
   /**
@@ -46,7 +75,7 @@ class PresentedOptions extends Component {
    * @returns {string}
    */
   getInputValue() {
-    return this.state.custom_options;
+    return this.state.customOptions;
   }
 
   /**
@@ -55,10 +84,88 @@ class PresentedOptions extends Component {
    * @returns {string}
    */
   getSelectType() {
-    if (typeof this.state.select_type !== 'undefined') {
-      return String(this.state.select_type);
+    if (typeof this.state.selectType !== 'undefined') {
+      return String(this.state.selectType);
     }
     return String(this.props.data.selectTypeDefault);
+  }
+
+  loadSuggestedOptions() {
+    const { selectedFields, data: { endpoint, resource } } = this.props;
+
+    // Clear the state of suggested options...
+    this.setState({
+      suggestedOptions: [],
+      loading: false,
+    });
+
+    // If there's no columns selected we can early return
+    if (!selectedFields.length) {
+      return;
+    }
+
+    let options = [];
+    const { suggestedOptionCache } = this.state;
+    const loadPromises = [];
+
+    // Prep a datastore. Not that this doesn't actually fire any requests yet.
+    const Datastore = CKANApi.loadDatastore(endpoint, resource);
+
+    // We'll loop through the selected columns an check if we've loaded values for fields previously
+    selectedFields.forEach(field => {
+      // Check the cache
+      if (suggestedOptionCache[field]) {
+        options = options.concat(suggestedOptionCache[field]);
+        return;
+      }
+
+      // Start loading and append the promise to an array so we can wait for all of them...
+      loadPromises.push(
+        Datastore.search([field], null, true).then(result => {
+          let newOptions = [];
+
+          // TODO implement something for if the request fails...
+          if (result) {
+            newOptions = result.records.map(record => record[field]);
+          }
+
+          // Update the "cache" with the options we've loaded.
+          this.setState(state => ({
+            suggestedOptionCache: {
+              // We can't use the local variable as the state may have been mutated while this
+              // promise was resolving...
+              ...state.suggestedOptionCache,
+              [field]: newOptions,
+            },
+          }));
+
+          // Wait for any other suggested options to load from CKAN
+          // TODO this is _not_ a robust method of doing this. Preferably we can wait for all the
+          // promises to complete - or chain the promises. Note that the user has to be pretty quick
+          // to choose two new columns and beat the snappy response from CKAN. Perhaps we can
+          // disable the select while this updates?
+          setTimeout(() => { this.loadSuggestedOptions(); }, 1000);
+        })
+      );
+    });
+
+    // If we didn't have to load options then we can just put the known options into state
+    if (!loadPromises.length) {
+      this.setState({
+        // Unique and sort the options...
+        suggestedOptions: options.filter((item, index) => options.indexOf(item) === index).sort(),
+        loading: false,
+      });
+      return;
+    }
+
+    // Mark as loading
+    this.setState({
+      loading: true,
+    });
+
+    // We have to wait for all promises and then just run this function again...
+    // Promise.all(loadPromises).then(() => this.loadSuggestedOptions());
   }
 
   /**
@@ -87,7 +194,7 @@ class PresentedOptions extends Component {
    */
   handleInputChange(event) {
     this.setState({
-      custom_options: event.target.value,
+      customOptions: event.target.value,
     });
   }
 
@@ -98,7 +205,7 @@ class PresentedOptions extends Component {
    */
   handleSelectTypeChange(event) {
     this.setState({
-      select_type: event.target.value,
+      selectType: event.target.value,
     });
   }
 
@@ -116,13 +223,13 @@ class PresentedOptions extends Component {
    * Renders a textarea where the CMS user can manually enter a list of options to
    * use, one per line
    *
-   * @returns {Input}
+   * @returns {Input|null}
    */
   renderFreetextInput() {
     // Don't render the free text input field unless we've chosen to specify a custom list
     // todo: can we move the value into a constant somewhere? It's already defined in PHP...
     if (this.getSelectType() !== '1') {
-      return;
+      return null;
     }
 
     return (
@@ -155,22 +262,24 @@ class PresentedOptions extends Component {
   /**
    * Renders a list of checkbox fields for the CMS user to select which options to use
    *
-   * @returns {DOMElement}
+   * @returns {DOMElement|null}
    */
   renderCheckboxList() {
     // Don't render the checkbox list unless we've chosen to select from a list of options
     // todo: can we move the value into a constant somewhere? It's already defined in PHP...
     if (this.getSelectType() !== '0') {
-      return;
+      return null;
     }
 
-    const { data: { options } } = this.props;
     const fieldName = this.getFieldName('options');
+    const { LoadingComponent } = this.props;
+    const { loading, suggestedOptions } = this.state;
 
     return (
       <fieldset className="ckan-presented-options__options-list">
         {
-          options.map((option, index) => (
+          loading ? <LoadingComponent /> :
+          suggestedOptions.map((option, index) => (
             <FormGroup key={option} className="ckan-presented-options__option-group">
               <Input
                 id={`${fieldName}-${index}`}
@@ -232,8 +341,13 @@ class PresentedOptions extends Component {
 }
 
 PresentedOptions.propTypes = {
+  // A list of CKAN fields (aka columns) that this options field will be targeting
+  selectedFields: PropTypes.arrayOf(PropTypes.string),
   data: PropTypes.shape({
-    options: PropTypes.arrayOf(PropTypes.string),
+    // The CKAN endpoint that this field is suggestion options for
+    endpoint: PropTypes.string.isRequired,
+    // The CKAN resource that this field is suggestion options for
+    resource: PropTypes.string.isRequired,
     selectTypeDefault: PropTypes.string,
     selectTypes: PropTypes.arrayOf(PropTypes.shape({
       value: PropTypes.string,
@@ -244,28 +358,34 @@ PresentedOptions.propTypes = {
   name: PropTypes.string,
   value: PropTypes.object,
   TextFieldComponent: PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.func
+    PropTypes.string,
+    PropTypes.func
   ]).isRequired,
   FormActionComponent: PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.func
+    PropTypes.string,
+    PropTypes.func
   ]).isRequired,
+  LoadingComponent: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.func
+  ]).isRequired
 };
 
 PresentedOptions.defaultProps = {
   data: {},
   extraClass: '',
+  selectedFields: [],
   value: {},
 };
 
 export { PresentedOptions as Component };
 
 export default fieldHolder(inject(
-  ['TextField', 'FormAction'],
-  (TextFieldComponent, FormActionComponent) => ({
+  ['TextField', 'FormAction', 'Loading'],
+  (TextFieldComponent, FormActionComponent, LoadingComponent) => ({
     TextFieldComponent,
     FormActionComponent,
+    LoadingComponent,
   }),
   () => 'CKAN.Filter.PresentedOptions'
 )(PresentedOptions));

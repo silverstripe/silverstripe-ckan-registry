@@ -2,6 +2,7 @@
 
 namespace SilverStripe\CKANRegistry\Forms;
 
+use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\TextField;
 
@@ -30,8 +31,23 @@ class PresentedOptionsField extends TextField
 
     protected $schemaComponent = 'PresentedOptions';
 
-    public function __construct($name, $title = null, $value = '', $maxLength = null, Form $form = null)
-    {
+    /**
+     * The resource that this options field will suggest options from
+     *
+     * @var Resource
+     */
+    protected $resouce;
+
+    public function __construct(
+        $name,
+        Resource $resource,
+        $title = null,
+        $value = '',
+        $maxLength = null,
+        Form $form = null
+    ) {
+        $this->setResouce($resource);
+
         parent::__construct($name, $title, $value, $maxLength, $form);
 
         $this->addExtraClass('ckan-presented-options__container');
@@ -48,6 +64,9 @@ class PresentedOptionsField extends TextField
         $data['data']['options'] = self::getOptions();
         $data['data']['selectTypeDefault'] = self::SELECT_TYPE_DEFAULT;
         $data['data']['selectTypes'] = self::getSelectTypes();
+        $data['data']['endpoint'] = $this->getResouce()->Endpoint;
+        $data['data']['resource'] = $this->getResouce()->Identifier;
+        $data['data']['fieldMap'] = $this->getResouce()->Fields()->map('ID', 'Name')->toArray();
         return $data;
     }
 
@@ -77,5 +96,23 @@ class PresentedOptionsField extends TextField
             'Other',
             'Something scrollable',
         ];
+    }
+
+    /**
+     * @return Resource
+     */
+    public function getResouce()
+    {
+        return $this->resouce;
+    }
+
+    /**
+     * @param Resource $resouce
+     * @return $this
+     */
+    public function setResouce($resouce)
+    {
+        $this->resouce = $resouce;
+        return $this;
     }
 }

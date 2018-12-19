@@ -28,6 +28,7 @@ class Dropdown extends ResourceFilter
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $fields->push(PresentedOptionsField::create(
                 'Options',
+                $this->FilterFor,
                 _t(__CLASS__ . '.OPTIONS', 'Presented options')
             ));
         });
