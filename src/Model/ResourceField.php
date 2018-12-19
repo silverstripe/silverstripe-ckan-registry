@@ -5,6 +5,7 @@ namespace SilverStripe\CKANRegistry\Model;
 use SilverStripe\CKANRegistry\Forms\ResultConditionsField;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\NumericField;
 use SilverStripe\i18n\i18n;
 use SilverStripe\ORM\DataObject;
 
@@ -59,13 +60,15 @@ class ResourceField extends DataObject
             $fields->removeByName('Type');
             $fields->dataFieldByName('ReadableName')
                 ->setAttribute('placeholder', $this->Name);
-            $fields->dataFieldByName('Order')
-                ->setTitle(i18n::_t(__CLASS__ . '.OrderLabel', 'Presented order'))
+            $orderField = NumericField::create('Order')
+                ->setTitle(i18n::_t(__CLASS__ . '.ORDER_LABEL', 'Presented order'))
                 ->setDescription(i18n::_t(
-                    __CLASS__ . '.OrderDenominator',
+                    __CLASS__ . '.ORDER_DENOMINATOR',
                     'of {count} fields',
                     ['count' => static::get()->filter('ResourceID', $this->ResourceID)->count()]
-                ));
+                ))
+                ->addExtraClass('ckan-resource__order');
+            $fields->replaceField('Order', $orderField);
 
             $summary = $fields->dataFieldByName('ShowInSummaryView');
             $detail = $fields->dataFieldByName('ShowInDetailView');
@@ -80,7 +83,7 @@ class ResourceField extends DataObject
                 'DisplayConditions',
                 ResultConditionsField::create(
                     'DisplayConditions',
-                    _t(__CLASS__ . '.ResultConditions', 'Result conditions')
+                    i18n::_t(__CLASS__ . '.RESULT_CONDITIONS', 'Result conditions')
                 )
             );
         });
