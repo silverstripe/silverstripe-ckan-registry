@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { inject } from 'lib/Injector';
-import { FormGroup, Input, Label } from 'reactstrap';
+import {
+  Button, FormGroup, FormText, Input, InputGroup, InputGroupAddon, Label, Row, Col
+} from 'reactstrap';
 import fieldHolder from 'components/FieldHolder/FieldHolder';
 import CKANApi from 'lib/CKANApi';
+import i18n from 'i18n';
 
 /**
  * "Presented options" are a either a selection of checkboxes, or a free text input field
@@ -24,12 +27,16 @@ class PresentedOptions extends Component {
       suggestedOptions: [],
       suggestedOptionCache: {},
       loading: false,
+      separatorDelimiter: '',
+      usedSeparators: [],
       ...value,
     };
 
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.handleSelectTypeChange = this.handleSelectTypeChange.bind(this);
+    this.handleDelimiterChange = this.handleDelimiterChange.bind(this);
+    this.handleExecuteSeparator = this.handleExecuteSeparator.bind(this);
   }
 
   componentDidMount() {
@@ -151,9 +158,26 @@ class PresentedOptions extends Component {
 
     // If we didn't have to load options then we can just put the known options into state
     if (!loadPromises.length) {
+      const suggestedOptions = this.splitOptionsBySeparators(options, this.state.usedSeparators)
+        .map(item => item.trim())
+        .filter((item, index) => {
+          // Exclude null, non-string or empty values
+          if (!item || typeof item !== 'string' || item.length === 0) {
+            return false;
+          }
+          // Exclude items that aren't unique. AKA remove if this index is not the same as the
+          // index where this item is first found
+          if (options.indexOf(item) !== index) {
+            return false;
+          }
+
+          return true;
+        })
+        .sort();
+
       this.setState({
-        // Unique and sort the options...
-        suggestedOptions: options.filter((item, index) => options.indexOf(item) === index).sort(),
+        // Trim, filter nulls, unique and sort the options...
+        suggestedOptions,
         loading: false,
       });
       return;
@@ -166,6 +190,19 @@ class PresentedOptions extends Component {
 
     // We have to wait for all promises and then just run this function again...
     // Promise.all(loadPromises).then(() => this.loadSuggestedOptions());
+  }
+
+  splitOptionsBySeparators(options, delimiters) {
+    // If there are no delimiters provided then we can just return the options
+    if (!delimiters || !delimiters.length) {
+      return options;
+    }
+    // Run through the options and split based on the currently applied delimiters
+    return options.reduce((accumulator, item) => {
+      let acc = accumulator;
+      delimiters.forEach(separator => { acc = acc.concat(item.split(separator)); });
+      return acc;
+    }, []);
   }
 
   /**
@@ -209,6 +246,34 @@ class PresentedOptions extends Component {
     });
   }
 
+  handleDelimiterChange(event) {
+    this.setState({
+      separatorDelimiter: event.target.value,
+    });
+  }
+
+  handleExecuteSeparator() {
+    const { suggestedOptions, separatorDelimiter, usedSeparators } = this.state;
+    let newOptions = suggestedOptions;
+
+    // Do nothing if the current delimiter is an empty string
+    if (!separatorDelimiter.length) {
+      return;
+    }
+
+    // Add the new delimiter and split the options if the delimiter hasn't already been applied
+    if (!usedSeparators.find(item => item === separatorDelimiter)) {
+      usedSeparators.push(separatorDelimiter);
+      newOptions = this.splitOptionsBySeparators(suggestedOptions, [separatorDelimiter]);
+    }
+
+    this.setState({
+      usedSeparators,
+      suggestedOptions: newOptions,
+      separatorDelimiter: '',
+    });
+  }
+
   /**
    * Check the state and determine whether a given checkbox value should be checked
    *
@@ -249,12 +314,14 @@ class PresentedOptions extends Component {
    */
   renderHiddenInput() {
     const { name } = this.props;
+    const { selections, usedSeparators } = this.state;
+    const value = { selectType: this.getSelectType(), selections, usedSeparators };
 
     return (
       <input
         type="hidden"
         name={name}
-        value={JSON.stringify(this.state)}
+        value={JSON.stringify(value)}
       />
     );
   }
@@ -265,37 +332,71 @@ class PresentedOptions extends Component {
    * @returns {DOMElement|null}
    */
   renderCheckboxList() {
+    const fieldName = this.getFieldName('options');
+    const { LoadingComponent } = this.props;
+    const { loading, suggestedOptions } = this.state;
+
+    const innerContent = suggestedOptions.length ?
+      suggestedOptions.map((option, index) => (
+        <FormGroup key={option} className="ckan-presented-options__option-group">
+          <Input
+            id={`${fieldName}-${index}`}
+            type="checkbox"
+            name={`${fieldName}[]`}
+            onChange={this.handleCheckboxChange}
+            checked={this.isCheckboxChecked(option)}
+            value={option}
+          />
+          <Label for={`${fieldName}-${index}`}>
+            { option }
+          </Label>
+        </FormGroup>
+      )) :
+      (
+        <span className="ckan-presented-options__options-list-empty">
+          {i18n._t(
+            'CKANPresentedOptions.PLEASE_SELECT_COLUMNS',
+            'Please select columns to be able to select from all options'
+          )}
+        </span>
+      );
+
+    return (
+      <fieldset className="ckan-presented-options__options-list">
+        { loading ? <LoadingComponent /> : innerContent }
+      </fieldset>
+    );
+  }
+
+  renderSeparator() {
+    return (
+      <FormGroup className="ckan-presented-options__option-separator">
+        <Label for="optionSeparator">Delimiter</Label>
+        <InputGroup>
+          <Input value={this.state.separatorDelimiter} onChange={this.handleDelimiterChange} />
+          <InputGroupAddon addonType="append">
+            <Button onClick={this.handleExecuteSeparator} color="primary">Update</Button>
+          </InputGroupAddon>
+        </InputGroup>
+        <FormText>
+          Split options by characters. eg. comma
+        </FormText>
+      </FormGroup>
+    );
+  }
+
+  renderCheckboxListAndSeparator() {
     // Don't render the checkbox list unless we've chosen to select from a list of options
     // todo: can we move the value into a constant somewhere? It's already defined in PHP...
     if (this.getSelectType() !== '0') {
       return null;
     }
 
-    const fieldName = this.getFieldName('options');
-    const { LoadingComponent } = this.props;
-    const { loading, suggestedOptions } = this.state;
-
     return (
-      <fieldset className="ckan-presented-options__options-list">
-        {
-          loading ? <LoadingComponent /> :
-          suggestedOptions.map((option, index) => (
-            <FormGroup key={option} className="ckan-presented-options__option-group">
-              <Input
-                id={`${fieldName}-${index}`}
-                type="checkbox"
-                name={`${fieldName}[]`}
-                onChange={this.handleCheckboxChange}
-                checked={this.isCheckboxChecked(option)}
-                value={option}
-              />
-              <Label for={`${fieldName}-${index}`}>
-                { option }
-              </Label>
-            </FormGroup>
-          ))
-        }
-      </fieldset>
+      <Row>
+        <Col lg={9} sm={12}>{ this.renderCheckboxList() }</Col>
+        <Col lg={3} sm={12}>{ this.renderSeparator() }</Col>
+      </Row>
     );
   }
 
@@ -311,15 +412,15 @@ class PresentedOptions extends Component {
 
     return selectTypes.map((option) => (
       <FormGroup key={option.value} className="ckan-presented-options__option-group">
-        <Input
-          id={`option-${option.value}`}
-          type="radio"
-          name={this.getFieldName('select-type')}
-          value={option.value}
-          onChange={this.handleSelectTypeChange}
-          checked={selectedValue === String(option.value)}
-        />
         <Label for={`option-${option.value}`} check>
+          <Input
+            id={`option-${option.value}`}
+            type="radio"
+            name={this.getFieldName('select-type')}
+            value={option.value}
+            onChange={this.handleSelectTypeChange}
+            checked={selectedValue === String(option.value)}
+          />
           {option.title}
         </Label>
       </FormGroup>
@@ -332,7 +433,7 @@ class PresentedOptions extends Component {
     return (
       <div className={extraClass}>
         { this.renderRadioOptions() }
-        { this.renderCheckboxList() }
+        { this.renderCheckboxListAndSeparator() }
         { this.renderFreetextInput() }
         { this.renderHiddenInput() }
       </div>
@@ -357,14 +458,14 @@ PresentedOptions.propTypes = {
   extraClass: PropTypes.string,
   name: PropTypes.string,
   value: PropTypes.object,
-  TextFieldComponent: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.func
-  ]).isRequired,
-  FormActionComponent: PropTypes.oneOfType([
-    PropTypes.string,
-    PropTypes.func
-  ]).isRequired,
+  // TextFieldComponent: PropTypes.oneOfType([
+  //   PropTypes.string,
+  //   PropTypes.func
+  // ]).isRequired,
+  // FormActionComponent: PropTypes.oneOfType([
+  //   PropTypes.string,
+  //   PropTypes.func
+  // ]).isRequired,
   LoadingComponent: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func

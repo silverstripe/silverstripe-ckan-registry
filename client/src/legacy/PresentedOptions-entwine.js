@@ -13,19 +13,19 @@ jQuery.entwine('ss', ($) => {
         return;
       }
 
-      this.renderComponent(temporaryInput.val());
+      this.renderComponent($('#Form_ItemEditForm_FilterFields').val(), temporaryInput.val());
     },
 
     onunmatch() {
       ReactDOM.unmountComponentAtNode(this[0]);
     },
 
-    renderComponent(value = null, fieldIDs = []) {
+    renderComponent(fieldIDs = [], value = null) {
       const context = {};
       const PresentedOptionsComponent = loadComponent('PresentedOptions', context);
       const schema = this.data('schema');
       const { data: { fieldMap } } = schema;
-      const fields = fieldIDs.map(id => fieldMap[id] || null);
+      const fields = fieldIDs ? fieldIDs.map(id => fieldMap[id] || null) : [];
       const { extraClass, ...forwardedProps } = schema;
       const props = {
         name: this.attr('name'),
@@ -46,7 +46,7 @@ jQuery.entwine('ss', ($) => {
   // option field? Right now it's just looking specifically for an ID :\
   $('.js-injector-boot #Form_ItemEditForm_FilterFields').entwine({
     onchange() {
-      $('.js-injector-boot .ckan-presented-options__container').renderComponent(null, this.val());
+      $('.js-injector-boot .ckan-presented-options__container').renderComponent(this.val());
     }
   });
 });

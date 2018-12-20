@@ -1,13 +1,24 @@
 .ckan-presented-options {
   &__options-list {
-    border: $border-width solid $border-color-light;
-    height: 12rem;
+    height: 16rem;
     overflow: scroll;
     padding: $panel-padding-x * 0.5;
+
+    // Make this look like a textarea field
+    background-color: $input-bg;
+    border: $input-border-width solid $input-border-color;
+    border-radius: $input-border-radius;
+
+    // Position relative forces the loading component to sit within this container
+    position: relative;
 
     // Remove absolute positioning from admin module
     .form-check-input {
       position: relative;
+    }
+
+    .form-group {
+      margin-bottom: 0;
     }
   }
 
