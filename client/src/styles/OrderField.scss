@@ -1,13 +1,13 @@
 .ckan-resource__order.field .form__field-holder {
   input {
-      max-width: 6em;
-      min-width: 3em;
-      display: inline-block;
+    max-width: 6em;
+    min-width: 3em;
+    display: inline-block;
   }
 
   .form__field-description {
     display: inline-block;
     font-size: $font-size-root;
-    margin-left: 0.5em;
+    margin-left: $input-padding-y;
   }
 }
