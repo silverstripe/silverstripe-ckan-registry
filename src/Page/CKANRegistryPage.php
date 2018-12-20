@@ -11,8 +11,10 @@ use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\TextField;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 
 /**
@@ -53,6 +55,24 @@ class CKANRegistryPage extends Page
                 $columnsConfig = GridFieldConfig_RecordEditor::create()
                     ->addComponent($injector->createWithArgs(GridFieldOrderableRows::class, ['Order']));
                 $resourceFields = GridField::create('DataColumns', 'Columns', $resource->Fields(), $columnsConfig);
+                // Configure inline editable checkboxes for the two boolean fields
+                $before = null;
+                $editableColumns = $injector->create(GridFieldEditableColumns::class);
+                foreach ($columnsConfig->getComponents() as $component) {
+                    if ($before !== null) {
+                        $before = $component;
+                        break;
+                    }
+                    if ($component instanceof GridFieldDataColumns) {
+                        $before = false;
+                        $columns = $component->getDisplayFields($resourceFields);
+                        $editable = array_flip(['ShowInSummaryView', 'ShowInDetailView']);
+                        $component->setDisplayFields(array_diff_key($columns, $editable));
+                        // set this way so that title translations are preserved
+                        $editableColumns->setDisplayFields(array_intersect_key($columns, $editable));
+                    }
+                }
+                $columnsConfig->addComponent($editableColumns, $before);
                 $fields->addFieldToTab('Root.Data', $resourceFields);
 
                 $filtersConfig = GridFieldConfig_RecordEditor::create();
