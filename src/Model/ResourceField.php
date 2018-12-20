@@ -78,12 +78,17 @@ class ResourceField extends DataObject
                 ->addExtraClass('ckan-resource__order');
             $fields->replaceField('Order', $orderField);
 
-            $summary = $fields->dataFieldByName('ShowInSummaryView');
-            $detail = $fields->dataFieldByName('ShowInDetailView');
-            $duplicates = $fields->dataFieldByName('RemoveDuplicates');
+            $summary = $fields->dataFieldByName('ShowInSummaryView')
+                ->addExtraClass('visibility-options__option');
+            $detail = $fields->dataFieldByName('ShowInDetailView')
+                ->addExtraClass('visibility-options__option');
+            $duplicates = $fields->dataFieldByName('RemoveDuplicates')
+                ->addExtraClass('visibility-options__option');
 
             $fields->removeByName(['ShowInSummaryView', 'ShowInDetailView', 'RemoveDuplicates',]);
-            $fields->insertBefore(FieldGroup::create('Visibility', [$summary, $detail, $duplicates]), 'Order');
+            $visibilityOptions = FieldGroup::create('Visibility', [$summary, $detail, $duplicates])
+                ->addExtraClass('visibility-options');
+            $fields->insertBefore($visibilityOptions, 'Order');
 
             $fields->removeByName('ResourceID');
 
