@@ -57,7 +57,7 @@ class ResourceFilter extends DataObject
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $fields->push(ListboxField::create(
                 'FilterFields',
-                _t(__CLASS__ . '.ColumnsToSearch', 'Columns to search'),
+                _t(__CLASS__ . '.COLUMNS_TO_SEARCH', 'Columns to search'),
                 $this->FilterFor()->Fields()->map('ID', 'ReadableName')
             ));
 

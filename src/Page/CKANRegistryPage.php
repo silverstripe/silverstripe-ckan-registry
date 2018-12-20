@@ -77,7 +77,7 @@ class CKANRegistryPage extends Page
         $fields = parent::getSettingsFields();
 
         $fields->addFieldsToTab('Root.Settings', [
-            TextField::create('ItemsPerPage', _t(__CLASS__ . '.ItemsPerPage', 'Items per page')),
+            TextField::create('ItemsPerPage', _t(__CLASS__ . '.ITEMS_PER_PAGE', 'Items per page')),
         ]);
 
         return $fields;
