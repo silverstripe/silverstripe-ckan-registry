@@ -27,7 +27,7 @@ class Dropdown extends ResourceFilter
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $fields->push(TextField::create(
                 'Options',
-                _t(__CLASS__ . '.Options', 'Dropdown options')
+                _t(__CLASS__ . '.OPTIONS', 'Dropdown options')
             ));
         });
 
