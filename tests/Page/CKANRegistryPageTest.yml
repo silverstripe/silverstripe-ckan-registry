@@ -1,3 +1,11 @@
+SilverStripe\CKANRegistry\Model\Resource:
+  animal_centers:
+    Name: Animal Centers
+    Endpoint: https://example.com/ckan
+    DataSet: animal-centers
+    Identifier: 123-456
+
 SilverStripe\CKANRegistry\Page\CKANRegistryPage:
   animal_centers:
     Title: Animal Centers
+    DataResourceID: =>SilverStripe\CKANRegistry\Model\Resource.animal_centers
