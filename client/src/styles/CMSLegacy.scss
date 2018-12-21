@@ -1,0 +1,13 @@
+// Legacy styles for the CMS, e.g GridFields etc
+.ckan-columns {
+  .form-check-input {
+    margin-left: 0;
+  }
+
+  // Nested for specificity
+  .grid-field__table {
+    .form-check-input.editable-column-field {
+      margin-top: 0;
+    }
+  }
+}

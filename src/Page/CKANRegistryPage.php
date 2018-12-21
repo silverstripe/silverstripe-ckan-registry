@@ -11,8 +11,10 @@ use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\TextField;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
+use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
 
 /**
@@ -52,7 +54,33 @@ class CKANRegistryPage extends Page
 
                 $columnsConfig = GridFieldConfig_RecordEditor::create()
                     ->addComponent($injector->createWithArgs(GridFieldOrderableRows::class, ['Order']));
+
                 $resourceFields = GridField::create('DataColumns', 'Columns', $resource->Fields(), $columnsConfig);
+                $resourceFields->addExtraClass('ckan-columns');
+
+                // Configure inline editable checkboxes for the two boolean fields
+                $before = null;
+                $editableColumns = $injector->create(GridFieldEditableColumns::class);
+                foreach ($columnsConfig->getComponents() as $component) {
+                    if ($before !== null) {
+                        $before = $component;
+                        break;
+                    }
+                    if ($component instanceof GridFieldDataColumns) {
+                        $before = false;
+                        $columns = $component->getDisplayFields($resourceFields);
+
+                        // We only want to change the labels for the GridField view, not the model's edit form
+                        $columns['ShowInSummaryView'] = _t(__CLASS__ . '.IN_RESULTS', 'In Results');
+                        $columns['ShowInDetailView'] = _t(__CLASS__ . '.IN_DETAIL', 'In Detail');
+
+                        $editable = array_flip(['ShowInSummaryView', 'ShowInDetailView']);
+                        $component->setDisplayFields(array_diff_key($columns, $editable));
+                        // set this way so that title translations are preserved
+                        $editableColumns->setDisplayFields(array_intersect_key($columns, $editable));
+                    }
+                }
+                $columnsConfig->addComponent($editableColumns, $before);
                 $fields->addFieldToTab('Root.Data', $resourceFields);
 
                 $filtersConfig = GridFieldConfig_RecordEditor::create();
@@ -64,7 +92,9 @@ class CKANRegistryPage extends Page
                         $injector->create(GridFieldAddNewMultiClass::class),
                         $injector->createWithArgs(GridFieldOrderableRows::class, ['Order']),
                     ]);
+
                 $resourceFilters = GridField::create('DataFilters', 'Filters', $resource->Filters(), $filtersConfig);
+
                 $fields->addFieldToTab('Root.Filters', $resourceFilters);
             }
         });
