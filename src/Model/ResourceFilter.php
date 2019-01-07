@@ -18,6 +18,9 @@ use SilverStripe\ORM\ManyManyList;
  * to use in a request against a CKAN API for that particular resource in order to filter the results shown in a
  * representation of that data.
  *
+ * @property string FilterLabel
+ * @property bool AllColumns
+ * @property int Order
  * @method Resource FilterFor
  * @method ManyManyList FilterFields
  */
@@ -129,6 +132,10 @@ class ResourceFilter extends DataObject
                 . _t(__CLASS__ . '.ALL_COLUMNS', 'All columns')
                 . '</span>'
             );
+        }
+
+        if (!$this->FilterFields()->count()) {
+            return '';
         }
 
         if ($this->FilterFields()->count() === 1) {
