@@ -66,7 +66,7 @@ class PresentedOptionsField extends TextField
         $data['data']['selectTypes'] = self::getSelectTypes();
         $data['data']['endpoint'] = $this->getResource()->Endpoint;
         $data['data']['resource'] = $this->getResource()->Identifier;
-        $data['data']['fieldMap'] = $this->getResource()->Fields()->map('ID', 'Name')->toArray();
+        $data['data']['fieldMap'] = $this->getResource()->Fields()->map('ID', 'OriginalLabel')->toArray();
         return $data;
     }
 

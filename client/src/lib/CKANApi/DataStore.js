@@ -1,5 +1,9 @@
 import CKANApi from '../CKANApi';
 
+/**
+ * Represents a "data store" on CKAN. Can be considered essentially an API to a CSV containing
+ * columns (fields) and rows (records) of data.
+ */
 export default class {
   constructor(endpoint, resource) {
     this.endpoint = endpoint;
@@ -7,14 +11,16 @@ export default class {
   }
 
   /**
+   * Perform a "datastore_search" action on the CKAN resource
    *
-   * @param {string[]} fields - The fields to return
+   * @param {string[]} fields - The fields to return for each record
    * @param {string|object} term - A string term to search globally or an object of field : term
    * @param {boolean} distinct
+   * @return {Promise}
    */
   search(fields = [], term = null, distinct = false) {
     if (!fields.length) {
-      return false;
+      return Promise.resolve(false);
     }
 
     const options = {
@@ -23,9 +29,9 @@ export default class {
     };
 
     // If an invalid term is given then assume that it will return nothing
-    const termType = term && typeof term;
+    const termType = term === null ? null : typeof term;
     if (term !== null && termType !== 'string' && termType !== 'object') {
-      return false;
+      return Promise.resolve(false);
     }
 
     // Parse the term - which can be a global term (string) or an object of { field: term }.

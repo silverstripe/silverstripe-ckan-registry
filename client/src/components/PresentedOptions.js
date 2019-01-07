@@ -28,7 +28,6 @@ class PresentedOptions extends Component {
       suggestedOptionCache: {},
       loading: false,
       separatorDelimiter: '',
-      usedSeparators: [],
       ...value,
     };
 
@@ -68,12 +67,10 @@ class PresentedOptions extends Component {
    * Returns the namespaced form field name for the given field
    *
    * @param {string} fieldName
-   * @param {object} props If provided, will be used instead of this.props
    * @returns {string}
    */
-  getFieldName(fieldName, props = {}) {
-    const name = props.name || this.props.name;
-    return `${name}-${fieldName}`;
+  getFieldName(fieldName) {
+    return `${this.props.name}-${fieldName}`;
   }
 
   /**
@@ -97,8 +94,14 @@ class PresentedOptions extends Component {
     return String(this.props.data.selectTypeDefault);
   }
 
+  /**
+   * Prompt the field to update the suggested options from the CKAN datastore
+   *
+   * @return {Array|null} Returns an array of options if all were loaded or null if promises have
+   *                      been started
+   */
   loadSuggestedOptions() {
-    const { selectedFields, data: { endpoint, resource } } = this.props;
+    const { selectedFields } = this.props;
 
     // Clear the state of suggested options...
     this.setState({
@@ -108,15 +111,12 @@ class PresentedOptions extends Component {
 
     // If there's no columns selected we can early return
     if (!selectedFields.length) {
-      return;
+      return [];
     }
 
     let options = [];
-    const { suggestedOptionCache } = this.state;
+    const { suggestedOptionCache, separatorDelimiter } = this.state;
     const loadPromises = [];
-
-    // Prep a datastore. Note that this doesn't actually fire any requests yet.
-    const Datastore = CKANApi.loadDatastore(endpoint, resource);
 
     // We'll loop through the selected columns an check if we've loaded values for fields previously
     selectedFields.forEach(field => {
@@ -128,61 +128,22 @@ class PresentedOptions extends Component {
 
       // Start loading and append the promise to an array so we can wait for all of them...
       loadPromises.push(
-        Datastore.search([field], null, true).then(result => {
-          let newOptions = [];
-
-          // TODO implement something for if the request fails...
-          if (result) {
-            newOptions = result.records.map(record => record[field]);
-          }
-
-          // Update the "cache" with the options we've loaded.
-          this.setState(state => ({
-            suggestedOptionCache: {
-              // We can't use the local variable as the state may have been mutated while this
-              // promise was resolving...
-              ...state.suggestedOptionCache,
-              [field]: newOptions,
-            },
-          }));
-
-          // Wait for any other suggested options to load from CKAN
-          // TODO this is _not_ a robust method of doing this. Preferably we can wait for all the
-          // promises to complete - or chain the promises. Note that the user has to be pretty quick
-          // to choose two new columns and beat the snappy response from CKAN. Perhaps we can
-          // disable the select while this updates?
-          setTimeout(() => { this.loadSuggestedOptions(); }, 1000);
-        })
+        this.fetchOptionsForField(field)
       );
     });
 
     // If we didn't have to load options then we can just put the known options into state
     if (!loadPromises.length) {
-      options = this.splitOptionsBySeparators(options, this.state.usedSeparators);
-      const suggestedOptions = options
-        // Trim whitespace and convert all whitespace chunks to a single space
-        .map(item => item.trim().replace(/\s+/g, ' '))
-        .filter((item, index) => {
-          // Exclude null, non-string or empty values
-          if (!item || typeof item !== 'string' || item.length === 0) {
-            return false;
-          }
-          // Exclude items that aren't unique. AKA remove if this index is not the same as the
-          // index where this item is first found
-          if (options.indexOf(item) !== index) {
-            return false;
-          }
-
-          return true;
-        })
-        .sort();
+      options = this.splitOptionsBySeparator(options, separatorDelimiter);
+      const suggestedOptions = this.prepOptions(options);
 
       this.setState({
         // Trim, filter nulls, unique and sort the options...
         suggestedOptions,
         loading: false,
       });
-      return;
+
+      return options;
     }
 
     // Mark as loading
@@ -192,19 +153,95 @@ class PresentedOptions extends Component {
 
     // We have to wait for all promises and then just run this function again...
     // Promise.all(loadPromises).then(() => this.loadSuggestedOptions());
+    return null;
   }
 
-  splitOptionsBySeparators(options, delimiters) {
-    // If there are no delimiters provided then we can just return the options
-    if (!delimiters || !delimiters.length) {
+  /**
+   * Given a list of options this method will:
+   * - Trim whitespace from the beginning and end of options
+   * - Ensure whitespace within an option is consistent
+   * - Remove empty or falsy options
+   * - Ensure each option is distinct
+   * - Sort the options alphabetically
+   *
+   * The updated list is returned.
+   *
+   * @param {Array} options
+   * @returns {Array}
+   */
+  prepOptions(options) {
+    return options
+      // Trim whitespace and convert all whitespace chunks to a single space
+      .map(item => item.trim().replace(/\s+/g, ' '))
+      .filter((item, index) => {
+        // Exclude null, non-string or empty values
+        if (!item || typeof item !== 'string' || item.length === 0) {
+          return false;
+        }
+        // Exclude items that aren't unique. AKA remove if this index is not the same as the
+        // index where this item is first found
+        if (options.indexOf(item) !== index) {
+          return false;
+        }
+
+        return true;
+      })
+      .sort();
+  }
+
+  /**
+   * Given a field fetch unique values that exist in that field in the datastore
+   *
+   * @param {string} field The name of the field to load options for
+   * @returns {Promise}
+   */
+  fetchOptionsForField(field) {
+    const { data: { endpoint, resource } } = this.props;
+
+    return CKANApi.loadDatastore(endpoint, resource).search([field], null, true).then(result => {
+      let newOptions = [];
+
+      // TODO implement something for if the request fails...
+      if (result) {
+        newOptions = result.records.map(record => record[field]);
+      }
+
+      // Update the "cache" with the options we've loaded.
+      this.setState(state => ({
+        suggestedOptionCache: {
+          // We can't use the local variable as the state may have been mutated while this
+          // promise was resolving...
+          ...state.suggestedOptionCache,
+          [field]: newOptions,
+        },
+      }));
+
+      // Wait for any other suggested options to load from CKAN
+      // TODO this is _not_ a robust method of doing this. Preferably we can wait for all the
+      // promises to complete - or chain the promises. Note that the user has to be pretty quick
+      // to choose two new columns and beat the snappy response from CKAN. Perhaps we can
+      // disable the select while this updates?
+      setTimeout(() => {
+        this.loadSuggestedOptions();
+      }, 1000);
+    });
+  }
+
+  /**
+   * Given a list of options, run through and split the options by the given separator/delimiter
+   *
+   * @param options
+   * @param delimiter
+   * @returns {*}
+   */
+  splitOptionsBySeparator(options, delimiter) {
+    // If there are no delimiter provided then we can just return the options
+    if (!delimiter || !delimiter.length) {
       return options;
     }
-    // Run through the options and split based on the currently applied delimiters
-    return options.reduce((accumulator, item) => {
-      let acc = accumulator;
-      delimiters.forEach(separator => { acc = acc.concat(item.split(separator)); });
-      return acc;
-    }, []);
+
+    // Run through the options and split based on the currently applied delimiter
+    return options.reduce((accumulator, item) => accumulator.concat(item.split(delimiter)), []);
   }
 
   /**
@@ -249,31 +286,43 @@ class PresentedOptions extends Component {
     });
   }
 
+  /**
+   * Update the delimiter that is used to split options coming from the CKAN datastore
+   *
+   * @param {object} event
+   */
   handleDelimiterChange(event) {
     this.setState({
       separatorDelimiter: event.target.value,
     });
   }
 
+  /**
+   * Update the list of options by separating the existing ones by the inputted delimiter
+   */
   handleExecuteSeparator() {
-    const { suggestedOptions, separatorDelimiter, usedSeparators } = this.state;
-    let newOptions = suggestedOptions;
+    const { separatorDelimiter } = this.state;
 
-    // Do nothing if the current delimiter is an empty string
+    // Reset the options by triggering a reload...
+    const options = this.loadSuggestedOptions();
+
+    // Resetting the options is all that's required if the current delimiter is an empty string
     if (!separatorDelimiter.length) {
       return;
     }
 
-    // Add the new delimiter and split the options if the delimiter hasn't already been applied
-    if (!usedSeparators.find(item => item === separatorDelimiter)) {
-      usedSeparators.push(separatorDelimiter);
-      newOptions = this.splitOptionsBySeparators(suggestedOptions, [separatorDelimiter]);
+    // If the return value of the load is false that means there's a promise (it's loading) going on
+    // We can assume that the options will be correctly split once that promise is resolved so we
+    // can safely return
+    if (!options) {
+      return;
     }
 
+    // Split by the new delimiter and apply cleanups
+    const newOptions = this.prepOptions(this.splitOptionsBySeparator(options, separatorDelimiter));
+
     this.setState({
-      usedSeparators,
       suggestedOptions: newOptions,
-      separatorDelimiter: '',
     });
   }
 
@@ -300,8 +349,11 @@ class PresentedOptions extends Component {
       return null;
     }
 
-    const description = i18n._t('.MANUAL_OPTION_DESCRIPTION', 'Options provided must match the ' +
-      'data within the selected column. Each option should be placed on a new line.');
+    const description = i18n._t(
+      'CKANPresentedOptions.MANUAL_OPTION_DESCRIPTION',
+      'Options provided must match the data within the selected column. Each option should be ' +
+        'placed on a new line.'
+    );
 
     return (
       <Row>
@@ -326,8 +378,13 @@ class PresentedOptions extends Component {
    */
   renderHiddenInput() {
     const { name } = this.props;
-    const { selections, customOptions, usedSeparators } = this.state;
-    const value = { selectType: this.getSelectType(), selections, customOptions, usedSeparators };
+    const { selections, customOptions, separatorDelimiter } = this.state;
+    const value = {
+      customOptions,
+      selectType: this.getSelectType(),
+      selections,
+      separatorDelimiter,
+    };
 
     return (
       <input
@@ -380,6 +437,12 @@ class PresentedOptions extends Component {
     );
   }
 
+  /**
+   * Renders an input with an attached button where the CMS user can enter a delimiter that is used
+   * to split the loaded options
+   *
+   * @returns {FormGroup}
+   */
   renderSeparator() {
     return (
       <FormGroup className="ckan-presented-options__option-separator">
@@ -387,16 +450,26 @@ class PresentedOptions extends Component {
         <InputGroup>
           <Input value={this.state.separatorDelimiter} onChange={this.handleDelimiterChange} />
           <InputGroupAddon addonType="append">
-            <Button onClick={this.handleExecuteSeparator} color="primary">Update</Button>
+            <Button onClick={this.handleExecuteSeparator} color="primary">
+              {i18n._t('CKANPresentedOptions.UPDATE', 'Update')}
+            </Button>
           </InputGroupAddon>
         </InputGroup>
         <FormText>
-          Split options by characters. eg. comma
+          {i18n._t(
+            'CKANPresentedOptions.SPLIT_OPTIONS_DESCRIPTION',
+            'Split options by characters. eg. comma'
+          )}
         </FormText>
       </FormGroup>
     );
   }
 
+  /**
+   * Renders the checkbox list and seperator in Reactstrap columns
+   *
+   * @return {Row}
+   */
   renderCheckboxListAndSeparator() {
     // Don't render the checkbox list unless we've chosen to select from a list of options
     // todo: can we move the value into a constant somewhere? It's already defined in PHP...

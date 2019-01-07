@@ -84,7 +84,7 @@ class ResourceFilter extends DataObject
             $columnSources
                 ->setTitle(_t(__CLASS__ . '.COLUMNS_SOURCES', 'Columns source(s)'))
                 ->addExtraClass('ckan-columns__sources');
-            $fields->push($columnSources);
+            $fields->addFieldToTab('Root.Main', $columnSources);
 
             $fields->removeByName([
                 'FilterForID',

@@ -26,7 +26,7 @@ class Dropdown extends ResourceFilter
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
-            $fields->push(PresentedOptionsField::create(
+            $fields->addFieldToTab('Root.Main', PresentedOptionsField::create(
                 'Options',
                 $this->FilterFor,
                 _t(__CLASS__ . '.OPTIONS', 'Presented options')
