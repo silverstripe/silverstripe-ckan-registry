@@ -51,9 +51,9 @@ class ResourceFieldPopulatorTest extends SapphireTest
         $this->assertCount(2, $resource->Fields(), 'Fields should be populated');
 
         // Test that the readable names were generated correctly
-        $this->assertSame('Field a', $resource->Fields()->first()->ReadableName);
-        $this->assertEquals(1, $resource->Fields()->first()->Order);
-        $this->assertSame('Field bar captain', $resource->Fields()->last()->ReadableName);
-        $this->assertEquals(2, $resource->Fields()->last()->Order);
+        $this->assertSame('Field a', $resource->Fields()->first()->ReadableLabel);
+        $this->assertEquals(1, $resource->Fields()->first()->Position);
+        $this->assertSame('Field bar captain', $resource->Fields()->last()->ReadableLabel);
+        $this->assertEquals(2, $resource->Fields()->last()->Position);
     }
 }

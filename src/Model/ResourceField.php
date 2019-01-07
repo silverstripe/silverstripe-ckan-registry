@@ -11,17 +11,17 @@ use SilverStripe\ORM\DataObject;
 
 /**
  * Represents a generic field on a CKAN Resource, e.g. a column in a spreadsheet.
- * It is intentionally generic, as the resource may not be a tabular one, e.g. geospatal data to be rendered in a map.
+ * It is intentionally generic, as the resource may not be a tabular one, e.g. geospatial data to be rendered in a map.
  *
  * @method Resource Resource
  * @method static ResourceField create()
- * @property string Name
+ * @property string OriginalLabel
  * @property string Type
- * @property string ReadableName
+ * @property string ReadableLabel
  * @property bool ShowInSummaryView
  * @property bool ShowInDetailView
  * @property bool RemoveDuplicates
- * @property int Order
+ * @property int Position
  * @property string DisplayConditions
  */
 class ResourceField extends DataObject
@@ -29,13 +29,13 @@ class ResourceField extends DataObject
     private static $table_name = 'CKANResourceField';
 
     private static $db = [
-        'Name' => 'Varchar',
+        'OriginalLabel' => 'Varchar',
         'Type' => 'Varchar',
-        'ReadableName' => 'Varchar',
+        'ReadableLabel' => 'Varchar',
         'ShowInSummaryView' => 'Boolean',
         'ShowInDetailView' => 'Boolean',
         'RemoveDuplicates' => 'Boolean',
-        'Order' => 'Int',
+        'Position' => 'Int',
         'DisplayConditions' => 'Text',
     ];
 
@@ -44,9 +44,9 @@ class ResourceField extends DataObject
     ];
 
     private static $summary_fields = [
-        'Order',
-        'ReadableName',
-        'Name',
+        'Position',
+        'ReadableLabel',
+        'OriginalLabel',
         'Type',
         'ShowInSummaryView',
         'ShowInDetailView',
@@ -55,19 +55,24 @@ class ResourceField extends DataObject
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
-            $originalTitle = ReadonlyField::create('Name', _t(
-                __CLASS__ . '.ORIGINAL_TITLE',
-                'Original title'
-            ))->setDescription(_t(
-                __CLASS__ . '.ORIGINAL_TITLE_DESCRIPTION',
-                'Title of this field as provided by the CKAN resource'
-            ));
-            $fields->replaceField('Name', $originalTitle);
+            $originalLabel = ReadonlyField::create('OriginalLabel')
+                ->setDescription(_t(
+                    __CLASS__ . '.ORIGINAL_LABEL_DESCRIPTION',
+                    'Title of this field as provided by the CKAN resource'
+                ));
+            // See https://github.com/silverstripe/silverstripe-framework/issues/8696
+            $originalLabel->setTitle(ucfirst(strtolower($originalLabel->Title())));
+            $fields->replaceField('OriginalLabel', $originalLabel);
+
+            $readableLabel = $fields->dataFieldByName('ReadableLabel');
+            $readableLabel
+                // See https://github.com/silverstripe/silverstripe-framework/issues/8696
+                ->setTitle(ucfirst(strtolower($readableLabel->Title())))
+                ->setAttribute('placeholder', $this->OriginalLabel);
 
             $fields->removeByName('Type');
-            $fields->dataFieldByName('ReadableName')
-                ->setAttribute('placeholder', $this->Name);
-            $orderField = NumericField::create('Order')
+
+            $positionField = NumericField::create('Position')
                 ->setTitle(_t(__CLASS__ . '.ORDER_LABEL', 'Presented order'))
                 ->setDescription(_t(
                     __CLASS__ . '.ORDER_DENOMINATOR',
@@ -75,7 +80,7 @@ class ResourceField extends DataObject
                     ['count' => static::get()->filter('ResourceID', $this->ResourceID)->count()]
                 ))
                 ->addExtraClass('ckan-resource__order');
-            $fields->replaceField('Order', $orderField);
+            $fields->replaceField('Position', $positionField);
 
             $summary = $fields->dataFieldByName('ShowInSummaryView')
                 ->addExtraClass('visibility-options__option');
@@ -84,10 +89,11 @@ class ResourceField extends DataObject
             $duplicates = $fields->dataFieldByName('RemoveDuplicates')
                 ->addExtraClass('visibility-options__option');
 
+            // Present the visibility fields in a group
             $fields->removeByName(['ShowInSummaryView', 'ShowInDetailView', 'RemoveDuplicates',]);
             $visibilityOptions = FieldGroup::create('Visibility', [$summary, $detail, $duplicates])
                 ->addExtraClass('visibility-options');
-            $fields->insertBefore($visibilityOptions, 'Order');
+            $fields->insertBefore($visibilityOptions, 'Position');
 
             $fields->removeByName('ResourceID');
 

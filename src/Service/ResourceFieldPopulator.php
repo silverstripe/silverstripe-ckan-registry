@@ -36,22 +36,22 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
 
         $newFields = [];
         $fields = $resource->Fields();
-        $order = 1;
+        $position = 1;
 
         foreach ($fieldSpecs as $fieldSpec) {
             $id = $fieldSpec['id'];
 
             // Skip fields that may already exist
-            if ($fields->find('Name', $id)) {
+            if ($fields->find('OriginalLabel', $id)) {
                 continue;
             }
 
             // Create a new field
             $newFields[] = $field = ResourceField::create();
-            $field->Name = $id;
-            $field->Order = $order++;
+            $field->OriginalLabel = $id;
+            $field->Position = $position++;
             // Attempt to parse a readable name
-            $field->ReadableName = $this->parseName($id);
+            $field->ReadableLabel = $this->parseName($id);
             $field->Type = $fieldSpec['type'];
         }
 
