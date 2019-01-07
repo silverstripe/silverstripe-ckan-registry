@@ -12,7 +12,7 @@ import fieldHolder from 'components/FieldHolder/FieldHolder';
  * multiple conditions to be stored in the state and field value. In the interim, values are stored
  * as a specific object index.
  */
-class ResultConditions extends Component {
+class CKANResultConditionsField extends Component {
   constructor(props) {
     super(props);
 
@@ -169,7 +169,7 @@ class ResultConditions extends Component {
   }
 }
 
-ResultConditions.propTypes = {
+CKANResultConditionsField.propTypes = {
   name: PropTypes.string,
   value: PropTypes.object,
   data: PropTypes.shape({
@@ -186,12 +186,12 @@ ResultConditions.propTypes = {
   SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]).isRequired,
 };
 
-ResultConditions.defaultProps = {
+CKANResultConditionsField.defaultProps = {
   value: {},
   data: {},
 };
 
-export { ResultConditions as Component };
+export { CKANResultConditionsField as Component };
 
 export default fieldHolder(inject(
   ['SingleSelectField', 'TextField'],
@@ -199,5 +199,5 @@ export default fieldHolder(inject(
     SelectComponent,
     TextFieldComponent,
   }),
-  () => 'CKAN.Column.ResultConditions'
-)(ResultConditions));
+  () => 'CKAN.Column.ResultConditionsField'
+)(CKANResultConditionsField));

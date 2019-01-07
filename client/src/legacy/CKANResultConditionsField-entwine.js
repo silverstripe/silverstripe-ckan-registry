@@ -7,7 +7,7 @@ jQuery.entwine('ss', ($) => {
   $('.js-injector-boot .ckan-result-conditions__container').entwine({
     onmatch() {
       const context = {};
-      const ResultConditions = loadComponent('ResultConditions', context);
+      const CKANResultConditionsField = loadComponent('CKANResultConditionsField', context);
 
       const temporaryInput = this.children('input:first');
 
@@ -24,7 +24,7 @@ jQuery.entwine('ss', ($) => {
       };
 
       ReactDOM.render(
-        <ResultConditions {...props} />,
+        <CKANResultConditionsField {...props} />,
         this[0]
       );
     },

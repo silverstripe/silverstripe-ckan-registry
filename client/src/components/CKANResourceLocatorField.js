@@ -8,9 +8,9 @@ import debounce from 'lodash/debounce';
 import { inject } from 'lib/Injector';
 import fieldHolder from 'components/FieldHolder/FieldHolder';
 import classNames from 'classnames';
-import URLInput from './ResourceLocator/URLInput';
+import URLInput from './CKANResourceLocatorField/URLInput';
 
-class CKANResourceLocator extends Component {
+class CKANResourceLocatorField extends Component {
   constructor(props) {
     super(props);
 
@@ -67,7 +67,7 @@ class CKANResourceLocator extends Component {
 
     // Return a generic "catch all" response
     message.value = i18n._t(
-      'CKANResourceLocator.INVALID_DATASET_URL',
+      'CKANResourceLocatorField.INVALID_DATASET_URL',
       'The provided data source URL does not appear to be a valid CKAN data set.'
     );
 
@@ -245,7 +245,7 @@ class CKANResourceLocator extends Component {
     }
 
     const unavailableMessage = i18n._t(
-      'CKANResourceLocator.INVALID_RESOURCE_SELECTION',
+      'CKANResourceLocatorField.INVALID_RESOURCE_SELECTION',
       'Datastore is not available for the selected resource.'
     );
 
@@ -309,7 +309,7 @@ class CKANResourceLocator extends Component {
 
     // Props for the URLInput
     const inputProps = {
-      title: i18n._t('CKANResourceLocator.DATA_SOURCE_URL', 'Data source URL'),
+      title: i18n._t('CKANResourceLocatorField.DATA_SOURCE_URL', 'Data source URL'),
       extraClass: 'form-field--no-divider stacked',
       message: invalidMessage,
       value: uri,
@@ -336,7 +336,7 @@ class CKANResourceLocator extends Component {
   }
 }
 
-CKANResourceLocator.propTypes = {
+CKANResourceLocatorField.propTypes = {
   // The field name
   name: PropTypes.string.isRequired,
   // The value of this field - A JSON object with `endpoint`, `dataset` and `resource` keys.
@@ -355,5 +355,5 @@ export default fieldHolder(inject(
   (SelectComponent) => ({
     SelectComponent,
   }),
-  () => 'CKAN.ResourceLocator'
-)(CKANResourceLocator));
+  () => 'CKAN.ResourceLocatorField'
+)(CKANResourceLocatorField));

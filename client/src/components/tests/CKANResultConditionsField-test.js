@@ -1,18 +1,18 @@
 import React from 'react';
-import { Component as ResultConditions } from '../ResultConditions';
+import { Component as CKANResultConditionsField } from '../CKANResultConditionsField';
 import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15.4/build/index';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-describe('ResultConditions', () => {
+describe('CKANCKANResultConditionsFieldField', () => {
   const MockTextField = () => <div />;
   const MockSelectField = () => <div />;
 
   describe('getFieldName()', () => {
     it('returns a composite field name containing the field name', () => {
       const wrapper = shallow(
-        <ResultConditions
+        <CKANResultConditionsField
           name="foo"
           TextFieldComponent={MockTextField}
           SelectComponent={MockSelectField}
@@ -24,7 +24,7 @@ describe('ResultConditions', () => {
 
     it('gives priority to passed props', () => {
       const wrapper = shallow(
-        <ResultConditions
+        <CKANResultConditionsField
           name="foo"
           TextFieldComponent={MockTextField}
           SelectComponent={MockSelectField}
@@ -38,7 +38,7 @@ describe('ResultConditions', () => {
   describe('getValue()', () => {
     it('returns the select and text field value from the state', () => {
       const wrapper = shallow(
-        <ResultConditions
+        <CKANResultConditionsField
           name="foo"
           value={{
             0: {
@@ -60,7 +60,7 @@ describe('ResultConditions', () => {
   describe('handleChange()', () => {
     it('merges the changed input name and value into the state', () => {
       const wrapper = shallow(
-        <ResultConditions
+        <CKANResultConditionsField
           name="foo"
           TextFieldComponent={MockTextField}
           SelectComponent={MockSelectField}
@@ -94,7 +94,7 @@ describe('ResultConditions', () => {
   describe('render()', () => {
     it('renders a select', () => {
       const wrapper = shallow(
-        <ResultConditions
+        <CKANResultConditionsField
           name="foo"
           TextFieldComponent={MockTextField}
           SelectComponent={MockSelectField}
@@ -106,7 +106,7 @@ describe('ResultConditions', () => {
 
     it('renders a text input', () => {
       const wrapper = shallow(
-        <ResultConditions
+        <CKANResultConditionsField
           name="foo"
           TextFieldComponent={MockTextField}
           SelectComponent={MockSelectField}
@@ -118,7 +118,7 @@ describe('ResultConditions', () => {
 
     it('renders a hidden input containing a serialized value', () => {
       const wrapper = shallow(
-        <ResultConditions
+        <CKANResultConditionsField
           name="foo"
           value={{
             0: {
@@ -138,7 +138,7 @@ describe('ResultConditions', () => {
 
     it('renders a single field with the correct name attribute', () => {
       const wrapper = shallow(
-        <ResultConditions
+        <CKANResultConditionsField
           name="foo"
           TextFieldComponent={MockTextField}
           SelectComponent={MockSelectField}
