@@ -36,7 +36,7 @@ class PresentedOptionsField extends TextField
      *
      * @var Resource
      */
-    protected $resouce;
+    protected $resource;
 
     public function __construct(
         $name,
@@ -46,7 +46,7 @@ class PresentedOptionsField extends TextField
         $maxLength = null,
         Form $form = null
     ) {
-        $this->setResouce($resource);
+        $this->setResource($resource);
 
         parent::__construct($name, $title, $value, $maxLength, $form);
 
@@ -64,9 +64,9 @@ class PresentedOptionsField extends TextField
         $data['data']['options'] = self::getOptions();
         $data['data']['selectTypeDefault'] = self::SELECT_TYPE_DEFAULT;
         $data['data']['selectTypes'] = self::getSelectTypes();
-        $data['data']['endpoint'] = $this->getResouce()->Endpoint;
-        $data['data']['resource'] = $this->getResouce()->Identifier;
-        $data['data']['fieldMap'] = $this->getResouce()->Fields()->map('ID', 'Name')->toArray();
+        $data['data']['endpoint'] = $this->getResource()->Endpoint;
+        $data['data']['resource'] = $this->getResource()->Identifier;
+        $data['data']['fieldMap'] = $this->getResource()->Fields()->map('ID', 'Name')->toArray();
         return $data;
     }
 
@@ -101,18 +101,18 @@ class PresentedOptionsField extends TextField
     /**
      * @return Resource
      */
-    public function getResouce()
+    public function getResource()
     {
-        return $this->resouce;
+        return $this->resource;
     }
 
     /**
      * @param Resource $resouce
      * @return $this
      */
-    public function setResouce($resouce)
+    public function setResource(Resource $resource)
     {
-        $this->resouce = $resouce;
+        $this->resource = $resource;
         return $this;
     }
 }
