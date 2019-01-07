@@ -21,7 +21,7 @@ class PresentedOptions extends Component {
 
     const value = props.value || {};
     this.state = {
-      customOptions: '',
+      customOptions: [],
       selectType: props.selectTypeDefault,
       selections: {},
       suggestedOptions: [],
@@ -82,7 +82,7 @@ class PresentedOptions extends Component {
    * @returns {string}
    */
   getInputValue() {
-    return this.state.customOptions;
+    return this.state.customOptions.join('\n');
   }
 
   /**
@@ -115,7 +115,7 @@ class PresentedOptions extends Component {
     const { suggestedOptionCache } = this.state;
     const loadPromises = [];
 
-    // Prep a datastore. Not that this doesn't actually fire any requests yet.
+    // Prep a datastore. Note that this doesn't actually fire any requests yet.
     const Datastore = CKANApi.loadDatastore(endpoint, resource);
 
     // We'll loop through the selected columns an check if we've loaded values for fields previously
@@ -158,8 +158,10 @@ class PresentedOptions extends Component {
 
     // If we didn't have to load options then we can just put the known options into state
     if (!loadPromises.length) {
-      const suggestedOptions = this.splitOptionsBySeparators(options, this.state.usedSeparators)
-        .map(item => item.trim())
+      options = this.splitOptionsBySeparators(options, this.state.usedSeparators);
+      const suggestedOptions = options
+        // Trim whitespace and convert all whitespace chunks to a single space
+        .map(item => item.trim().replace(/\s+/g, ' '))
         .filter((item, index) => {
           // Exclude null, non-string or empty values
           if (!item || typeof item !== 'string' || item.length === 0) {
@@ -231,7 +233,8 @@ class PresentedOptions extends Component {
    */
   handleInputChange(event) {
     this.setState({
-      customOptions: event.target.value,
+      // Split the text area by new lines and trim each entry
+      customOptions: event.target.value.split('\n').map(value => value.trim()),
     });
   }
 
@@ -297,13 +300,22 @@ class PresentedOptions extends Component {
       return null;
     }
 
+    const description = i18n._t('.MANUAL_OPTION_DESCRIPTION', 'Options provided must match the ' +
+      'data within the selected column. Each option should be placed on a new line.');
+
     return (
-      <Input
-        type="textarea"
-        name={this.getFieldName('options-custom')}
-        onChange={this.handleInputChange}
-        value={this.getInputValue()}
-      />
+      <Row>
+        <Col lg={9} sm={12}>
+          <Input
+            type="textarea"
+            className="ckan-presented-options__manual-options"
+            name={this.getFieldName('options-custom')}
+            onChange={this.handleInputChange}
+            value={this.getInputValue()}
+          />
+        </Col>
+        <Col lg={3} sm={12}>{ description }</Col>
+      </Row>
     );
   }
 
@@ -314,8 +326,8 @@ class PresentedOptions extends Component {
    */
   renderHiddenInput() {
     const { name } = this.props;
-    const { selections, usedSeparators } = this.state;
-    const value = { selectType: this.getSelectType(), selections, usedSeparators };
+    const { selections, customOptions, usedSeparators } = this.state;
+    const value = { selectType: this.getSelectType(), selections, customOptions, usedSeparators };
 
     return (
       <input

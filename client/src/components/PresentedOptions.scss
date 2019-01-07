@@ -8,6 +8,7 @@
     background-color: $input-bg;
     border: $input-border-width solid $input-border-color;
     border-radius: $input-border-radius;
+    @include box-shadow($input-box-shadow);
 
     // Position relative forces the loading component to sit within this container
     position: relative;
@@ -30,5 +31,9 @@
     &:last-child {
       margin-bottom: 0;
     }
+  }
+
+  &__manual-options {
+    height: 16rem;
   }
 }
