@@ -76,11 +76,10 @@ class ResourceLocatorField extends FormField
 
     public function getSchemaDataDefaults()
     {
-        $schemaData = parent::getSchemaDataDefaults();
-
-        $schemaData['defaultEndpoint'] = $this->getDefaultEndpoint();
-
-        return $schemaData;
+        return array_merge(parent::getSchemaDataDefaults(), [
+            'hideLabels' => true,
+            'defaultEndpoint' => $this->getDefaultEndpoint(),
+        ]);
     }
 
     public function setValue($value, $data = null)

@@ -48,7 +48,12 @@ class CKANRegistryPage extends Page
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $resource = $this->DataResource();
-            $fields->addFieldToTab('Root.Data', ResourceLocatorField::create('DataResource'));
+
+            $fields->addFieldToTab(
+                'Root.Data',
+                ResourceLocatorField::create('DataResource')
+                    ->addExtraClass('form-field--no-divider')
+            );
 
             if ($resource && $resource->Identifier) {
                 $injector = Injector::inst();

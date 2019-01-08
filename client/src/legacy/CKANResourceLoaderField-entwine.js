@@ -13,6 +13,7 @@ jQuery.entwine('ss', ($) => {
       const value = this.children('input:first').val();
       const props = {
         name: this.attr('name'),
+        ...schemaData,
         defaultEndpoint: schemaData.defaultEndpoint || null,
         description: schemaData.description.html || '',
         value: value ? JSON.parse(value) : undefined,
