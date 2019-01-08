@@ -36,7 +36,7 @@ class Client implements ClientInterface
 
     public function getSearchData(Resource $resource)
     {
-        return $this->getData($resource, 'datastore_search');
+        return $this->getData($resource, 'datastore_search', 'Identifier');
     }
 
     public function getData(Resource $resource, $action = 'datastore_search', $id = 'Identifier')
