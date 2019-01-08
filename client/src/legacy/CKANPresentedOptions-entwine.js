@@ -40,13 +40,4 @@ jQuery.entwine('ss', ($) => {
       );
     }
   });
-
-  // Hook into changes on the columns field so we can update the presented options props
-  // TODO this should probably work by getting the name of an attached field from the presented
-  // option field? Right now it's just looking specifically for an ID :\
-  $('.js-injector-boot #Form_ItemEditForm_FilterFields').entwine({
-    onchange() {
-      $('.js-injector-boot .ckan-presented-options__container').renderComponent(this.val());
-    }
-  });
 });
