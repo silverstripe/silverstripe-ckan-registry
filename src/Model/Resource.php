@@ -2,7 +2,7 @@
 
 namespace SilverStripe\CKANRegistry\Model;
 
-use SilverStripe\CKANRegistry\Service\ResourceFieldPopulatorInterface;
+use SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
@@ -11,6 +11,7 @@ use SilverStripe\ORM\HasManyList;
  * A CKAN Resource that belongs to a DataSet/Package, as to be accessed via the CKAN API.
  *
  * @property string Name
+ * @property string ResourceName
  * @property string Endpoint
  * @property string DataSet
  * @property string Identifier
@@ -23,6 +24,7 @@ class Resource extends DataObject
 
     private static $db = [
         'Name' => 'Varchar',
+        'ResourceName' => 'Varchar',
         'Endpoint' => 'Varchar',
         'DataSet' => 'Varchar',
         'Identifier' => 'Varchar',
@@ -43,8 +45,8 @@ class Resource extends DataObject
         if ($this->isChanged('Identifier')) {
             $this->Fields()->removeAll();
 
-            /** @var ResourceFieldPopulatorInterface $populator */
-            $populator = Injector::inst()->get(ResourceFieldPopulatorInterface::class);
+            /** @var ResourcePopulatorInterface $populator */
+            $populator = Injector::inst()->get(ResourcePopulatorInterface::class);
             $populator->populateFields($this);
 
             // Remove the existing filters and add a default text entry to search all ResourceFields
@@ -54,5 +56,21 @@ class Resource extends DataObject
         }
 
         parent::onAfterWrite();
+    }
+
+    /**
+     * Whenever the CKAN resource identifier is changed, populate a new set of metadata for the new resource
+     *
+     * {@inheritdoc}
+     */
+    public function onBeforeWrite()
+    {
+        if ($this->isChanged('Identifier')) {
+            /** @var ResourcePopulatorInterface $populator */
+            $populator = Injector::inst()->get(ResourcePopulatorInterface::class);
+            $populator->populateMetadata($this);
+        }
+
+        parent::onBeforeWrite();
     }
 }

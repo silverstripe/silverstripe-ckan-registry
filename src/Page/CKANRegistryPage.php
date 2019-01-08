@@ -65,8 +65,17 @@ class CKANRegistryPage extends Page
                         GridFieldDeleteAction::class,
                     ]);
 
-                $resourceFields = GridField::create('DataColumns', 'Columns', $resource->Fields(), $columnsConfig);
+                $resourceFields = GridField::create('DataColumns', '', $resource->Fields(), $columnsConfig);
                 $resourceFields->addExtraClass('ckan-columns');
+
+                // Set the title for the GridField to the data set and resource name (if selected)
+                if ($resource->Name) {
+                    $title = $resource->Name;
+                    if ($resource->ResourceName) {
+                        $title .= ' / ' . $resource->ResourceName;
+                    }
+                    $resourceFields->setTitle($title);
+                }
 
                 // Configure inline editable checkboxes for the two boolean fields
                 $before = null;
