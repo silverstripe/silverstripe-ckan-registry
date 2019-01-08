@@ -3,6 +3,7 @@
 namespace SilverStripe\CKANRegistry\Tests\Forms;
 
 use SilverStripe\CKANRegistry\Forms\PresentedOptionsField;
+use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\Dev\SapphireTest;
 
 class PresentedOptionsFieldTest extends SapphireTest

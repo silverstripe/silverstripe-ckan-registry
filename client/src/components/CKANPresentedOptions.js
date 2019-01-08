@@ -202,9 +202,11 @@ class CKANPresentedOptions extends Component {
       let newOptions = [];
 
       // TODO implement something for if the request fails...
-      if (result) {
-        newOptions = result.records.map(record => record[field]);
+      if (!result) {
+        return;
       }
+
+      newOptions = result.records.map(record => record[field]);
 
       // Update the "cache" with the options we've loaded.
       this.setState(state => ({
