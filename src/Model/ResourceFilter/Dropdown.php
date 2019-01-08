@@ -18,7 +18,7 @@ class Dropdown extends ResourceFilter
 
     private static $table_name = 'CKANFilter_Dropdown';
 
-    private static $singular_name = 'Dropdown Filter';
+    private static $singular_name = 'Dropdown';
 
     protected $fieldType = DropdownField::class;
 

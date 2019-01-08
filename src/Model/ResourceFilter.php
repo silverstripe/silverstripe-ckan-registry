@@ -48,7 +48,7 @@ class ResourceFilter extends DataObject
         'Columns',
     ];
 
-    private static $singular_name = 'Text Filter';
+    private static $singular_name = 'Text';
 
     /**
      * Defines the type of {@link FormField} that will be used to render the filter in the CMS. This is defined
@@ -63,8 +63,6 @@ class ResourceFilter extends DataObject
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
             $allColumnsField = $fields->dataFieldByName('AllColumns');
             $allColumnsField->addExtraClass('ckan-columns__all-columns');
-            // See https://github.com/silverstripe/silverstripe-framework/issues/8696
-            $allColumnsField->setTitle(ucfirst(strtolower($allColumnsField->Title())));
 
             // Remove the scaffolded Filter Fields tab and the AllColumns field
             $fields->removeByName(['FilterFields', 'AllColumns']);
@@ -83,11 +81,16 @@ class ResourceFilter extends DataObject
                 ->addExtraClass('ckan-columns__sources');
             $fields->push($columnSources);
 
-            // See https://github.com/silverstripe/silverstripe-framework/issues/8696
-            $filterLabel = $fields->dataFieldByName('FilterLabel');
-            $filterLabel->setTitle(ucfirst(strtolower($filterLabel->Title())));
+            $fields->removeByName([
+                'FilterForID',
+                'Order',
+            ]);
 
-            $fields->removeByName('FilterForID');
+            // See https://github.com/silverstripe/silverstripe-framework/issues/8696
+            foreach (['AllColumns', 'FilterLabel'] as $fieldName) {
+                $field = $fields->dataFieldByName($fieldName);
+                $field->setTitle(ucfirst(strtolower($field->Title())));
+            }
         });
 
         return parent::getCMSFields();

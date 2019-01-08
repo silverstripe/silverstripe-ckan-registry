@@ -1,8 +1,50 @@
 en:
+  SilverStripe\CKANRegistry\Forms\ResourceLocatorField:
+    DESCRIPTION: 'Connect to a data source from {site}. Once added and saved you can configure the appearance and add search filters.'
+    GENERIC_SITE_NAME: 'a CKAN website'
+  SilverStripe\CKANRegistry\Forms\ResultConditionsField:
+    MUST_MATCH: 'Must match'
+    MUST_NOT_MATCH: 'Must not match'
+  SilverStripe\CKANRegistry\Model\Resource:
+    PLURALNAME: Resources
+    PLURALS:
+      one: 'A Resource'
+      other: '{count} Resources'
+    SINGULARNAME: Resource
+  SilverStripe\CKANRegistry\Model\ResourceField:
+    ORDER_DENOMINATOR: 'of {count} columns'
+    ORDER_LABEL: 'Presented order'
+    ORIGINAL_LABEL_DESCRIPTION: 'Title of this field as provided by the CKAN resource'
+    PLURALNAME: 'Resource Fields'
+    PLURALS:
+      one: 'A Resource Field'
+      other: '{count} Resource Fields'
+    REMOVE_DUPLICATES_LABEL: 'Only show one value if duplicates exist'
+    RESULT_CONDITIONS: 'Result conditions'
+    SINGULARNAME: 'Resource Field'
+  SilverStripe\CKANRegistry\Model\ResourceFilter:
+    ALL_COLUMNS: 'All columns'
+    COLUMNS_SOURCES: 'Columns source(s)'
+    MULTIPLE_COLUMNS: 'Multiple columns'
+    PLURALNAME: Texts
+    PLURALS:
+      one: 'A Text'
+      other: '{count} Texts'
+    SINGULARNAME: Text
+  SilverStripe\CKANRegistry\Model\ResourceFilter\Dropdown:
+    OPTIONS: 'Dropdown options'
+    PLURALNAME: Dropdowns
+    PLURALS:
+      one: 'A Dropdown'
+      other: '{count} Dropdowns'
+    SINGULARNAME: Dropdown
   SilverStripe\CKANRegistry\Page\CKANRegistryPage:
-    ItemsPerPage: 'Items per page'
+    IN_DETAIL: 'In Detail'
+    IN_RESULTS: 'In Results'
+    ITEMS_PER_PAGE: 'Items per page'
     PLURALNAME: 'CKAN Registry Pages'
     PLURALS:
       one: 'A CKAN Registry Page'
       other: '{count} CKAN Registry Pages'
+    POS: Pos.
     SINGULARNAME: 'CKAN Registry Page'

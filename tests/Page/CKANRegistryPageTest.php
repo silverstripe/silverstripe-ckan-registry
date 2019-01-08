@@ -76,7 +76,7 @@ class CKANRegistryPageTest extends SapphireTest
 
         $displayFields = $component->getDisplayFields($field);
         $this->assertEquals([
-            'ShowInSummaryView' => _t('SilverStripe\\CKANRegistry\\Page\\CKANRegistryPage.IN_RESULTS', 'In Results'),
+            'ShowInResultsView' => _t('SilverStripe\\CKANRegistry\\Page\\CKANRegistryPage.IN_RESULTS', 'In Results'),
             'ShowInDetailView' => _t('SilverStripe\\CKANRegistry\\Page\\CKANRegistryPage.IN_DETAIL', 'In Detail'),
         ], $displayFields, 'Correct display fields were not found');
     }
