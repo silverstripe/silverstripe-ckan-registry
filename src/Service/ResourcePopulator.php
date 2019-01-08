@@ -96,7 +96,7 @@ class ResourcePopulator implements ResourcePopulatorInterface
      * Validates that the given {@link Resource} has the necessary data to make the request
      *
      * @param Resource $resource
-     * @returns bool True if successful
+     * @return bool True if successful
      * @throws RuntimeException If validation fails
      */
     protected function validateResource(Resource $resource)
