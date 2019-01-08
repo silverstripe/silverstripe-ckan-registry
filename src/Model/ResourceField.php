@@ -33,7 +33,7 @@ class ResourceField extends DataObject
         'Type' => 'Varchar',
         'ReadableLabel' => 'Varchar',
         'ShowInResultsView' => 'Boolean',
-        'ShowInDetailView' => 'Boolean',
+        'ShowInDetailView' => 'Boolean(1)',
         'RemoveDuplicates' => 'Boolean',
         'Position' => 'Int',
         'DisplayConditions' => 'Text',
