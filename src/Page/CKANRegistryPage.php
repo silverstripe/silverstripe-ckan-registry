@@ -12,6 +12,7 @@ use SilverStripe\Forms\GridField\GridFieldAddExistingAutocompleter;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use SilverStripe\Forms\TextField;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
 use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
@@ -53,7 +54,11 @@ class CKANRegistryPage extends Page
                 $injector = Injector::inst();
 
                 $columnsConfig = GridFieldConfig_RecordEditor::create()
-                    ->addComponent($injector->createWithArgs(GridFieldOrderableRows::class, ['Position']));
+                    ->addComponent($injector->createWithArgs(GridFieldOrderableRows::class, ['Position']))
+                    ->removeComponentsByType([
+                        GridFieldAddNewButton::class,
+                        GridFieldDeleteAction::class,
+                    ]);
 
                 $resourceFields = GridField::create('DataColumns', 'Columns', $resource->Fields(), $columnsConfig);
                 $resourceFields->addExtraClass('ckan-columns');
@@ -87,10 +92,11 @@ class CKANRegistryPage extends Page
                 $fields->addFieldToTab('Root.Data', $resourceFields);
 
                 $filtersConfig = GridFieldConfig_RecordEditor::create();
-                $filtersConfig->removeComponentsByType([
-                    GridFieldAddExistingAutocompleter::class,
-                    GridFieldAddNewButton::class
-                ])
+                $filtersConfig
+                    ->removeComponentsByType([
+                        GridFieldAddExistingAutocompleter::class,
+                        GridFieldAddNewButton::class
+                    ])
                     ->addComponents([
                         $injector->create(GridFieldAddNewMultiClass::class),
                         $injector->createWithArgs(GridFieldOrderableRows::class, ['Order']),
