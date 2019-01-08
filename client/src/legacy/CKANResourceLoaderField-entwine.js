@@ -16,6 +16,7 @@ jQuery.entwine('ss', ($) => {
         defaultEndpoint: schemaData.defaultEndpoint || null,
         description: schemaData.description.html || '',
         value: value ? JSON.parse(value) : undefined,
+        ...schemaData,
       };
 
       ReactDOM.render(
