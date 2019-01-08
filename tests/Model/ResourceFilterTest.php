@@ -24,7 +24,7 @@ class ResourceFilterTest extends SapphireTest
     public function testGetType()
     {
         $filter = new ResourceFilter();
-        $this->assertSame('Text Filter', $filter->getType());
+        $this->assertSame('Text', $filter->getType());
     }
 
     public function testGetCMSFields()

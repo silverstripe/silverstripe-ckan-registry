@@ -25,6 +25,6 @@ class DropdownTest extends SapphireTest
     public function testGetType()
     {
         $field = new Dropdown();
-        $this->assertSame('Dropdown Filter', $field->getType());
+        $this->assertSame('Dropdown', $field->getType());
     }
 }
