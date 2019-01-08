@@ -1,12 +1,10 @@
 <?php
+
 namespace SilverStripe\CKANRegistry\Service;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Psr7\Request;
 use RuntimeException;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\CKANRegistry\Model\ResourceField;
-use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
@@ -14,17 +12,16 @@ use SilverStripe\Core\Injector\Injectable;
  */
 class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
 {
-    use Extensible;
     use Injectable;
 
     private static $dependencies = [
-        'GuzzleClient' => '%$' . Client::class,
+        'Client' => '%$' . ClientInterface::class,
     ];
 
     /**
-     * @var Client
+     * @var ClientInterface
      */
-    protected $guzzleClient;
+    protected $client;
 
     public function populateFields(Resource $resource)
     {
@@ -64,35 +61,11 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
      *
      * @param Resource $resource
      * @return array
-     * @throws \GuzzleHttp\Exception\GuzzleException|RuntimeException
      */
     protected function doFieldRequest(Resource $resource)
     {
-        $endpoint = sprintf(
-            '%s/api/3/action/datastore_search?id=%s',
-            trim($resource->Endpoint, '/'),
-            $resource->Identifier
-        );
-
-        $request = new Request('GET', $endpoint);
-        $response = $this->getGuzzleClient()->send($request, $this->getClientOptions());
-
-        $statusCode = $response->getStatusCode();
-        if ($statusCode < 200 || $statusCode >= 300) {
-            throw new RuntimeException('CKAN API is not available. Error code ' . $statusCode);
-        }
-
-        if (!count(preg_grep('#application/json#', $response->getHeader('Content-Type')))) {
-            throw new RuntimeException('CKAN API returns an invalid response: Content-Type is not JSON');
-        }
-
-        $responseBody = json_decode($response->getBody()->getContents(), true);
-
-        if (!$responseBody || !isset($responseBody['success']) || !$responseBody['success']) {
-            throw new RuntimeException('CKAN API returns an invalid response: Responded as invalid');
-        }
-
-        return $responseBody['result']['fields'];
+        $data = $this->getClient()->getData($resource);
+        return isset($data['result']['fields']) ? $data['result']['fields'] : [];
     }
 
     /**
@@ -116,34 +89,20 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
     }
 
     /**
-     * @return Client
+     * @return ClientInterface
      */
-    protected function getGuzzleClient()
+    public function getClient()
     {
-        return $this->guzzleClient;
+        return $this->client;
     }
 
     /**
-     * @param Client $guzzleClient
+     * @param ClientInterface $client
      * @return $this
      */
-    public function setGuzzleClient(Client $guzzleClient)
+    public function setClient(ClientInterface $client)
     {
-        $this->guzzleClient = $guzzleClient;
+        $this->client = $client;
         return $this;
-    }
-
-    /**
-     * Get Guzzle client options
-     *
-     * @return array
-     */
-    protected function getClientOptions()
-    {
-        $options = [
-            'http_errors' => false,
-        ];
-        $this->extend('updateClientOptions', $options);
-        return $options;
     }
 }

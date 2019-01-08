@@ -18,7 +18,17 @@ $ composer require silverstripe/ckan-registry 1.0.x-dev
 
 ## Documentation
 
-Watch this space.
+### Making API calls to a CKAN API
+
+#### Backend requests
+
+When requests are made from the SilverStripe CMS, a `SilverStripe\CKANRegistry\Service\ClientInterface` implementation
+is used. This service is responsible for making requests to a CKAN API from the backend. It must be passed a `Resource`
+model, and will return the raw response from the API endpoint for that `Resource` via the `getData()` method.
+
+The default implementation of this interface is `SilverStripe\CKANRegistry\Service\Client`, which uses GuzzleHttp to
+communicate with the CKAN API endpoint. You can configure additional Guzzle options via the extension point in
+`getClientOptions()` if needed, for example if configuring proxy settings for the requests. 
 
 ## Versioning
 
