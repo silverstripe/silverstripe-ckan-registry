@@ -1,5 +1,5 @@
 import fetch from 'isomorphic-fetch';
-import Datastore from './CKANApi/DataStore';
+import Datastore from 'lib/CKANApi/DataStore';
 
 const CKAN_VERSION = 3;
 
@@ -214,7 +214,6 @@ class CKANApi {
    * A simple internal helper method to query the given endpoint with the provided action,
    * adding any given request vars to the GET request.
    *
-   * @protected
    * @param {string} endpoint
    * @param {string} action
    * @param {object} requestVars

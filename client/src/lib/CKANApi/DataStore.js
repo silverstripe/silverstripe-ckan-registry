@@ -1,4 +1,4 @@
-import CKANApi from '../CKANApi';
+import CKANApi from 'lib/CKANApi';
 
 /**
  * Represents a "data store" on CKAN. Can be considered essentially an API to a CSV containing
@@ -19,7 +19,7 @@ export default class {
    * @return {Promise}
    */
   search(fields = [], term = null, distinct = false) {
-    if (!fields.length) {
+    if (!Array.isArray(fields) || !fields.length) {
       return Promise.resolve(false);
     }
 
