@@ -8,6 +8,19 @@ import fieldHolder from 'components/FieldHolder/FieldHolder';
 import CKANApi from 'lib/CKANApi';
 import i18n from 'i18n';
 
+
+/**
+ * This is shared with the server side definition of "select types"
+ *
+ * @var int
+ */
+const SELECT_TYPE_ALL = '0';
+
+/**
+ * @var int
+ */
+const SELECT_TYPE_CUSTOM = '1';
+
 /**
  * "Presented options" are a either a selection of checkboxes, or a free text input field
  * for the user to define a list of the presented options that will be applied for a given
@@ -152,7 +165,7 @@ class CKANPresentedOptions extends Component {
     });
 
     // We have to wait for all promises and then just run this function again...
-    // Promise.all(loadPromises).then(() => this.loadSuggestedOptions());
+    Promise.all(loadPromises).then(() => this.loadSuggestedOptions());
     return null;
   }
 
@@ -171,8 +184,6 @@ class CKANPresentedOptions extends Component {
    */
   prepOptions(options) {
     return options
-      // Trim whitespace and convert all whitespace chunks to a single space
-      .map(item => item.trim().replace(/\s+/g, ' '))
       .filter((item, index) => {
         // Exclude null, non-string or empty values
         if (!item || typeof item !== 'string' || item.length === 0) {
@@ -186,6 +197,8 @@ class CKANPresentedOptions extends Component {
 
         return true;
       })
+      // Trim whitespace and convert all whitespace chunks to a single space
+      .map(item => item.trim().replace(/\s+/g, ' '))
       .sort();
   }
 
@@ -217,15 +230,6 @@ class CKANPresentedOptions extends Component {
           [field]: newOptions,
         },
       }));
-
-      // Wait for any other suggested options to load from CKAN
-      // TODO this is _not_ a robust method of doing this. Preferably we can wait for all the
-      // promises to complete - or chain the promises. Note that the user has to be pretty quick
-      // to choose two new columns and beat the snappy response from CKAN. Perhaps we can
-      // disable the select while this updates?
-      setTimeout(() => {
-        this.loadSuggestedOptions();
-      }, 1000);
     });
   }
 
@@ -346,8 +350,7 @@ class CKANPresentedOptions extends Component {
    */
   renderFreetextInput() {
     // Don't render the free text input field unless we've chosen to specify a custom list
-    // todo: can we move the value into a constant somewhere? It's already defined in PHP...
-    if (this.getSelectType() !== '1') {
+    if (this.getSelectType() !== SELECT_TYPE_CUSTOM) {
       return null;
     }
 
@@ -474,8 +477,7 @@ class CKANPresentedOptions extends Component {
    */
   renderCheckboxListAndSeparator() {
     // Don't render the checkbox list unless we've chosen to select from a list of options
-    // todo: can we move the value into a constant somewhere? It's already defined in PHP...
-    if (this.getSelectType() !== '0') {
+    if (this.getSelectType() !== SELECT_TYPE_ALL) {
       return null;
     }
 
