@@ -71,13 +71,13 @@ class CKANRegistryPage extends Page
                         $columns = $component->getDisplayFields($resourceFields);
 
                         // We only want to change the labels for the GridField view, not the model's edit form
-                        $columns['ShowInSummaryView'] = _t(__CLASS__ . '.IN_RESULTS', 'In Results');
+                        $columns['ShowInResultsView'] = _t(__CLASS__ . '.IN_RESULTS', 'In Results');
                         $columns['ShowInDetailView'] = _t(__CLASS__ . '.IN_DETAIL', 'In Detail');
 
                         // Abbreviate the position title
                         $columns['Position'] = _t(__CLASS__ . '.POS', 'Pos.', 'Abbreviated version of position');
 
-                        $editable = array_flip(['ShowInSummaryView', 'ShowInDetailView']);
+                        $editable = array_flip(['ShowInResultsView', 'ShowInDetailView']);
                         $component->setDisplayFields(array_diff_key($columns, $editable));
                         // set this way so that title translations are preserved
                         $editableColumns->setDisplayFields(array_intersect_key($columns, $editable));
