@@ -8,7 +8,7 @@ use SilverStripe\CKANRegistry\Model\Resource;
 /**
  * A service responsible for communicating with a CKAN API endpoint
  */
-interface ClientInterface
+interface APIClientInterface
 {
     /**
      * The CKAN API version to communicate with

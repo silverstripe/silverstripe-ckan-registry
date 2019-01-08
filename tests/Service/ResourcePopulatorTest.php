@@ -5,7 +5,7 @@ namespace SilverStripe\CKANRegistry\Tests\Service;
 use PHPUnit_Framework_MockObject_MockObject;
 use RuntimeException;
 use SilverStripe\CKANRegistry\Model\Resource;
-use SilverStripe\CKANRegistry\Service\Client;
+use SilverStripe\CKANRegistry\Service\APIClient;
 use SilverStripe\CKANRegistry\Service\ResourcePopulator;
 use SilverStripe\Dev\SapphireTest;
 
@@ -19,7 +19,7 @@ class ResourcePopulatorTest extends SapphireTest
     protected $resource;
 
     /**
-     * @var Client
+     * @var APIClient
      */
     protected $client;
 
@@ -32,8 +32,8 @@ class ResourcePopulatorTest extends SapphireTest
         $this->resource->DataSet = 'foo-bar';
         $this->resource->Identifier = '123-456';
 
-        /** @var PHPUnit_Framework_MockObject_MockObject|Client $client */
-        $this->client = $this->createMock(Client::class);
+        /** @var PHPUnit_Framework_MockObject_MockObject|APIClient $client */
+        $this->client = $this->createMock(APIClient::class);
     }
 
     /**
@@ -64,7 +64,7 @@ class ResourcePopulatorTest extends SapphireTest
             ],
         ]);
         $populator = new ResourcePopulator();
-        $populator->setClient($this->client);
+        $populator->setAPIClient($this->client);
 
         $this->assertCount(0, $this->resource->Fields(), 'Resource has no fields before population');
         $populator->populateFields($this->resource);
@@ -90,7 +90,7 @@ class ResourcePopulatorTest extends SapphireTest
             ],
         ]);
         $populator = new ResourcePopulator();
-        $populator->setClient($this->client);
+        $populator->setAPIClient($this->client);
         $populator->populateMetadata($this->resource);
 
         $this->assertSame('List of Animals', $this->resource->Name, 'DataSet name should be populated');

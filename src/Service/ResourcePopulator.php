@@ -16,13 +16,13 @@ class ResourcePopulator implements ResourcePopulatorInterface
     use Injectable;
 
     private static $dependencies = [
-        'Client' => '%$' . ClientInterface::class,
+        'APIClient' => '%$' . APIClientInterface::class,
     ];
 
     /**
-     * @var ClientInterface
+     * @var APIClientInterface
      */
-    protected $client;
+    protected $apiClient;
 
     /**
      * Populates the {@link Resource} with metadata from the API response, such as the name of the data set
@@ -34,7 +34,7 @@ class ResourcePopulator implements ResourcePopulatorInterface
     {
         $this->validateResource($resource);
 
-        $data = $this->getClient()->getPackage($resource);
+        $data = $this->getAPIClient()->getPackage($resource);
 
         // Get the title of the data set
         $datasetTitle = isset($data['result']['title']) ? $data['result']['title'] : '';
@@ -62,7 +62,7 @@ class ResourcePopulator implements ResourcePopulatorInterface
     {
         $this->validateResource($resource);
 
-        $data = $this->getClient()->getSearchData($resource);
+        $data = $this->getAPIClient()->getSearchData($resource);
         $fieldSpecs = isset($data['result']['fields']) ? $data['result']['fields'] : [];
 
         $newFields = [];
@@ -128,20 +128,20 @@ class ResourcePopulator implements ResourcePopulatorInterface
     }
 
     /**
-     * @return ClientInterface
+     * @return APIClientInterface
      */
-    public function getClient()
+    public function getAPIClient()
     {
-        return $this->client;
+        return $this->apiClient;
     }
 
     /**
-     * @param ClientInterface $client
+     * @param APIClientInterface $client
      * @return $this
      */
-    public function setClient(ClientInterface $client)
+    public function setAPIClient(APIClientInterface $apiClient)
     {
-        $this->client = $client;
+        $this->apiClient = $apiClient;
         return $this;
     }
 }

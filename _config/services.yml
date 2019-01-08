@@ -4,5 +4,5 @@ Name: ckanregistryservices
 SilverStripe\Core\Injector\Injector:
   SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface:
     class: SilverStripe\CKANRegistry\Service\ResourcePopulator
-  SilverStripe\CKANRegistry\Service\ClientInterface:
-    class: SilverStripe\CKANRegistry\Service\Client
+  SilverStripe\CKANRegistry\Service\APIClientInterface:
+    class: SilverStripe\CKANRegistry\Service\APIClient

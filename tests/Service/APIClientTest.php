@@ -2,17 +2,18 @@
 
 namespace SilverStripe\CKANRegistry\Tests\Service;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\StreamInterface;
 use RuntimeException;
 use SilverStripe\CKANRegistry\Model\Resource;
-use SilverStripe\CKANRegistry\Service\Client;
+use SilverStripe\CKANRegistry\Service\APIClient;
 use SilverStripe\Dev\SapphireTest;
 
-class ClientTest extends SapphireTest
+class APIClientTest extends SapphireTest
 {
     /**
-     * @var \GuzzleHttp\Client
+     * @var Client
      */
     protected $guzzleClient;
 
@@ -35,7 +36,7 @@ class ClientTest extends SapphireTest
     {
         parent::setUp();
 
-        $this->guzzleClient = $this->createMock(\GuzzleHttp\Client::class);
+        $this->guzzleClient = $this->createMock(Client::class);
         $this->response = $this->createMock(Response::class);
         $this->mockBody = $this->createMock(StreamInterface::class);
         $this->resource = new Resource();
@@ -50,7 +51,7 @@ class ClientTest extends SapphireTest
         $this->guzzleClient->expects($this->once())->method('send')->willReturn($this->response);
         $this->response->expects($this->once())->method('getStatusCode')->willReturn(123);
 
-        $client = new Client();
+        $client = new APIClient();
         $client->setGuzzleClient($this->guzzleClient);
         $client->getData($this->resource);
     }
@@ -65,7 +66,7 @@ class ClientTest extends SapphireTest
         $this->response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $this->response->expects($this->once())->method('getHeader')->with('Content-Type')->willReturn(['junk']);
 
-        $client = new Client();
+        $client = new APIClient();
         $client->setGuzzleClient($this->guzzleClient);
         $client->getData($this->resource);
     }
@@ -84,7 +85,7 @@ class ClientTest extends SapphireTest
             "success": false
         }');
 
-        $client = new Client();
+        $client = new APIClient();
         $client->setGuzzleClient($this->guzzleClient);
         $client->getData($this->resource);
     }
@@ -100,7 +101,7 @@ class ClientTest extends SapphireTest
             "data": "test"
         }');
 
-        $client = new Client();
+        $client = new APIClient();
         $client->setGuzzleClient($this->guzzleClient);
         $result = $client->getData($this->resource);
 

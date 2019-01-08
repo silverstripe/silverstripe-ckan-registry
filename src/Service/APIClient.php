@@ -2,23 +2,24 @@
 
 namespace SilverStripe\CKANRegistry\Service;
 
+use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use RuntimeException;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\Core\Extensible;
 use SilverStripe\Core\Injector\Injectable;
 
-class Client implements ClientInterface
+class APIClient implements APIClientInterface
 {
     use Extensible;
     use Injectable;
 
     private static $dependencies = [
-        'GuzzleClient' => '%$' . \GuzzleHttp\Client::class,
+        'GuzzleClient' => '%$' . Client::class,
     ];
 
     /**
-     * @var \GuzzleHttp\Client
+     * @var Client
      */
     protected $guzzleClient;
 
@@ -44,7 +45,7 @@ class Client implements ClientInterface
         $endpoint = sprintf(
             '%s/api/%s/action/%s?id=%s',
             trim($resource->Endpoint, '/'),
-            ClientInterface::API_VERSION,
+            APIClientInterface::API_VERSION,
             $action,
             $resource->{$id}
         );
@@ -87,10 +88,10 @@ class Client implements ClientInterface
     }
 
     /**
-     * @param \GuzzleHttp\Client $guzzleClient
+     * @param Client $guzzleClient
      * @return $this
      */
-    public function setGuzzleClient(\GuzzleHttp\Client $guzzleClient)
+    public function setGuzzleClient(Client $guzzleClient)
     {
         $this->guzzleClient = $guzzleClient;
         return $this;
