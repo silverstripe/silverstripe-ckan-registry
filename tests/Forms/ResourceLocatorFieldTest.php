@@ -6,7 +6,7 @@ use InvalidArgumentException;
 use SilverStripe\CKANRegistry\Forms\ResourceLocatorField;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\CKANRegistry\Page\CKANRegistryPage;
-use SilverStripe\CKANRegistry\Service\ResourceFieldPopulatorInterface;
+use SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use stdClass;
@@ -32,8 +32,8 @@ class ResourceLocatorFieldTest extends SapphireTest
             ->setResourceFieldName('Identifier');
 
         // Mock the field populator, in case an action we perform in a unit test tries to contact the mock API
-        $populator = $this->createMock(ResourceFieldPopulatorInterface::class);
-        Injector::inst()->registerService($populator, ResourceFieldPopulatorInterface::class);
+        $populator = $this->createMock(ResourcePopulatorInterface::class);
+        Injector::inst()->registerService($populator, ResourcePopulatorInterface::class);
     }
 
     public function testConstruct()

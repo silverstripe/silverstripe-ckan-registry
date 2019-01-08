@@ -22,13 +22,37 @@ class Client implements ClientInterface
      */
     protected $guzzleClient;
 
-    public function getData(Resource $resource)
+    /**
+     * Instance cache for repeated calls within the same request
+     *
+     * @var array[]
+     */
+    protected $cache;
+
+    public function getPackage(Resource $resource)
+    {
+        return $this->getData($resource, 'package_show', 'DataSet');
+    }
+
+    public function getSearchData(Resource $resource)
+    {
+        return $this->getData($resource, 'datastore_search');
+    }
+
+    public function getData(Resource $resource, $action = 'datastore_search', $id = 'Identifier')
     {
         $endpoint = sprintf(
-            '%s/api/3/action/datastore_search?id=%s',
+            '%s/api/%s/action/%s?id=%s',
             trim($resource->Endpoint, '/'),
-            $resource->Identifier
+            ClientInterface::API_VERSION,
+            $action,
+            $resource->{$id}
         );
+
+        // Check for a cached result
+        if (isset($this->cache[$endpoint])) {
+            return $this->cache[$endpoint];
+        }
 
         $request = new Request('GET', $endpoint);
         $response = $this->getGuzzleClient()->send($request, $this->getClientOptions());
@@ -47,6 +71,9 @@ class Client implements ClientInterface
         if (!$responseBody || !isset($responseBody['success']) || !$responseBody['success']) {
             throw new RuntimeException('CKAN API returns an invalid response: Responded as invalid');
         }
+
+        // Store cached result for subsequent calls within the same request
+        $this->cache[$endpoint] = $responseBody;
 
         return $responseBody;
     }

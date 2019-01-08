@@ -2,7 +2,7 @@
 Name: ckanregistryservices
 ---
 SilverStripe\Core\Injector\Injector:
-  SilverStripe\CKANRegistry\Service\ResourceFieldPopulatorInterface:
-    class: SilverStripe\CKANRegistry\Service\ResourceFieldPopulator
+  SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface:
+    class: SilverStripe\CKANRegistry\Service\ResourcePopulator
   SilverStripe\CKANRegistry\Service\ClientInterface:
     class: SilverStripe\CKANRegistry\Service\Client

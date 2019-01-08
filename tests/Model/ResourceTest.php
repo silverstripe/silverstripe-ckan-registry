@@ -3,8 +3,8 @@
 namespace SilverStripe\CKANRegistry\Tests\Model;
 
 use SilverStripe\CKANRegistry\Model\Resource;
-use SilverStripe\CKANRegistry\Service\ResourceFieldPopulator;
-use SilverStripe\CKANRegistry\Service\ResourceFieldPopulatorInterface;
+use SilverStripe\CKANRegistry\Service\ResourcePopulator;
+use SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 
@@ -14,8 +14,8 @@ class ResourceTest extends SapphireTest
 
     protected function setUp()
     {
-        $populator = $this->createMock(ResourceFieldPopulator::class);
-        Injector::inst()->registerService($populator, ResourceFieldPopulatorInterface::class);
+        $populator = $this->createMock(ResourcePopulator::class);
+        Injector::inst()->registerService($populator, ResourcePopulatorInterface::class);
 
         parent::setUp();
     }

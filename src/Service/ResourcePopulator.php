@@ -8,9 +8,10 @@ use SilverStripe\CKANRegistry\Model\ResourceField;
 use SilverStripe\Core\Injector\Injectable;
 
 /**
- * This service will take a CKAN Resource and populate its Fields `has_many` relationship from the CKAN API
+ * This service will take a CKAN Resource and populate its Fields `has_many` relationship and other data
+ * from the CKAN API
  */
-class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
+class ResourcePopulator implements ResourcePopulatorInterface
 {
     use Injectable;
 
@@ -23,13 +24,46 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
      */
     protected $client;
 
+    /**
+     * Populates the {@link Resource} with metadata from the API response, such as the name of the data set
+     *
+     * @param Resource $resource
+     * @return $this
+     */
+    public function populateMetadata(Resource $resource)
+    {
+        $this->validateResource($resource);
+
+        $data = $this->getClient()->getPackage($resource);
+
+        // Get the title of the data set
+        $datasetTitle = isset($data['result']['title']) ? $data['result']['title'] : '';
+
+        // Get the title of the selected resource
+        $resources = isset($data['result']['resources'])
+            ? array_column($data['result']['resources'], 'name', 'id')
+            : [];
+        $resourceTitle = isset($resources[$resource->Identifier]) ? $resources[$resource->Identifier] : '';
+
+        $resource->Name = $datasetTitle;
+        $resource->ResourceName = $resourceTitle;
+
+        return $this;
+    }
+
+    /**
+     * Take a CKAN {@link Resource} and populate its Fields `has_many` relationship and other data
+     * from the CKAN API response.
+     *
+     * @param Resource $resource
+     * @return $this
+     */
     public function populateFields(Resource $resource)
     {
-        if (!$resource->Endpoint && !$resource->Identifier) {
-            throw new RuntimeException('Could not fetch fields for a resource that is not fully configured');
-        }
+        $this->validateResource($resource);
 
-        $fieldSpecs = $this->doFieldRequest($resource);
+        $data = $this->getClient()->getSearchData($resource);
+        $fieldSpecs = isset($data['result']['fields']) ? $data['result']['fields'] : [];
 
         $newFields = [];
         $fields = $resource->Fields();
@@ -54,18 +88,23 @@ class ResourceFieldPopulator implements ResourceFieldPopulatorInterface
 
         // Add our new fields
         $fields->addMany($newFields);
+
+        return $this;
     }
 
     /**
-     * Perform a request to the CKAN endpoint provided by the given resource to fetch field definitons
+     * Validates that the given {@link Resource} has the necessary data to make the request
      *
      * @param Resource $resource
-     * @return array
+     * @returns bool True if successful
+     * @throws RuntimeException If validation fails
      */
-    protected function doFieldRequest(Resource $resource)
+    protected function validateResource(Resource $resource)
     {
-        $data = $this->getClient()->getData($resource);
-        return isset($data['result']['fields']) ? $data['result']['fields'] : [];
+        if (!$resource->Endpoint || !$resource->DataSet || !$resource->Identifier) {
+            throw new RuntimeException('Could not fetch fields for a resource that is not fully configured');
+        }
+        return true;
     }
 
     /**
