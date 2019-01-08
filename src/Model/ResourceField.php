@@ -18,7 +18,7 @@ use SilverStripe\ORM\DataObject;
  * @property string OriginalLabel
  * @property string Type
  * @property string ReadableLabel
- * @property bool ShowInSummaryView
+ * @property bool ShowInResultsView
  * @property bool ShowInDetailView
  * @property bool RemoveDuplicates
  * @property int Position
@@ -32,7 +32,7 @@ class ResourceField extends DataObject
         'OriginalLabel' => 'Varchar',
         'Type' => 'Varchar',
         'ReadableLabel' => 'Varchar',
-        'ShowInSummaryView' => 'Boolean',
+        'ShowInResultsView' => 'Boolean',
         'ShowInDetailView' => 'Boolean',
         'RemoveDuplicates' => 'Boolean',
         'Position' => 'Int',
@@ -48,7 +48,7 @@ class ResourceField extends DataObject
         'ReadableLabel',
         'OriginalLabel',
         'Type',
-        'ShowInSummaryView',
+        'ShowInResultsView',
         'ShowInDetailView',
     ];
 
@@ -60,15 +60,10 @@ class ResourceField extends DataObject
                     __CLASS__ . '.ORIGINAL_LABEL_DESCRIPTION',
                     'Title of this field as provided by the CKAN resource'
                 ));
-            // See https://github.com/silverstripe/silverstripe-framework/issues/8696
-            $originalLabel->setTitle(ucfirst(strtolower($originalLabel->Title())));
             $fields->replaceField('OriginalLabel', $originalLabel);
 
             $readableLabel = $fields->dataFieldByName('ReadableLabel');
-            $readableLabel
-                // See https://github.com/silverstripe/silverstripe-framework/issues/8696
-                ->setTitle(ucfirst(strtolower($readableLabel->Title())))
-                ->setAttribute('placeholder', $this->OriginalLabel);
+            $readableLabel->setAttribute('placeholder', $this->OriginalLabel);
 
             $fields->removeByName('Type');
 
@@ -76,21 +71,24 @@ class ResourceField extends DataObject
                 ->setTitle(_t(__CLASS__ . '.ORDER_LABEL', 'Presented order'))
                 ->setDescription(_t(
                     __CLASS__ . '.ORDER_DENOMINATOR',
-                    'of {count} fields',
+                    'of {count} columns',
                     ['count' => static::get()->filter('ResourceID', $this->ResourceID)->count()]
                 ))
                 ->addExtraClass('ckan-resource__order');
             $fields->replaceField('Position', $positionField);
 
-            $summary = $fields->dataFieldByName('ShowInSummaryView')
+            $summary = $fields->dataFieldByName('ShowInResultsView')
                 ->addExtraClass('visibility-options__option');
             $detail = $fields->dataFieldByName('ShowInDetailView')
                 ->addExtraClass('visibility-options__option');
             $duplicates = $fields->dataFieldByName('RemoveDuplicates')
+                ->setTitle(
+                    _t(__CLASS__ . '.REMOVE_DUPLICATES_LABEL', 'Only show one value if duplicates exist')
+                )
                 ->addExtraClass('visibility-options__option');
 
             // Present the visibility fields in a group
-            $fields->removeByName(['ShowInSummaryView', 'ShowInDetailView', 'RemoveDuplicates',]);
+            $fields->removeByName(['ShowInResultsView', 'ShowInDetailView', 'RemoveDuplicates']);
             $visibilityOptions = FieldGroup::create('Visibility', [$summary, $detail, $duplicates])
                 ->addExtraClass('visibility-options');
             $fields->insertBefore($visibilityOptions, 'Position');
@@ -104,6 +102,11 @@ class ResourceField extends DataObject
                     _t(__CLASS__ . '.RESULT_CONDITIONS', 'Result conditions')
                 )
             );
+
+            // See https://github.com/silverstripe/silverstripe-framework/issues/8696
+            foreach ([$summary, $detail, $readableLabel, $originalLabel] as $field) {
+                $field->setTitle(ucfirst(strtolower($field->Title())));
+            }
         });
         return parent::getCMSFields();
     }
