@@ -96,7 +96,7 @@ class CKANRegistryPage extends Page
                         $injector->createWithArgs(GridFieldOrderableRows::class, ['Order']),
                     ]);
 
-                $resourceFilters = GridField::create('DataFilters', 'Filters', $resource->Filters(), $filtersConfig);
+                $resourceFilters = GridField::create('DataFilters', '', $resource->Filters(), $filtersConfig);
 
                 $fields->addFieldToTab('Root.Filters', $resourceFilters);
             }
