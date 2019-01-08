@@ -22,7 +22,7 @@ jQuery.entwine('ss', ($) => {
 
     renderComponent(fieldIDs = [], value = null) {
       const context = {};
-      const PresentedOptionsComponent = loadComponent('PresentedOptions', context);
+      const PresentedOptionsComponent = loadComponent('CKANPresentedOptions', context);
       const schema = this.data('schema');
       const { data: { fieldMap } } = schema;
       const fields = fieldIDs ? fieldIDs.map(id => fieldMap[id] || null) : [];

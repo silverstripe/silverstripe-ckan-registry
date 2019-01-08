@@ -15,7 +15,7 @@ import i18n from 'i18n';
  *
  * If using a checkbox set, the user can adjust the default delimiter field.
  */
-class PresentedOptions extends Component {
+class CKANPresentedOptions extends Component {
   constructor(props) {
     super(props);
 
@@ -526,7 +526,7 @@ class PresentedOptions extends Component {
   }
 }
 
-PresentedOptions.propTypes = {
+CKANPresentedOptions.propTypes = {
   // A list of CKAN fields (aka columns) that this options field will be targeting
   selectedFields: PropTypes.arrayOf(PropTypes.string),
   data: PropTypes.shape({
@@ -557,14 +557,14 @@ PresentedOptions.propTypes = {
   ]).isRequired
 };
 
-PresentedOptions.defaultProps = {
+CKANPresentedOptions.defaultProps = {
   data: {},
   extraClass: '',
   selectedFields: [],
   value: {},
 };
 
-export { PresentedOptions as Component };
+export { CKANPresentedOptions as Component };
 
 export default fieldHolder(inject(
   ['TextField', 'FormAction', 'Loading'],
@@ -574,4 +574,4 @@ export default fieldHolder(inject(
     LoadingComponent,
   }),
   () => 'CKAN.Filter.PresentedOptions'
-)(PresentedOptions));
+)(CKANPresentedOptions));
