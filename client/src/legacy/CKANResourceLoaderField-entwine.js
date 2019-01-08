@@ -7,7 +7,7 @@ jQuery.entwine('ss', ($) => {
   $('.js-injector-boot .ckan-resource-locator__container').entwine({
     onmatch() {
       const context = {};
-      const CKANResourceLocator = loadComponent('CKANResourceLocator', context);
+      const CKANResourceLocatorField = loadComponent('CKANResourceLocatorField', context);
       const schemaData = this.data('schema');
 
       const value = this.children('input:first').val();
@@ -19,7 +19,7 @@ jQuery.entwine('ss', ($) => {
       };
 
       ReactDOM.render(
-        <CKANResourceLocator {...props} />,
+        <CKANResourceLocatorField {...props} />,
         this[0]
       );
     },

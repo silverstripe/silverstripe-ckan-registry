@@ -1,10 +1,10 @@
 import Injector from 'lib/Injector';
-import CKANResourceLocator from 'components/CKANResourceLocator';
-import ResultConditions from 'components/ResultConditions';
+import CKANResourceLocatorField from 'components/CKANResourceLocatorField';
+import CKANResultConditionsField from 'components/CKANResultConditionsField';
 
 export default () => {
   Injector.component.registerMany({
-    CKANResourceLocator,
-    ResultConditions,
+    CKANResourceLocatorField,
+    CKANResultConditionsField,
   });
 };
