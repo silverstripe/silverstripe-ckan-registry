@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { inject } from 'lib/Injector';
 import {
-  Button, FormGroup, FormText, Input, InputGroup, InputGroupAddon, Label, Row, Col
+  Button, FormGroup, Input, InputGroup, InputGroupAddon, Label, Row, Col
 } from 'reactstrap';
 import fieldHolder from 'components/FieldHolder/FieldHolder';
 import CKANApi from 'lib/CKANApi';
@@ -40,6 +40,7 @@ class CKANPresentedOptions extends Component {
       suggestedOptions: [],
       suggestedOptionCache: {},
       loading: false,
+      fetchFailure: false,
       separatorDelimiter: '',
       ...value,
     };
@@ -49,6 +50,7 @@ class CKANPresentedOptions extends Component {
     this.handleSelectTypeChange = this.handleSelectTypeChange.bind(this);
     this.handleDelimiterChange = this.handleDelimiterChange.bind(this);
     this.handleExecuteSeparator = this.handleExecuteSeparator.bind(this);
+    this.handleTryAgain = this.handleTryAgain.bind(this);
   }
 
   componentDidMount() {
@@ -113,7 +115,7 @@ class CKANPresentedOptions extends Component {
    * @return {Array|null} Returns an array of options if all were loaded or null if promises have
    *                      been started
    */
-  loadSuggestedOptions() {
+  loadSuggestedOptions(resetFetchFailure = false) {
     const { selectedFields } = this.props;
 
     // Clear the state of suggested options...
@@ -122,13 +124,19 @@ class CKANPresentedOptions extends Component {
       loading: false,
     });
 
+    if (resetFetchFailure) {
+      this.setState({
+        fetchFailure: false,
+      });
+    }
+
     // If there's no columns selected we can early return
     if (!selectedFields.length) {
       return [];
     }
 
     let options = [];
-    const { suggestedOptionCache, separatorDelimiter } = this.state;
+    const { suggestedOptionCache, separatorDelimiter, fetchFailure } = this.state;
     const loadPromises = [];
 
     // We'll loop through the selected columns an check if we've loaded values for fields previously
@@ -139,10 +147,12 @@ class CKANPresentedOptions extends Component {
         return;
       }
 
-      // Start loading and append the promise to an array so we can wait for all of them...
-      loadPromises.push(
-        this.fetchOptionsForField(field)
-      );
+      if (!fetchFailure || resetFetchFailure) {
+        // Start loading and append the promise to an array so we can wait for all of them...
+        loadPromises.push(
+          this.fetchOptionsForField(field)
+        );
+      }
     });
 
     // If we didn't have to load options then we can just put the known options into state
@@ -211,26 +221,29 @@ class CKANPresentedOptions extends Component {
   fetchOptionsForField(field) {
     const { data: { endpoint, resource } } = this.props;
 
-    return CKANApi.loadDatastore(endpoint, resource).search([field], null, true).then(result => {
-      let newOptions = [];
+    return CKANApi.loadDatastore(endpoint, resource).search([field], null, true)
+      .then(result => {
+        let newOptions = [];
 
-      // TODO implement something for if the request fails...
-      if (!result) {
-        return;
-      }
+        newOptions = result.records.map(record => record[field]);
 
-      newOptions = result.records.map(record => record[field]);
-
-      // Update the "cache" with the options we've loaded.
-      this.setState(state => ({
-        suggestedOptionCache: {
-          // We can't use the local variable as the state may have been mutated while this
-          // promise was resolving...
-          ...state.suggestedOptionCache,
-          [field]: newOptions,
-        },
-      }));
-    });
+        // Update the "cache" with the options we've loaded.
+        this.setState(state => ({
+          suggestedOptionCache: {
+            // We can't use the local variable as the state may have been mutated while this
+            // promise was resolving...
+            ...state.suggestedOptionCache,
+            [field]: newOptions,
+            fetchFailure: false,
+          },
+        }));
+      })
+      .catch(() => {
+        this.setState(() => ({
+          loading: false,
+          fetchFailure: true,
+        }));
+      });
   }
 
   /**
@@ -332,6 +345,10 @@ class CKANPresentedOptions extends Component {
     });
   }
 
+  handleTryAgain() {
+    this.loadSuggestedOptions(true);
+  }
+
   /**
    * Check the state and determine whether a given checkbox value should be checked
    *
@@ -427,12 +444,15 @@ class CKANPresentedOptions extends Component {
         </FormGroup>
       )) :
       (
-        <span className="ckan-presented-options__options-list-empty">
-          {i18n._t(
-            'CKANPresentedOptions.PLEASE_SELECT_COLUMNS',
-            'Please select columns to be able to select from all options'
-          )}
-        </span>
+        <div>
+          {this.renderBadFetchMessage()}
+          <span className="ckan-presented-options__options-list-empty">
+            {i18n._t(
+              'CKANPresentedOptions.PLEASE_SELECT_COLUMNS',
+              'Please select columns to be able to select from all options'
+            )}
+          </span>
+        </div>
       );
 
     return (
@@ -460,13 +480,47 @@ class CKANPresentedOptions extends Component {
             </Button>
           </InputGroupAddon>
         </InputGroup>
-        <FormText>
+        <div className="form__field-description">
           {i18n._t(
             'CKANPresentedOptions.SPLIT_OPTIONS_DESCRIPTION',
             'Split options by characters. eg. comma'
           )}
-        </FormText>
+        </div>
       </FormGroup>
+    );
+  }
+
+  /**
+   * Render a message notifying the user that the attempt to fetch values from their selected
+   * options columns has failed, and present a retry button.
+   */
+  renderBadFetchMessage() {
+    const { data: { selectTypes } } = this.props;
+    const manualAdd = selectTypes.find(type => type.value.toString() === SELECT_TYPE_CUSTOM).title;
+    const { fetchFailure } = this.state;
+    const fetchErrorDescription = i18n._t(
+      'CKANPresentedOptions.FETCH_FAILURE',
+      'There was an issue fetching the available options. '
+    );
+    const tryAgain = i18n._t('CKANPresentedOptions.RETRY_FETCH', 'Try again?');
+    const orManuallyAdd = i18n.inject(
+      i18n._t('CKANPresentedOptions.OR_MANUAL', ' Or choose to "{manualAdd}"'),
+      { manualAdd }
+    );
+
+    return fetchFailure && (
+      <div className="ckan-presented-options__fetch-failure alert alert-danger">
+        {fetchErrorDescription}
+        <a
+          className="ckan-presented-options__try-again alert-link"
+          onClick={this.handleTryAgain}
+          role="button"
+          tabIndex="0"
+        >
+          {tryAgain}
+        </a>
+        {orManuallyAdd && null}
+      </div>
     );
   }
 

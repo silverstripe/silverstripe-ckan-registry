@@ -13,7 +13,7 @@ jQuery.entwine('ss', ($) => {
         return;
       }
 
-      this.renderComponent($('#Form_ItemEditForm_FilterFields').val(), temporaryInput.val());
+      this.renderComponent('', temporaryInput.val());
     },
 
     onunmatch() {

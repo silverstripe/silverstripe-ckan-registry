@@ -36,4 +36,17 @@
   &__manual-options {
     height: 16rem;
   }
+
+  &__options-list-empty {
+    font-style: italic;
+    color: $text-muted;
+  }
+
+  &__try-again {
+    cursor: pointer;
+  }
+
+  .form__field-description {
+    font-style: italic;
+  }
 }
