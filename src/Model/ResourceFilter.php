@@ -48,7 +48,7 @@ class ResourceFilter extends DataObject
         'Columns',
     ];
 
-    private static $singular_name = 'Text Filter';
+    private static $singular_name = 'Text';
 
     /**
      * Defines the type of {@link FormField} that will be used to render the filter in the CMS. This is defined
