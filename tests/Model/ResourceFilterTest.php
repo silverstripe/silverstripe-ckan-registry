@@ -38,12 +38,15 @@ class ResourceFilterTest extends SapphireTest
     public function testGetColumnsNoFields()
     {
         $filter = new ResourceFilter();
+        $filter->AllColumns = false;
+
         $this->assertEmpty($filter->getColumns(), 'Should return an empty string without fields');
     }
 
     public function testGetColumnsOneField()
     {
         $filter = new ResourceFilter();
+        $filter->AllColumns = false;
         $field = new ResourceField();
         $field->ReadableLabel = 'My field';
         $filter->FilterFields()->add($field);
@@ -54,6 +57,7 @@ class ResourceFilterTest extends SapphireTest
     public function testGetColumnsMultipleFields()
     {
         $filter = new ResourceFilter();
+        $filter->AllColumns = false;
 
         $field = new ResourceField();
         $filter->FilterFields()->add($field);
@@ -70,5 +74,14 @@ class ResourceFilterTest extends SapphireTest
         $filter->AllColumns = true;
 
         $this->assertContains('All columns', $filter->getColumns(), 'Should return "all columns"');
+    }
+
+    public function testDefaultValues()
+    {
+        $filter = new ResourceFilter();
+        $filter->write();
+
+        $this->assertTrue($filter->AllColumns, 'AllColumns should be enabled by default');
+        $this->assertSame('Search', $filter->FilterLabel, 'The label should have a default value of "Search"');
     }
 }
