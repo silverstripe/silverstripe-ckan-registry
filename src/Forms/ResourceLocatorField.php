@@ -70,8 +70,6 @@ class ResourceLocatorField extends FormField
             . ' filters.',
             [ 'site' => $this->getSiteName() ]
         ));
-
-        $this->addExtraClass('ckan-resource-locator__container');
     }
 
     public function getSchemaDataDefaults()

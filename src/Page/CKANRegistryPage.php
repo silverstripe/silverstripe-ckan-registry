@@ -3,6 +3,7 @@
 namespace SilverStripe\CKANRegistry\Page;
 
 use Page;
+use SilverStripe\CKANRegistry\Forms\GridFieldResourceTitle;
 use SilverStripe\CKANRegistry\Forms\ResourceLocatorField;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\Core\Injector\Injector;
@@ -13,6 +14,8 @@ use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\Forms\GridField\GridFieldPageCount;
+use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\Forms\TextField;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
 use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
@@ -59,23 +62,19 @@ class CKANRegistryPage extends Page
                 $injector = Injector::inst();
 
                 $columnsConfig = GridFieldConfig_RecordEditor::create()
-                    ->addComponent($injector->createWithArgs(GridFieldOrderableRows::class, ['Position']))
+                    ->addComponents([
+                        $injector->createWithArgs(GridFieldOrderableRows::class, ['Position']),
+                        $injector->createWithArgs(GridFieldResourceTitle::class, [$resource]),
+                    ])
                     ->removeComponentsByType([
                         GridFieldAddNewButton::class,
                         GridFieldDeleteAction::class,
+                        GridFieldPageCount::class,
+                        GridFieldToolbarHeader::class,
                     ]);
 
                 $resourceFields = GridField::create('DataColumns', '', $resource->Fields(), $columnsConfig);
                 $resourceFields->addExtraClass('ckan-columns');
-
-                // Set the title for the GridField to the data set and resource name (if selected)
-                if ($resource->Name) {
-                    $title = $resource->Name;
-                    if ($resource->ResourceName) {
-                        $title .= ' / ' . $resource->ResourceName;
-                    }
-                    $resourceFields->setTitle($title);
-                }
 
                 // Configure inline editable checkboxes for the two boolean fields
                 $before = null;

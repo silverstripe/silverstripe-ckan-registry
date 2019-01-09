@@ -1,0 +1,16 @@
+.ckan-columns {
+  // Shift the resource/dataset title up slightly so it's in line with the search button
+  &__title {
+    margin-top: 2px;
+  }
+
+  // Remove the underline when hovering over the "Edit resource" button, the icon already
+  // has an underline
+  &__edit-resource {
+    &:hover,
+    &:active,
+    &:focus {
+      text-decoration: none;
+    }
+  }
+}
