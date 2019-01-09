@@ -14,7 +14,7 @@ class ResourceLocatorField extends FormField
      * @config
      * @var string
      */
-    private static $default_endpoint = 'https://catalogue.data.govt.nz/';
+    private static $default_endpoint = 'https://demo.ckan.org/';
 
     /**
      * The default CKAN endpoint to be used in this field. This will allow consumers of the field to only provide
