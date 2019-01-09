@@ -30,8 +30,13 @@ class ResourceFilter extends DataObject
 
     private static $db = [
         'FilterLabel' => 'Varchar',
-        'AllColumns' => 'Boolean',
+        'AllColumns' => 'Boolean(1)',
         'Order' => 'Int',
+    ];
+
+    private static $defaults = [
+        'AllColumns' => true,
+        'FilterLabel' => 'Search',
     ];
 
     private static $has_one = [
