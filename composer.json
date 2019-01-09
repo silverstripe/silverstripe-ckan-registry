@@ -32,7 +32,8 @@
     },
     "extra": {
         "expose": [
-            "client/dist"
+            "client/dist",
+            "client/images"
         ],
         "branch-alias": {
             "dev-master": "1.0.x-dev"
