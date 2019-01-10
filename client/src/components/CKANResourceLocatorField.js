@@ -210,7 +210,7 @@ class CKANResourceLocatorField extends Component {
         // a value for the user. This will just be the first datastore_active resource in the list
         if (!spec.resource && dataset) {
           const resource = dataset.resources.find(res => res.datastore_active);
-          spec.resource = resource && resource.package_id;
+          spec.resource = resource && resource.id;
         }
 
         this.setState({
@@ -234,7 +234,7 @@ class CKANResourceLocatorField extends Component {
 
     // Create some props that'll be shared by the disabled input and the select component
     const sharedProps = {
-      title: 'Resource name',
+      title: i18n._t('CKANResourceLocatorField.RESOURCE_NAME', 'Resource name'),
       extraClass: 'form-field--no-divider stacked',
     };
 
@@ -349,6 +349,8 @@ CKANResourceLocatorField.propTypes = {
   // The component to be used for a Select DOM node
   SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func])
 };
+
+export { CKANResourceLocatorField as Component };
 
 export default fieldHolder(inject(
   ['SingleSelectField'],

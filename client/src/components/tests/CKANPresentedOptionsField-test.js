@@ -1,13 +1,11 @@
 /* global jest, describe, it, expect */
-
-
 jest.mock('lib/CKANApi');
 
 import React from 'react';
 import {
-Component as CKANPresentedOptions,
-SELECT_TYPE_ALL,
-SELECT_TYPE_CUSTOM
+  Component as CKANPresentedOptions,
+  SELECT_TYPE_ALL,
+  SELECT_TYPE_CUSTOM
 } from '../CKANPresentedOptionsField';
 import Enzyme, { shallow, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15.4/build/index';
@@ -51,7 +49,7 @@ const prepCKANApiMock = (options = null) => {
   });
 };
 
-describe('CKANPresentedOptions', () => {
+describe('CKANPresentedOptionsField', () => {
   it('should render given select options', () => {
     const props = { data: {
         ...dataProps,
