@@ -44,7 +44,7 @@ class CKANRegistryPage extends Page
 
     private static $plural_name = 'CKAN Registry Pages';
 
-    private static $icon = 'silverstripe/ckan-registry:client/images/registrypage-icon.svg';
+    private static $icon_class = 'font-icon-p-data';
 
     public function getCMSFields()
     {
