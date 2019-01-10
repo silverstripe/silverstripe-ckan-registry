@@ -8,7 +8,7 @@ import {
 Component as CKANPresentedOptions,
 SELECT_TYPE_ALL,
 SELECT_TYPE_CUSTOM
-} from '../CKANPresentedOptions';
+} from '../CKANPresentedOptionsField';
 import Enzyme, { shallow, mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15.4/build/index';
 import CKANApi from 'lib/CKANApi';

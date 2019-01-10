@@ -28,7 +28,7 @@ export const SELECT_TYPE_CUSTOM = '1';
  *
  * If using a checkbox set, the user can adjust the default delimiter field.
  */
-class CKANPresentedOptions extends Component {
+class CKANPresentedOptionsField extends Component {
   constructor(props) {
     super(props);
 
@@ -365,7 +365,7 @@ class CKANPresentedOptions extends Component {
     }
 
     const description = i18n._t(
-      'CKANPresentedOptions.MANUAL_OPTION_DESCRIPTION',
+      'CKANPresentedOptionsField.MANUAL_OPTION_DESCRIPTION',
       'Options provided must match the data within the selected column. Each option should be ' +
         'placed on a new line.'
     );
@@ -441,7 +441,7 @@ class CKANPresentedOptions extends Component {
           {this.renderBadFetchMessage()}
           <span className="ckan-presented-options__options-list-empty">
             {i18n._t(
-              'CKANPresentedOptions.PLEASE_SELECT_COLUMNS',
+              'CKANPresentedOptionsField.PLEASE_SELECT_COLUMNS',
               'Please select columns to be able to select from all options'
             )}
           </span>
@@ -465,19 +465,19 @@ class CKANPresentedOptions extends Component {
     return (
       <FormGroup className="ckan-presented-options__option-separator">
         <Label for="optionSeparator">
-          {i18n._t('CKANPresentedOptions.DELIMITER', 'Delimiter')}
+          {i18n._t('CKANPresentedOptionsField.DELIMITER', 'Delimiter')}
         </Label>
         <InputGroup>
           <Input value={this.state.separatorDelimiter} onChange={this.handleDelimiterChange} />
           <InputGroupAddon addonType="append">
             <Button onClick={this.handleExecuteSeparator} color="primary">
-              {i18n._t('CKANPresentedOptions.UPDATE', 'Update')}
+              {i18n._t('CKANPresentedOptionsField.UPDATE', 'Update')}
             </Button>
           </InputGroupAddon>
         </InputGroup>
         <div className="form__field-description">
           {i18n._t(
-            'CKANPresentedOptions.SPLIT_OPTIONS_DESCRIPTION',
+            'CKANPresentedOptionsField.SPLIT_OPTIONS_DESCRIPTION',
             'Split options by characters. eg. comma'
           )}
         </div>
@@ -494,12 +494,12 @@ class CKANPresentedOptions extends Component {
     const manualAdd = selectTypes.find(type => type.value.toString() === SELECT_TYPE_CUSTOM).title;
     const { fetchFailure } = this.state;
     const fetchErrorDescription = i18n._t(
-      'CKANPresentedOptions.FETCH_FAILURE',
+      'CKANPresentedOptionsField.FETCH_FAILURE',
       'There was an issue fetching the available options. '
     );
-    const tryAgain = i18n._t('CKANPresentedOptions.RETRY_FETCH', 'Try again?');
+    const tryAgain = i18n._t('CKANPresentedOptionsField.RETRY_FETCH', 'Try again?');
     const orManuallyAdd = i18n.inject(
-      i18n._t('CKANPresentedOptions.OR_MANUAL', ' Or choose to "{manualAdd}"'),
+      i18n._t('CKANPresentedOptionsField.OR_MANUAL', ' Or choose to "{manualAdd}"'),
       { manualAdd }
     );
 
@@ -579,7 +579,7 @@ class CKANPresentedOptions extends Component {
   }
 }
 
-CKANPresentedOptions.propTypes = {
+CKANPresentedOptionsField.propTypes = {
   // A list of CKAN fields (aka columns) that this options field will be targeting
   selectedFields: PropTypes.arrayOf(PropTypes.string),
   data: PropTypes.shape({
@@ -602,14 +602,14 @@ CKANPresentedOptions.propTypes = {
   ]).isRequired
 };
 
-CKANPresentedOptions.defaultProps = {
+CKANPresentedOptionsField.defaultProps = {
   data: {},
   extraClass: '',
   selectedFields: [],
   value: {},
 };
 
-export { CKANPresentedOptions as Component };
+export { CKANPresentedOptionsField as Component };
 
 export default fieldHolder(inject(
   ['Loading'],
@@ -617,4 +617,4 @@ export default fieldHolder(inject(
     LoadingComponent,
   }),
   () => 'CKAN.Filter.PresentedOptions'
-)(CKANPresentedOptions));
+)(CKANPresentedOptionsField));
