@@ -42,10 +42,6 @@ class ResourceLocatorFieldTest extends SapphireTest
 
         $this->assertSame('http://example.com', $field->getDefaultEndpoint());
         $this->assertContains('Connect to a data source from', $field->getDescription());
-        $this->assertTrue(
-            $field->hasClass('ckan-resource-locator__container'),
-            'Field class name is required for React scaffold'
-        );
     }
 
     public function testSetValueWithArray()
