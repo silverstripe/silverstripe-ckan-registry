@@ -43,7 +43,9 @@ class Resource extends DataObject
     public function onAfterWrite()
     {
         if ($this->isChanged('Identifier')) {
-            $this->Fields()->removeAll();
+            $this->Fields()->each(function (ResourceField $field) {
+                $field->delete();
+            });
 
             /** @var ResourcePopulatorInterface $populator */
             $populator = Injector::inst()->get(ResourcePopulatorInterface::class);
@@ -51,7 +53,9 @@ class Resource extends DataObject
 
             // Remove the existing filters and add a default text entry to search all ResourceFields
             $this->Filters()
-                ->removeAll()
+                ->each(function (ResourceFilter $filter) {
+                    $filter->delete();
+                })
                 ->add(ResourceFilter::create());
         }
 
