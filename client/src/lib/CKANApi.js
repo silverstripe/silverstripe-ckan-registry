@@ -206,6 +206,14 @@ class CKANApi {
     }, () => Promise.resolve(false));
   }
 
+  /**
+   * Returns a Datastore object that can be used to access data in the datastore. Note this method
+   * doesn't perform any requests but provides an object with an API to perform requests
+   *
+   * @param {string} endpoint
+   * @param {string} resource
+   * @return {Datastore}
+   */
   static loadDatastore(endpoint, resource) {
     return new Datastore(endpoint, resource);
   }

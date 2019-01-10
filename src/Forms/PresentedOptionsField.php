@@ -61,7 +61,6 @@ class PresentedOptionsField extends TextField
     public function getSchemaDataDefaults()
     {
         $data = parent::getSchemaDataDefaults();
-        $data['data']['options'] = self::getOptions();
         $data['data']['selectTypeDefault'] = self::SELECT_TYPE_DEFAULT;
         $data['data']['selectTypes'] = self::getSelectTypes();
         $data['data']['endpoint'] = $this->getResource()->Endpoint;
@@ -80,21 +79,6 @@ class PresentedOptionsField extends TextField
         return [
             ['value' => self::SELECT_TYPE_ALL, 'title' => _t(__CLASS__ . '.SELECT_ALL', 'Select from all options')],
             ['value' => self::SELECT_TYPE_CUSTOM, 'title' => _t(__CLASS__ . '.SELECT_CUSTOM', 'Manually add options')],
-        ];
-    }
-
-    /**
-     * @todo remove mock data
-     */
-    public static function getOptions()
-    {
-        return [
-            'One-by-one',
-            'Group session',
-            'Phone',
-            'Helpline',
-            'Other',
-            'Something scrollable',
         ];
     }
 

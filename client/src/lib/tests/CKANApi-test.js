@@ -4,6 +4,7 @@ jest.mock('isomorphic-fetch');
 
 import fetch from 'isomorphic-fetch';
 import CKANApi from 'lib/CKANApi';
+import DataStore from 'lib/CKANApi/DataStore';
 import chalk from 'chalk';
 
 // Create an extension of `expect` so we get nicer errors on failures
@@ -343,6 +344,16 @@ describe('CKANApi', () => {
         expect(response).toBe(true);
         done();
       });
+    });
+  });
+
+  describe('loadDatastore', () => {
+    it('should return a datastore', () => {
+      const store = CKANApi.loadDatastore('a', 'b');
+
+      expect(store).toBeInstanceOf(DataStore);
+      expect(store).toHaveProperty('endpoint', 'a');
+      expect(store).toHaveProperty('resource', 'b');
     });
   });
 });

@@ -14,12 +14,12 @@ import i18n from 'i18n';
  *
  * @var int
  */
-const SELECT_TYPE_ALL = '0';
+export const SELECT_TYPE_ALL = '0';
 
 /**
  * @var int
  */
-const SELECT_TYPE_CUSTOM = '1';
+export const SELECT_TYPE_CUSTOM = '1';
 
 /**
  * "Presented options" are a either a selection of checkboxes, or a free text input field
@@ -36,7 +36,7 @@ class CKANPresentedOptions extends Component {
     this.state = {
       customOptions: [],
       selectType: props.selectTypeDefault,
-      selections: {},
+      selections: [],
       suggestedOptions: [],
       suggestedOptionCache: {},
       loading: false,
@@ -55,26 +55,6 @@ class CKANPresentedOptions extends Component {
 
   componentDidMount() {
     // Ensure the suggested options are loaded
-    this.loadSuggestedOptions();
-  }
-
-  componentDidUpdate(prevProps) {
-    // Compare if selected fields have changed
-    const newFields = this.props.selectedFields;
-    const oldFields = prevProps.selectedFields;
-
-    // If the type or length doesn't match then they must be different
-    if (typeof newFields !== typeof oldFields || newFields.length !== oldFields.length) {
-      this.loadSuggestedOptions();
-      return;
-    }
-
-    // Otherwise filter out options that appear in both arrays and assert the remaining count is
-    // zero
-    if (oldFields.filter(old => !newFields.includes(old)).length === 0) {
-      return;
-    }
-
     this.loadSuggestedOptions();
   }
 
@@ -136,7 +116,7 @@ class CKANPresentedOptions extends Component {
     }
 
     let options = [];
-    const { suggestedOptionCache, separatorDelimiter, fetchFailure } = this.state;
+    const { suggestedOptionCache, separatorDelimiter, fetchFailure, selections } = this.state;
     const loadPromises = [];
 
     // We'll loop through the selected columns an check if we've loaded values for fields previously
@@ -158,11 +138,12 @@ class CKANPresentedOptions extends Component {
     // If we didn't have to load options then we can just put the known options into state
     if (!loadPromises.length) {
       options = this.splitOptionsBySeparator(options, separatorDelimiter);
+      // Trim, filter nulls, unique and sort the options...
       const suggestedOptions = this.prepOptions(options);
 
       this.setState({
-        // Trim, filter nulls, unique and sort the options...
         suggestedOptions,
+        selections: selections.length ? selections : suggestedOptions,
         loading: false,
       });
 
@@ -193,7 +174,10 @@ class CKANPresentedOptions extends Component {
    * @returns {Array}
    */
   prepOptions(options) {
-    return options
+    // Trim whitespace and convert all whitespace chunks to a single space
+    const trimmed = options.map(item => item.trim().replace(/\s+/g, ' '));
+
+    return trimmed
       .filter((item, index) => {
         // Exclude null, non-string or empty values
         if (!item || typeof item !== 'string' || item.length === 0) {
@@ -201,14 +185,12 @@ class CKANPresentedOptions extends Component {
         }
         // Exclude items that aren't unique. AKA remove if this index is not the same as the
         // index where this item is first found
-        if (options.indexOf(item) !== index) {
+        if (trimmed.indexOf(item) !== index) {
           return false;
         }
 
         return true;
       })
-      // Trim whitespace and convert all whitespace chunks to a single space
-      .map(item => item.trim().replace(/\s+/g, ' '))
       .sort();
   }
 
@@ -249,8 +231,8 @@ class CKANPresentedOptions extends Component {
   /**
    * Given a list of options, run through and split the options by the given separator/delimiter
    *
-   * @param options
-   * @param delimiter
+   * @param {Array} options
+   * @param {string} delimiter
    * @returns {*}
    */
   splitOptionsBySeparator(options, delimiter) {
@@ -271,14 +253,18 @@ class CKANPresentedOptions extends Component {
    * @param {object} event
    */
   handleCheckboxChange(event) {
-    const prevState = this.state;
-    const isAlreadyChecked = prevState.selections[event.target.value] || 0;
+    const { selections } = this.state;
+    const currentCheckedIndex = selections.indexOf(event.target.value);
+    const newSelections = selections;
+
+    if (currentCheckedIndex < 0) {
+      newSelections.push(event.target.value);
+    } else {
+      newSelections.splice(currentCheckedIndex, 1);
+    }
 
     this.setState({
-      selections: {
-        ...prevState.selections,
-        [event.target.value]: isAlreadyChecked ? undefined : true,
-      },
+      selections: newSelections,
     });
   }
 
@@ -340,8 +326,15 @@ class CKANPresentedOptions extends Component {
     // Split by the new delimiter and apply cleanups
     const newOptions = this.prepOptions(this.splitOptionsBySeparator(options, separatorDelimiter));
 
+    // If there's no value saved, reset the selected options
+    let selections = this.state.selections;
+    if (!this.props.value || !this.props.value.selections || !this.props.value.selections.length) {
+      selections = newOptions;
+    }
+
     this.setState({
       suggestedOptions: newOptions,
+      selections,
     });
   }
 
@@ -356,7 +349,7 @@ class CKANPresentedOptions extends Component {
    * @returns {boolean}
    */
   isCheckboxChecked(value) {
-    return !!this.state.selections[value] || 0;
+    return this.state.selections.includes(value);
   }
 
   /**
@@ -471,7 +464,9 @@ class CKANPresentedOptions extends Component {
   renderSeparator() {
     return (
       <FormGroup className="ckan-presented-options__option-separator">
-        <Label for="optionSeparator">Delimiter</Label>
+        <Label for="optionSeparator">
+          {i18n._t('CKANPresentedOptions.DELIMITER', 'Delimiter')}
+        </Label>
         <InputGroup>
           <Input value={this.state.separatorDelimiter} onChange={this.handleDelimiterChange} />
           <InputGroupAddon addonType="append">
@@ -601,14 +596,6 @@ CKANPresentedOptions.propTypes = {
   extraClass: PropTypes.string,
   name: PropTypes.string,
   value: PropTypes.object,
-  // TextFieldComponent: PropTypes.oneOfType([
-  //   PropTypes.string,
-  //   PropTypes.func
-  // ]).isRequired,
-  // FormActionComponent: PropTypes.oneOfType([
-  //   PropTypes.string,
-  //   PropTypes.func
-  // ]).isRequired,
   LoadingComponent: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func
@@ -625,10 +612,8 @@ CKANPresentedOptions.defaultProps = {
 export { CKANPresentedOptions as Component };
 
 export default fieldHolder(inject(
-  ['TextField', 'FormAction', 'Loading'],
-  (TextFieldComponent, FormActionComponent, LoadingComponent) => ({
-    TextFieldComponent,
-    FormActionComponent,
+  ['Loading'],
+  (LoadingComponent) => ({
     LoadingComponent,
   }),
   () => 'CKAN.Filter.PresentedOptions'
