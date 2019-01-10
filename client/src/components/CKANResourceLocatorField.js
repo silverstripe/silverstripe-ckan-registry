@@ -29,6 +29,8 @@ class CKANResourceLocatorField extends Component {
       currentDataset: null,
       // A reference to a `setTimeout` that will set `forceInvalid` (above) after a longer delay
       forceInvalidTimeout: null,
+      // The select field had an error message, which will mean we need to hide the description
+      selectError: false,
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -267,6 +269,13 @@ class CKANResourceLocatorField extends Component {
         type: 'error',
         value: unavailableMessage,
       };
+      this.setState({
+        selectError: true,
+      });
+    } else {
+      this.setState({
+        selectError: false,
+      });
     }
 
     return (
@@ -301,7 +310,9 @@ class CKANResourceLocatorField extends Component {
    */
   render() {
     const { uri, validationPending } = this.state;
+    const { selectError } = this.state;
 
+    const { description } = this.props;
     // Get any invalid message for the URL field
     const invalidMessage = this.getInvalidURLMessage();
     // And determine validity by the existance of that message
@@ -330,6 +341,11 @@ class CKANResourceLocatorField extends Component {
         <div className="ckan-resource-locator__resource-select">
           { this.renderResourceSelect() }
         </div>
+        { description && !invalidMessage && !selectError &&
+          <div className="ckan-resource-locator__description">
+            { description }
+          </div>
+        }
         { this.renderHiddenInput() }
       </div>
     );
@@ -350,10 +366,10 @@ CKANResourceLocatorField.propTypes = {
   SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func])
 };
 
-export default fieldHolder(inject(
+export default inject(
   ['SingleSelectField'],
   (SelectComponent) => ({
     SelectComponent,
   }),
   () => 'CKAN.ResourceLocatorField'
-)(CKANResourceLocatorField));
+)(CKANResourceLocatorField);

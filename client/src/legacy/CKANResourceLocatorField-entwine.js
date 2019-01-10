@@ -11,11 +11,12 @@ jQuery.entwine('ss', ($) => {
       const schemaData = this.data('schema');
 
       const value = this.children('input:first').val();
+      const description = schemaData.description && schemaData.description.html;
       const props = {
         name: this.attr('name'),
         ...schemaData,
         defaultEndpoint: schemaData.defaultEndpoint || null,
-        description: schemaData.description.html || '',
+        description: description || '',
         value: value ? JSON.parse(value) : undefined,
       };
 

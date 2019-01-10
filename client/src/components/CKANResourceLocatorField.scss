@@ -1,5 +1,6 @@
 .ckan-resource-locator {
   display: flex;
+  flex-wrap: wrap;
 
   &__uri-input {
     flex: 2;
@@ -20,10 +21,11 @@
     }
   }
 
-  &__container {
-    .form__field-description {
-      margin-top: 0;
-    }
+  &__description {
+    margin-top: -$spacer - $input-padding-y;
+    margin-bottom: 1rem;
+    padding-bottom: $spacer;
+    width: 100%;
   }
 
   &__big-slash {
