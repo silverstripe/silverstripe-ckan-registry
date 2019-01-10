@@ -2,6 +2,7 @@
 
 namespace SilverStripe\CKANRegistry\Model\ResourceFilter;
 
+use SilverStripe\CKANRegistry\Forms\PresentedOptionsField;
 use SilverStripe\CKANRegistry\Model\ResourceFilter;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
@@ -25,9 +26,10 @@ class Dropdown extends ResourceFilter
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
-            $fields->push(TextField::create(
+            $fields->addFieldToTab('Root.Main', PresentedOptionsField::create(
                 'Options',
-                _t(__CLASS__ . '.OPTIONS', 'Dropdown options')
+                $this->FilterFor,
+                _t(__CLASS__ . '.OPTIONS', 'Presented options')
             ));
         });
 
