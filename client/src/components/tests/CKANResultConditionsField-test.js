@@ -5,7 +5,7 @@ import Adapter from 'enzyme-adapter-react-15.4/build/index';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-describe('CKANCKANResultConditionsFieldField', () => {
+describe('CKANResultConditionsField', () => {
   const MockTextField = () => <div />;
   const MockSelectField = () => <div />;
 

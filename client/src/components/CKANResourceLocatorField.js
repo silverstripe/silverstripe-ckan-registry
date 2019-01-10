@@ -350,6 +350,8 @@ CKANResourceLocatorField.propTypes = {
   SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func])
 };
 
+export { CKANResourceLocatorField as Component };
+
 export default fieldHolder(inject(
   ['SingleSelectField'],
   (SelectComponent) => ({
