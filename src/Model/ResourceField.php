@@ -13,7 +13,7 @@ use SilverStripe\ORM\DataObject;
  * Represents a generic field on a CKAN Resource, e.g. a column in a spreadsheet.
  * It is intentionally generic, as the resource may not be a tabular one, e.g. geospatial data to be rendered in a map.
  *
- * @method Resource Resource
+ * @property Resource Resource
  * @method static ResourceField create()
  * @property string OriginalLabel
  * @property string Type
