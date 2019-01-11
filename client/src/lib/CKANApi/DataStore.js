@@ -18,7 +18,7 @@ export default class {
    * @param {boolean} distinct
    * @return {Promise}
    */
-  search(fields = [], term = null, distinct = false) {
+  search(fields, term = null, distinct = false) {
     if (!Array.isArray(fields) || !fields.length) {
       return Promise.resolve(false);
     }

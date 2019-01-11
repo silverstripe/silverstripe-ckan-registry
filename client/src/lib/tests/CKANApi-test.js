@@ -338,6 +338,10 @@ describe('CKANApi', () => {
 
       fetch.mockImplementation(() => Promise.resolve({
         ok: true,
+        json: () => Promise.resolve({
+          success: true,
+          result: true,
+        }),
       }));
 
       CKANApi.validateEndpoint('').then(response => {
