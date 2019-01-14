@@ -3,6 +3,7 @@
 namespace SilverStripe\CKANRegistry\Page;
 
 use Page;
+use SilverStripe\CKANRegistry\Forms\GridField\GridFieldDetailForm\ResourceFieldItemRequest;
 use SilverStripe\CKANRegistry\Forms\GridFieldResourceTitle;
 use SilverStripe\CKANRegistry\Forms\ResourceLocatorField;
 use SilverStripe\CKANRegistry\Model\Resource;
@@ -14,6 +15,7 @@ use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldPageCount;
 use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\Forms\TextField;
@@ -72,6 +74,9 @@ class CKANRegistryPage extends Page
                         GridFieldPageCount::class,
                         GridFieldToolbarHeader::class,
                     ]);
+
+                $columnsConfig->getComponentByType(GridFieldDetailForm::class)
+                    ->setItemRequestClass(ResourceFieldItemRequest::class);
 
                 $resourceFields = GridField::create('DataColumns', '', $resource->Fields(), $columnsConfig);
                 $resourceFields->addExtraClass('ckan-columns');
