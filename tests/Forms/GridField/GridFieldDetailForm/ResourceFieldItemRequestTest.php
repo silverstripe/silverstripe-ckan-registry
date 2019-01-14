@@ -40,7 +40,7 @@ class ResourceFieldItemRequestTest extends SapphireTest
         /** @var Resource $resource */
         $resource = $this->objFromFixture(Resource::class, 'teachers');
 
-        $this->assertSame(
+        $this->assertArrayEqualsInOrder(
             [
                 'Subject' => '1',
                 'First name' => '2',
@@ -54,7 +54,7 @@ class ResourceFieldItemRequestTest extends SapphireTest
 
         $this->moveFieldFixture('firstname', 5);
 
-        $this->assertSame(
+        $this->assertArrayEqualsInOrder(
             [
                 'Subject' => '1',
                 'Last name' => '2',
@@ -68,7 +68,7 @@ class ResourceFieldItemRequestTest extends SapphireTest
 
         $this->moveFieldFixture('subject', 9);
 
-        $this->assertSame(
+        $this->assertArrayEqualsInOrder(
             [
                 'Last name' => '1',
                 'City' => '2',
@@ -82,7 +82,7 @@ class ResourceFieldItemRequestTest extends SapphireTest
 
         $this->moveFieldFixture('gender', 1);
 
-        $this->assertSame(
+        $this->assertArrayEqualsInOrder(
             [
                 'Gender' => '1',
                 'Last name' => '2',
@@ -134,5 +134,20 @@ class ResourceFieldItemRequestTest extends SapphireTest
 
         // Handle our request
         $itemRequest->handleRequest($request);
+    }
+
+    protected function assertArrayEqualsInOrder($expected, $actual)
+    {
+        $message = 'Failed asserting array in order. Expected '.print_r($expected, true).
+            '. Actual: '.print_r($actual, true);
+
+        foreach ($actual as $key => $value) {
+            $expectedKey = key($expected);
+            $expectedValue = array_shift($expected);
+            $this->assertSame($expectedKey, $key, $message);
+            $this->assertEquals($expectedValue, $value, $message);
+        }
+
+        $this->assertEmpty($expected, $message);
     }
 }
