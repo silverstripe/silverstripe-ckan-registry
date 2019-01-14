@@ -62,7 +62,8 @@
       "!**/bundles/**",
       "!**/legacy/**",
       "!**/vendor/**",
-      "!**/*-test.{js,jsx}"
+      "!**/*-test.{js,jsx}",
+      "!**/*-story.{js,jsx}"
     ],
     "testMatch": [
       "**/tests/**/*-test.js?(x)"
