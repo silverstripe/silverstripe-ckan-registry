@@ -141,4 +141,9 @@ class CKANRegistryPage extends Page
 
         return $fields;
     }
+
+    public function getCKANClientConfig()
+    {
+        return '{}';
+    }
 }
