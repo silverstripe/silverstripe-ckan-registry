@@ -1,0 +1,32 @@
+SilverStripe\CKANRegistry\Model\Resource:
+  teachers:
+    Name: Teachers
+    Endpoint: https://foo.ckan.gov/
+    DataSet: teachers
+    Identifier: 26f44973-b06d-479d-b697-8d7943c97c5a
+
+SilverStripe\CKANRegistry\Model\ResourceField:
+  firstname:
+    OriginalLabel: "First name"
+    Resource: =>SilverStripe\CKANRegistry\Model\Resource.teachers
+    Position: 1
+  lastname:
+    OriginalLabel: "Last name"
+    Resource: =>SilverStripe\CKANRegistry\Model\Resource.teachers
+    Position: 2
+  subject:
+    OriginalLabel: Subject
+    Resource: =>SilverStripe\CKANRegistry\Model\Resource.teachers
+    Position: 3
+  city:
+    OriginalLabel: City
+    Resource: =>SilverStripe\CKANRegistry\Model\Resource.teachers
+    Position: 4
+  school:
+    OriginalLabel: School
+    Resource: =>SilverStripe\CKANRegistry\Model\Resource.teachers
+    Position: 5
+  gender:
+    OriginalLabel: Gender
+    Resource: =>SilverStripe\CKANRegistry\Model\Resource.teachers
+    Position: 6

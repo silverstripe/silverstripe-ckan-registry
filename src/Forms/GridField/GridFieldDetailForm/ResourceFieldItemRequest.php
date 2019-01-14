@@ -3,6 +3,7 @@
 namespace SilverStripe\CKANRegistry\Forms\GridField\GridFieldDetailForm;
 
 use SilverStripe\CKANRegistry\Model\ResourceField;
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\GridField\GridFieldDetailForm_ItemRequest;
 use SilverStripe\ORM\Queries\SQLUpdate;
 
@@ -52,7 +53,7 @@ class ResourceFieldItemRequest extends GridFieldDetailForm_ItemRequest
         }
 
         $update = SQLUpdate::create(
-            $record->baseTable(),
+            '"' . $record->baseTable() . '"',
             [],
             $where + ['"ID" != ?' => $record->ID, '"ResourceID"' => $resource->ID]
         );
