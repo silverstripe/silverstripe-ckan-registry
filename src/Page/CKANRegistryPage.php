@@ -49,6 +49,8 @@ class CKANRegistryPage extends Page
 
     private static $plural_name = 'CKAN Registry Pages';
 
+    private static $icon_class = 'font-icon-p-data';
+
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
