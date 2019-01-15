@@ -82,6 +82,5 @@ class ResourceFilterTest extends SapphireTest
         $filter->write();
 
         $this->assertTrue($filter->AllColumns, 'AllColumns should be enabled by default');
-        $this->assertSame('Search', $filter->FilterLabel, 'The label should have a default value of "Search"');
     }
 }

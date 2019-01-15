@@ -36,7 +36,7 @@ class ResourceFilter extends DataObject
 
     private static $defaults = [
         'AllColumns' => true,
-        'FilterLabel' => 'Search',
+        'FilterLabel' => '',
     ];
 
     private static $has_one = [
