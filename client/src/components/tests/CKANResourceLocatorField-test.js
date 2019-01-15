@@ -1,3 +1,4 @@
+/* global jest */
 import React from 'react';
 import { Component as CKANResourceLocatorField } from '../CKANResourceLocatorField';
 import Enzyme, { shallow } from 'enzyme';
@@ -22,6 +23,52 @@ describe('CKANResourceLocatorField', () => {
       expect(input).toHaveLength(1);
       expect(input.props().title).toBe('Resource name');
       expect(input.props().disabled).toBe(true);
+    });
+  });
+
+  describe('handleNotificationOfChanges()', () => {
+    it('does not alert when initial value is empty', () => {
+      window.alert = jest.fn();
+
+      const wrapper = shallow(
+        <CKANResourceLocatorField
+          name="test-field"
+          value={null}
+          SelectComponent={MockSelectComponent}
+        />
+      );
+      wrapper.instance().handleNotificationOfChanges();
+      expect(window.alert).not.toHaveBeenCalled();
+    });
+
+    it('alerts when a value is changed', () => {
+      window.alert = jest.fn();
+
+      const wrapper = shallow(
+        <CKANResourceLocatorField
+          name="test-field"
+          value={{ endpoint: 'https://example.com' }}
+          SelectComponent={MockSelectComponent}
+        />
+      );
+      wrapper.instance().handleNotificationOfChanges();
+      expect(window.alert).toHaveBeenCalled();
+    });
+
+    it('alerts when a value is changed but not subsequently', () => {
+      window.alert = jest.fn();
+
+      const wrapper = shallow(
+        <CKANResourceLocatorField
+          name="test-field"
+          value={{ endpoint: 'https://example.com' }}
+          SelectComponent={MockSelectComponent}
+        />
+      );
+      wrapper.instance().handleNotificationOfChanges();
+      wrapper.instance().handleNotificationOfChanges();
+      wrapper.instance().handleNotificationOfChanges();
+      expect(window.alert).toHaveBeenCalledTimes(1);
     });
   });
 });

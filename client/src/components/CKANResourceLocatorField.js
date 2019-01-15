@@ -1,3 +1,4 @@
+/* global window */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import CKANApi from 'lib/CKANApi';
@@ -29,6 +30,8 @@ class CKANResourceLocatorField extends Component {
       currentDataset: null,
       // A reference to a `setTimeout` that will set `forceInvalid` (above) after a longer delay
       forceInvalidTimeout: null,
+      // Whether the user has been warned about changing resources yet, so we don't do it twice
+      changesNotified: false,
     };
 
     // Prep a property to store a ref to the hidden input that holds the value of this field
@@ -36,6 +39,7 @@ class CKANResourceLocatorField extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleResourceSelect = this.handleResourceSelect.bind(this);
+    this.handleNotificationOfChanges = this.handleNotificationOfChanges.bind(this);
 
     // We assign a debounced version of the validate input function as we want both a debounced
     // and a "normal" version
@@ -107,6 +111,8 @@ class CKANResourceLocatorField extends Component {
 
     // Run the debounced validation for the URL input.
     this.delayedValidateInput();
+
+    this.handleNotificationOfChanges();
   }
 
   /**
@@ -122,7 +128,32 @@ class CKANResourceLocatorField extends Component {
         resource: value,
       },
     });
+
+    this.handleNotificationOfChanges();
   }
+
+  /**
+   * Notify the user (once) when changing a dataset URL or resource that saving the
+   * changes will clear all columns and filters.
+   */
+  handleNotificationOfChanges() {
+    const { value } = this.props;
+    const { changesNotified } = this.state;
+
+    // Don't notify if it's already been done once, or if we're just creating the page
+    if (changesNotified || !value || value.length === 0) {
+      return;
+    }
+
+    // eslint-disable-next-line no-alert
+    window.alert(i18n._t(
+      'CKANResourceLocatorField.CHANGES_WARNING',
+      'Please note: Changing the data source URL or resource will clear all'
+      + ' existing columns and filters when saving the page.'
+    ));
+    this.setState({ changesNotified: true });
+  }
+
 
   /**
    * Validate that the URL input is valid and attempt to verify with the CKAN endpoint.
@@ -361,7 +392,7 @@ CKANResourceLocatorField.propTypes = {
   // The field name
   name: PropTypes.string.isRequired,
   // The value of this field - A JSON object with `endpoint`, `dataset` and `resource` keys.
-  value: PropTypes.object.isRequired,
+  value: PropTypes.object,
   // A default endpoint to be used in the case that the URL pasted does not provide one
   // This allows things like putting package names and resource names in the URL field
   defaultEndpoint: PropTypes.string,
