@@ -38,6 +38,7 @@ class URLInput extends Component {
     const props = {
       className: classNames(
         className,
+        'no-change-track',
         { 'is-invalid': invalid }
       ),
       value,
