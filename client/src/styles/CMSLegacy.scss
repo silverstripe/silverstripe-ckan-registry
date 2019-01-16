@@ -16,6 +16,12 @@
     }
   }
 
+  // Center the inline editable checkboxes in the columns GridField
+  .col-ShowInResultsView,
+  .col-ShowInDetailView {
+    text-align: center;
+  }
+
   // Used in the GridField display of ResourceFilters (data filters)
   &--multiple,
   &--all-columns {
