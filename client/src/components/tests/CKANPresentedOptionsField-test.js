@@ -1,4 +1,4 @@
-/* global jest, describe, it, expect */
+/* global jest */
 jest.mock('lib/CKANApi');
 
 import React from 'react';
@@ -50,43 +50,49 @@ const prepCKANApiMock = (options = null) => {
 };
 
 describe('CKANPresentedOptionsField', () => {
-  it('should render given select options', () => {
-    const props = { data: {
-        ...dataProps,
-        selectTypes: [{
-          value: SELECT_TYPE_ALL,
-          title: 'Option A',
-        }, {
-          value: SELECT_TYPE_CUSTOM,
-          title: 'Option B',
-        }]
-    } };
+  describe('render()', () => {
+    it('should render given select options', () => {
+      const props = {
+        data: {
+          ...dataProps,
+          selectTypes: [{
+            value: SELECT_TYPE_ALL,
+            title: 'Option A',
+          }, {
+            value: SELECT_TYPE_CUSTOM,
+            title: 'Option B',
+          }]
+        }
+      };
 
-    const component = shallow(
-      <CKANPresentedOptions LoadingComponent={LoadingComponent} {...props} />
-    );
+      const component = shallow(
+        <CKANPresentedOptions LoadingComponent={LoadingComponent} {...props} />
+      );
 
-    const options = component.find('.ckan-presented-options__option-group');
-    expect(options).toHaveLength(2);
-    expect(options.at(0).render().text()).toBe('Option A');
-    expect(options.at(1).render().text()).toBe('Option B');
-  });
+      const options = component.find('.ckan-presented-options__option-group');
+      expect(options).toHaveLength(2);
+      expect(options.at(0).render().text()).toBe('Option A');
+      expect(options.at(1).render().text()).toBe('Option B');
+    });
 
-  it('should allow specifying a default select type', () => {
-    const props = { data: {
-        ...dataProps,
-        selectTypeDefault: SELECT_TYPE_CUSTOM,
-    } };
+    it('should allow specifying a default select type', () => {
+      const props = {
+        data: {
+          ...dataProps,
+          selectTypeDefault: SELECT_TYPE_CUSTOM,
+        }
+      };
 
-    const component = shallow(
-      <CKANPresentedOptions LoadingComponent={LoadingComponent} {...props} />
-    );
+      const component = shallow(
+        <CKANPresentedOptions LoadingComponent={LoadingComponent} {...props} />
+      );
 
-    const options = component.find('.ckan-presented-options__option-group');
-    expect(options).toHaveLength(2);
-    const secondOption = options.at(1).render();
-    expect(secondOption.find('input').val()).toBe(SELECT_TYPE_CUSTOM);
-    expect(secondOption.find(':checked')).toHaveLength(1);
+      const options = component.find('.ckan-presented-options__option-group');
+      expect(options).toHaveLength(2);
+      const secondOption = options.at(1).render();
+      expect(secondOption.find('input').val()).toBe(SELECT_TYPE_CUSTOM);
+      expect(secondOption.find(':checked')).toHaveLength(1);
+    });
   });
 
   describe('with SELECT_TYPE_ALL option selected', () => {
@@ -284,6 +290,68 @@ describe('CKANPresentedOptionsField', () => {
             'two',
           ]);
         });
+    });
+  });
+
+  describe('prepOptions()', () => {
+    const props = { data: dataProps };
+    const component = shallow(
+      <CKANPresentedOptions LoadingComponent={LoadingComponent} {...props} />
+    );
+
+    it('replaces more than one space with a single space', () => {
+      const result = component.instance().prepOptions([
+        'foo     bar',
+      ]);
+      expect(result).toContain('foo bar');
+    });
+
+    it('trims whitespace off the end of each option', () => {
+      const result = component.instance().prepOptions([
+        '    MonkeyBars    ',
+      ]);
+      expect(result).toContain('MonkeyBars');
+    });
+
+    it('skips null values', () => {
+      const result = component.instance().prepOptions([
+        null,
+      ]);
+
+      expect(result).not.toContain(null);
+      expect(result).not.toContain('');
+    });
+
+    it('handles and converts integers to strings', () => {
+      const result = component.instance().prepOptions([
+        123,
+      ]);
+
+      expect(result).toContain('123');
+    });
+
+    it('excludes duplicate values', () => {
+      const result = component.instance().prepOptions([
+        'Science',
+        'Math',
+        'Science',
+      ]);
+
+      expect(result.filter(value => value === 'Science')).toHaveLength(1);
+    });
+
+    it('sorts the results alphabetically', () => {
+      const result = component.instance().prepOptions([
+        'Science',
+        'Math',
+        'Geology',
+      ]);
+
+      expect(result).toEqual([
+        'Geology',
+        'Math',
+        'Science',
+      ]);
     });
   });
 });
