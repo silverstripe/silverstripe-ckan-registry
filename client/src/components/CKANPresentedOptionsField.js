@@ -175,7 +175,12 @@ class CKANPresentedOptionsField extends Component {
    */
   prepOptions(options) {
     // Trim whitespace and convert all whitespace chunks to a single space
-    const trimmed = options.map(item => item.trim().replace(/\s+/g, ' '));
+    const trimmed = options.map(item => {
+      if (item === null) {
+        return null;
+      }
+      return String(item).trim().replace(/\s+/g, ' ');
+    });
 
     return trimmed
       .filter((item, index) => {
