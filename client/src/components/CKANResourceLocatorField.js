@@ -31,6 +31,9 @@ class CKANResourceLocatorField extends Component {
       forceInvalidTimeout: null,
     };
 
+    // Prep a property to store a ref to the hidden input that holds the value of this field
+    this.valueInput = null;
+
     this.handleChange = this.handleChange.bind(this);
     this.handleResourceSelect = this.handleResourceSelect.bind(this);
 
@@ -44,6 +47,17 @@ class CKANResourceLocatorField extends Component {
 
     if (uri.length) {
       this.validateInput();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // If the spec has changed (ie. the value of this field) then we need to dispatch an event. We
+    // do this because jQuery will not see any event that might be dispatched already from an input
+    // change. In this case we're prompting the change tracker to update.
+    if (this.valueInput && JSON.stringify(prevState.spec) !== JSON.stringify(this.state.spec)) {
+      const event = new Event('change', { bubbles: true });
+      event.simulated = true;
+      this.valueInput.dispatchEvent(event);
     }
   }
 
@@ -291,7 +305,14 @@ class CKANResourceLocatorField extends Component {
     const { spec, validationMessage } = this.state;
     const value = !spec || validationMessage ? null : JSON.stringify(spec);
 
-    return <Input name={this.props.name} type="hidden" value={value} />;
+    return (
+      <Input
+        name={this.props.name}
+        type="hidden"
+        value={value}
+        innerRef={input => { this.valueInput = input; }}
+      />
+    );
   }
 
   /**
