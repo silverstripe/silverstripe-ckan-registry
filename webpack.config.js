@@ -65,7 +65,7 @@ const config = [
   {
     name: 'frontend-css',
     entry: {
-      bundle: `${PATHS.SRC}/styles/bundle.scss`,
+      bundle: `${PATHS.SRC}/styles/bundle-admin.scss`,
     },
     output: {
       path: PATHS.DIST,
