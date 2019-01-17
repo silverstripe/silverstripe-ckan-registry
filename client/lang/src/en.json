@@ -3,5 +3,6 @@
   "CKANResourceLocatorField.DATA_SOURCE_URL": "Data source URL",
   "CKANResourceLocatorField.INVALID_DATASET_URL": "The provided data source URL does not appear to be a valid CKAN data set.",
   "CKANResourceLocatorField.INVALID_RESOURCE_SELECTION": "Datastore is not available for the selected resource.",
-  "CKANResourceLocatorField.RESOURCE_NAME": "Resource name"
+  "CKANResourceLocatorField.RESOURCE_NAME": "Resource name",
+  "CKANRegistryDisplay.DOWNLOAD": "Export results to CSV"
 }

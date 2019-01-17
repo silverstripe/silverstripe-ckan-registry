@@ -1,5 +1,6 @@
 const Path = require('path');
 const webpackConfig = require('@silverstripe/webpack-config');
+
 const {
   resolveJS,
   externalJS,
@@ -20,9 +21,9 @@ const PATHS = {
 
 const config = [
   {
-    name: 'js',
+    name: 'admin-js',
     entry: {
-      bundle: `${PATHS.SRC}/bundles/bundle.js`,
+      'bundle-admin': `${PATHS.SRC}/bundles/bundle-admin.js`,
     },
     output: {
       path: PATHS.DIST,
@@ -35,7 +36,34 @@ const config = [
     plugins: pluginJS(ENV, PATHS),
   },
   {
-    name: 'css',
+    name: 'admin-css',
+    entry: {
+      'bundle-admin': `${PATHS.SRC}/styles/bundle-admin.scss`,
+    },
+    output: {
+      path: PATHS.DIST,
+      filename: 'styles/[name].css',
+    },
+    devtool: (ENV !== 'production') ? 'source-map' : '',
+    module: moduleCSS(ENV, PATHS),
+    plugins: pluginCSS(ENV, PATHS),
+  },
+  {
+    name: 'frontend-js',
+    entry: {
+      bundle: `${PATHS.SRC}/bundles/bundle.js`,
+    },
+    output: {
+      path: PATHS.DIST,
+      filename: 'js/[name].js',
+    },
+    devtool: (ENV !== 'production') ? 'source-map' : '',
+    resolve: resolveJS(ENV, PATHS),
+    module: moduleJS(ENV, PATHS),
+    plugins: pluginJS(ENV, PATHS),
+  },
+  {
+    name: 'frontend-css',
     entry: {
       bundle: `${PATHS.SRC}/styles/bundle.scss`,
     },

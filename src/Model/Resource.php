@@ -28,11 +28,16 @@ class Resource extends DataObject
         'Endpoint' => 'Varchar',
         'DataSet' => 'Varchar',
         'Identifier' => 'Varchar',
+        'ItemsPerPage' => 'Int',
     ];
 
     private static $has_many = [
         'Fields' => ResourceField::class,
         'Filters' => ResourceFilter::class,
+    ];
+
+    private static $defaults = [
+        'ItemsPerPage' => 30,
     ];
 
     /**
@@ -76,5 +81,20 @@ class Resource extends DataObject
         }
 
         parent::onBeforeWrite();
+    }
+
+    /**
+     * Loads model data encapsulated as JSON in order to power front end technologies used to render that
+     * data. Includes critical info such as the CKAN site to query (e.g. which domain, datastore, etc.)
+     * but also can be extended to be used for configuring the component used to show this (e.g. React.js
+     * or Vue.js component configuration).
+     *
+     * @return string
+     */
+    public function getCKANClientConfig()
+    {
+        $config = '{}';
+        $this->extend('updateCKANClientConfig', $config);
+        return $config;
     }
 }
