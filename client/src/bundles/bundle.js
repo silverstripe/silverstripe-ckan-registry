@@ -1,4 +1,2 @@
-// Components that are only used on the frontend view
-require('legacy/CKANRegistryDisplay-loader.js');
-require('components/CKANDropdownFilter');
-require('components/CKANTextFilter');
+// An example React app that consumes a CKAN registry
+require('legacy/CKANExampleApp-loader.js');

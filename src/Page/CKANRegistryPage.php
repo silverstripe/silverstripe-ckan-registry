@@ -19,7 +19,6 @@ use SilverStripe\Forms\GridField\GridFieldDetailForm;
 use SilverStripe\Forms\GridField\GridFieldPageCount;
 use SilverStripe\Forms\GridField\GridFieldToolbarHeader;
 use SilverStripe\Forms\TextField;
-use SilverStripe\View\Requirements;
 use Symbiote\GridFieldExtensions\GridFieldAddNewMultiClass;
 use Symbiote\GridFieldExtensions\GridFieldEditableColumns;
 use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
@@ -51,6 +50,13 @@ class CKANRegistryPage extends Page
     private static $plural_name = 'CKAN Registry Pages';
 
     private static $icon_class = 'font-icon-p-data';
+
+    /**
+     * CKAN pages cannot have children since it interferes with frontend app routing of sub-URLs
+     *
+     * {@inheritdoc}
+     */
+    private static $allowed_children = 'none';
 
     public function getCMSFields()
     {
