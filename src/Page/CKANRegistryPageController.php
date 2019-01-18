@@ -53,7 +53,7 @@ class CKANRegistryPageController extends PageController
                         'RemoveDuplicates' => $field->RemoveDuplicates,
                     ];
                 },
-                $this->Fields()->filterAny([
+                $resource->Fields()->filterAny([
                     'ShowInResultsView' => true,
                     'ShowInDetailView' => true,
                     'RemoveDuplicates' => true,

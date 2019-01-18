@@ -72,7 +72,7 @@ class CKANRegistryDisplay extends Component {
   }
 
   loadData() {
-    const { endpoint, resource, fields, pageSize } = this.props;
+    const { spec: { endpoint, identifier }, fields, pageSize } = this.props;
     const { currentPage } = this.state;
     const recordMapper = record => {
       const newRecord = {};
@@ -86,7 +86,7 @@ class CKANRegistryDisplay extends Component {
     };
 
     CKANApi
-      .loadDatastore(endpoint, resource)
+      .loadDatastore(endpoint, identifier)
       .search(
         fields
           .filter(field => field.ShowInResultsView)
