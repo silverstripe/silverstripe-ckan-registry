@@ -1,7 +1,9 @@
 /* global window */
 import React from 'react';
+import PropTypes from 'prop-types';
 import Griddle from 'griddle-react';
 import classnames from 'classnames';
+import { Link } from 'react-router-dom';
 
 const getGriddleProperties = (props) => ({
   data: [],
@@ -24,7 +26,22 @@ const CKANRegistryDisplay = (props) => (
         </a>
       )}
     </div>
+
+    { /* example for adding a link using react-router */ }
+    <Link to={`${props.basePath}/view/123`}>Go to item 123</Link>
   </div>
 );
+
+CKANRegistryDisplay.propTypes = {
+  basePath: PropTypes.string,
+  className: PropTypes.string,
+  downloadLink: PropTypes.string,
+};
+
+CKANRegistryDisplay.defaultProps = {
+  basePath: '/',
+  className: '',
+  downloadLink: '',
+};
 
 export default CKANRegistryDisplay;
