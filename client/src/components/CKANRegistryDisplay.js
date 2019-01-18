@@ -28,7 +28,7 @@ const CKANRegistryDisplay = (props) => (
     </div>
 
     { /* example for adding a link using react-router */ }
-    <Link to={`${props.basePath}/123`}>Go to item 123</Link>
+    <Link to={`${props.basePath}/view/123`}>Go to item 123</Link>
   </div>
 );
 

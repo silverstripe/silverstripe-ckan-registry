@@ -2,7 +2,6 @@
 
 namespace SilverStripe\CKANRegistry\Model;
 
-use SilverStripe\CKANRegistry\Page\CKANRegistryPage;
 use SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
@@ -30,10 +29,6 @@ class Resource extends DataObject
         'DataSet' => 'Varchar',
         'Identifier' => 'Varchar',
         'ItemsPerPage' => 'Int',
-    ];
-
-    private static $belongs_to = [
-        'Page' => CKANRegistryPage::class . '.DataResource',
     ];
 
     private static $has_many = [
@@ -86,44 +81,5 @@ class Resource extends DataObject
         }
 
         parent::onBeforeWrite();
-    }
-
-    /**
-     * Loads model data encapsulated as JSON in order to power front end technologies used to render that
-     * data. Includes critical info such as the CKAN site to query (e.g. which domain, datastore, etc.)
-     * but also can be extended to be used for configuring the component used to show this (e.g. React.js
-     * or Vue.js component configuration).
-     *
-     * @return array
-     */
-    public function getCKANClientConfig()
-    {
-        $config = [
-            'spec' => [
-                'endpoint' => $this->Endpoint,
-                'dataset' => $this->DataSet,
-                'identifier' => $this->Identifier,
-            ],
-            'name' => $this->Name,
-            'resourceName' => $this->ResourceName,
-            'basePath' => $this->getPageBasePath(),
-        ];
-
-        $this->extend('updateCKANClientConfig', $config);
-
-        return $config;
-    }
-
-    /**
-     * Returns the base path for the resource's page with a leading slash
-     *
-     * @return string
-     */
-    public function getPageBasePath()
-    {
-        /** @var CKANRegistryPage $page */
-        $page = $this->getComponent('Page');
-        $pagePath = $page->RelativeLink();
-        return '/' . trim($pagePath, '/');
     }
 }

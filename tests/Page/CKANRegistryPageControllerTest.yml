@@ -1,0 +1,13 @@
+SilverStripe\CKANRegistry\Model\Resource:
+  animal_centers:
+    Name: Animal Centers
+    Endpoint: https://example.com/ckan
+    DataSet: animal-centers
+    Identifier: 123-456
+    ResourceName: Vet Clinics
+
+SilverStripe\CKANRegistry\Page\CKANRegistryPage:
+  animal_centers:
+    Title: Animal Centers
+    URLSegment: animal-centers
+    DataResourceID: =>SilverStripe\CKANRegistry\Model\Resource.animal_centers

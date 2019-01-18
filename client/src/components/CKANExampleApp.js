@@ -57,7 +57,7 @@ class CKANExampleApp extends Component {
         />
 
         <Route
-          path={`${basePath}/:item`}
+          path={`${basePath}/view/:item`}
           render={props => <CKANRegistryDetailView {...props} basePath={basePath} />}
         />
       </div>

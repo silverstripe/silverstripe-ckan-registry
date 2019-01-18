@@ -2,11 +2,9 @@
 
 namespace SilverStripe\CKANRegistry\Tests\Model;
 
-use PHPUnit_Framework_MockObject_MockObject;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\CKANRegistry\Model\ResourceField;
 use SilverStripe\CKANRegistry\Model\ResourceFilter;
-use SilverStripe\CKANRegistry\Page\CKANRegistryPage;
 use SilverStripe\CKANRegistry\Service\ResourcePopulator;
 use SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface;
 use SilverStripe\Core\Injector\Injector;
@@ -65,54 +63,5 @@ class ResourceTest extends SapphireTest
 
         $this->assertCount(0, ResourceField::get(), 'Resource fields should be deleted');
         $this->assertCount(1, ResourceFilter::get(), 'Resource filters should be deleted (one gets added)');
-    }
-
-    public function testGetCKANClientConfig()
-    {
-        /** @var Resource $resource */
-        $resource = $this->objFromFixture(Resource::class, 'teachers');
-        $config = $resource->getCKANClientConfig();
-
-        $this->assertSame([
-            'endpoint' => 'https://foo.ckan.gov/',
-            'dataset' => 'teachers',
-            'identifier' => '26f44973-b06d-479d-b697-8d7943c97c5a',
-        ], $config['spec'], 'CKAN endpoint specification should be provided');
-        $this->assertSame('Teachers', $config['name'], 'Name should be provided');
-        $this->assertSame('Class sizes', $config['resourceName'], 'Resource name should be provided');
-        $this->assertSame('/', $config['basePath'],'Without a page, basePath should be root');
-    }
-
-    /**
-     * @param string $relativeLink
-     * @param string $expected
-     * @dataProvider pageBasePathProvider
-     */
-    public function testGetPageBasePath($relativeLink, $expected)
-    {
-        /** @var CKANRegistryPage|PHPUnit_Framework_MockObject_MockObject */
-        $page = $this->createMock(CKANRegistryPage::class);
-        $page->expects($this->once())->method('RelativeLink')->willReturn($relativeLink);
-
-        /** @var Resource|PHPUnit_Framework_MockObject_MockObject $resource */
-        $resource = $this->getMockBuilder(Resource::class)->setMethods(['getComponent'])->getMock();
-        $resource->expects($this->once())->method('getComponent')->with('Page')->willReturn($page);
-
-        $this->assertSame($expected, $resource->getPageBasePath());
-    }
-
-    /**
-     * @return array[]
-     */
-    public function pageBasePathProvider()
-    {
-        return [
-            ['/', '/'],
-            ['/my-page', '/my-page'],
-            ['my-page', '/my-page'],
-            ['my-page/', '/my-page'],
-            ['/my-page/', '/my-page'],
-            ['/my-page/my-resources/', '/my-page/my-resources'],
-        ];
     }
 }

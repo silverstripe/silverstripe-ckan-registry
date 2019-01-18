@@ -6,7 +6,7 @@
         $Content
     <% end_if %>
     <% with $DataResource %>
-        <% include SilverStripe\CKANRegistry\CKANRegistry %>
+        <% include SilverStripe\CKANRegistry\CKANRegistry Record=$Up %>
     <% end_with %>
     $Form
 </section>

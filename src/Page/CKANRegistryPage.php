@@ -51,13 +51,6 @@ class CKANRegistryPage extends Page
 
     private static $icon_class = 'font-icon-p-data';
 
-    /**
-     * CKAN pages cannot have children since it interferes with frontend app routing of sub-URLs
-     *
-     * {@inheritdoc}
-     */
-    private static $allowed_children = 'none';
-
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {
