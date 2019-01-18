@@ -89,7 +89,7 @@ class CKANRegistryDisplay extends Component {
       .loadDatastore(endpoint, identifier)
       .search(
         fields
-          .filter(field => field.ShowInResultsView)
+          .filter(field => parseInt(field.ShowInResultsView, 10) === 1)
           .map(field => field.OriginalLabel), // fields (select)
         null, // search term (where)
         false, // distinct
