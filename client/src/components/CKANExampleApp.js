@@ -1,7 +1,7 @@
 /* global document */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 import CKANRegistryDisplay from 'components/CKANRegistryDisplay';
 import CKANRegistryDetailView from 'components/CKANRegistryDetailView';
 
@@ -59,6 +59,12 @@ class CKANExampleApp extends Component {
         <Route
           path={`${basePath}/view/:item`}
           render={props => <CKANRegistryDetailView {...props} basePath={basePath} />}
+        />
+
+        <Route
+          path={`${basePath}/view`}
+          exact
+          render={() => <Redirect to={basePath} />}
         />
       </div>
     );
