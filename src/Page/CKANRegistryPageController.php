@@ -42,15 +42,23 @@ class CKANRegistryPageController extends PageController
             'name' => $resource->Name,
             'resourceName' => $resource->ResourceName,
             'basePath' => $this->getBasePath($holder),
-            'fields' => array_map(function (ResourceField $field) {
-                return [
-                    'OriginalLabel' => $field->OriginalLabel,
-                    'ReadableLabel' => $field->ReadableLabel,
-                    'ShowInResultsView' => $field->ShowInResultsView,
-                    'ShowInDetailView' => $field->ShowInDetailView,
-                    'DisplayConditions' => $field->DisplayConditions,
-                ];
-            }, $resource->Fields()->toArray()),
+            'fields' => array_map(
+                function (ResourceField $field) {
+                    return [
+                        'OriginalLabel' => $field->OriginalLabel,
+                        'ReadableLabel' => $field->ReadableLabel,
+                        'ShowInResultsView' => $field->ShowInResultsView,
+                        'ShowInDetailView' => $field->ShowInDetailView,
+                        'DisplayConditions' => $field->DisplayConditions,
+                        'RemoveDuplicates' => $field->RemoveDuplicates,
+                    ];
+                },
+                $this->Fields()->filterAny([
+                    'ShowInResultsView' => true,
+                    'ShowInDetailView' => true,
+                    'RemoveDuplicates' => true,
+                ])->Sort('Position', 'ASC')->toArray()
+            ),
         ];
 
         $this->extend('updateCKANClientConfig', $config);

@@ -22,7 +22,7 @@ export default class {
    */
   search(fields, term = null, distinct = false, limit = 100, offset = 0) {
     if (!Array.isArray(fields) || !fields.length) {
-      return Promise.resolve(false);
+      return Promise.reject(false);
     }
 
     const options = {
