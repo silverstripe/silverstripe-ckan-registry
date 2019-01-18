@@ -12,6 +12,7 @@ class CKANRegistryDisplay extends Component {
 
     this.state = {
       data: [],
+      loading: true,
       currentPage: 1,
       recordCount: 0,
     };
@@ -74,6 +75,7 @@ class CKANRegistryDisplay extends Component {
   loadData() {
     const { spec: { endpoint, identifier }, fields, pageSize } = this.props;
     const { currentPage } = this.state;
+
     const recordMapper = record => {
       const newRecord = {};
       Object.entries(record).forEach(([key, value]) => {
@@ -85,6 +87,7 @@ class CKANRegistryDisplay extends Component {
       return newRecord;
     };
 
+    this.setState({ loading: true });
     CKANApi
       .loadDatastore(endpoint, identifier)
       .search(
@@ -100,12 +103,55 @@ class CKANRegistryDisplay extends Component {
         this.setState({
           data: result.records ? result.records.map(recordMapper) : [],
           recordCount: result.total,
+          loading: false,
         });
       });
   }
 
+  /**
+   * Renders a loading message if "loading" is true in the state
+   *
+   * @returns {HTMLElement|null}
+   */
+  renderLoading() {
+    const { loading } = this.state;
+    if (!loading) {
+      return null;
+    }
+
+    return (
+      <p className="ckan-registry__loading">
+        { window.i18n._t('CKANRegistryDisplay.LOADING', 'Loading...') }
+      </p>
+    );
+  }
+
+  /**
+   * Renders a download/export to CSV link
+   *
+   * @returns {HTMLElement|null}
+   */
+  renderDownloadLink() {
+    const { downloadLink } = this.props;
+    if (!downloadLink) {
+      return null;
+    }
+
+    return (
+      <div className="ckan-registry__export">
+        <a
+          className="ckan-registry__button ckan-registry__button--export"
+          href={downloadLink}
+        >
+          { window.i18n._t('CKANRegistryDisplay.DOWNLOAD', 'Export results to CSV') }
+        </a>
+      </div>
+    );
+  }
+
   render() {
-    const { className, downloadLink, fields } = this.props;
+    const { className, fields } = this.props;
+
     const invalidConfig = !fields || !fields.length;
     const classes = classnames(
       'ckan-registry',
@@ -128,17 +174,9 @@ class CKANRegistryDisplay extends Component {
 
     return (
       <div className={classes}>
+        { this.renderLoading() }
         <Griddle {...this.getGriddleProps()} />
-        {downloadLink && (
-          <div className="ckan-registry__export">
-            <a
-              className="ckan-registry__button ckan-registry__button--export"
-              href={downloadLink}
-            >
-              {window.i18n._t('CKANRegistryDisplay.DOWNLOAD', 'Export results to CSV')}
-            </a>
-          </div>
-        )}
+        { this.renderDownloadLink() }
 
         { /* example for adding a link using react-router */ }
         <Link to={`${this.props.basePath}/view/123`}>Go to item 123</Link>
