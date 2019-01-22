@@ -23,7 +23,11 @@ class CKANExampleApp extends Component {
    * @returns {string}
    */
   getTitle() {
-    return `${this.props.name} / ${this.props.resourceName}`;
+    let { name, resourceName } = this.props;
+    name = name || '';
+    resourceName = resourceName || '';
+    const separator = (name && resourceName) ? ' / ' : '';
+    return name + separator + resourceName;
   }
 
   /**

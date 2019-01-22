@@ -27,7 +27,7 @@ export default class {
 
     const options = {
       id: this.resource,
-      fields: fields.map(encodeURIComponent).join(','),
+      fields: fields.join(','),
       // Always ensure a total is requested
       include_total: true,
     };
