@@ -7,7 +7,7 @@ import { FormGroup, Input, Label } from 'reactstrap';
  * A text filter is used to filter a CKAN dataset by a specified text string
  * against the columns that
  */
-const CKANTextFilter = ({ columns, extraClass, id, label, onChange }) => {
+const CKANTextFilter = ({ extraClass, id, label, onChange }) => {
   const classes = classnames(extraClass, 'form-group', 'ckan-registry__text-filter');
   const inputId = `TextFilter_${id}_Search`;
   const handleChange = event => onChange(event.target.value);
@@ -22,19 +22,12 @@ const CKANTextFilter = ({ columns, extraClass, id, label, onChange }) => {
         name={`TextFilter[${id}][Search]`}
         onChange={handleChange}
       />
-
-      <Input
-        type="hidden"
-        name={`TextFilter[${id}][Columns]`}
-        value={JSON.stringify(columns)}
-      />
     </FormGroup>
   );
 };
 
 CKANTextFilter.propTypes = {
   id: PropTypes.string.isRequired,
-  columns: PropTypes.arrayOf(PropTypes.string),
   extraClass: PropTypes.string,
   label: PropTypes.string,
 };

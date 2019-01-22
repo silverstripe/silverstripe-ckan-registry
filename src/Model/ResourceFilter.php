@@ -126,6 +126,25 @@ class ResourceFilter extends DataObject
     }
 
     /**
+     * Return a "schema" that can be provided to client side JavaScript components for client side rendering
+     *
+     * @return array
+     */
+    public function getClientConfig()
+    {
+        return [
+            'label' => $this->FilterLabel,
+            'allColumns' => $this->AllColumns,
+            'columns' => $this->AllColumns ? null : array_map(function (ResourceField $field) {
+                return [
+                    'label' => $field->ReadableLabel,
+                    'target' => $field->OriginalLabel,
+                ];
+            }, $this->FilterFields()->toArray()),
+        ];
+    }
+
+    /**
      * Returns either the selected column's readable label value, or a fixed string representing multiple columns
      * having been selected.
      *

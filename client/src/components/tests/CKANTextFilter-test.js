@@ -29,16 +29,6 @@ describe('CKANTextFilter', () => {
       expect(wrapper.find('label').text()).toContain('Search things');
     });
 
-    it('renders a hidden input field', () => {
-      const wrapper = mount(
-        <CKANTextFilter
-          id="123"
-        />
-      );
-
-      expect(wrapper.find('input[type="hidden"]').length).toBe(1);
-    });
-
     it('adds the provided extraClass values', () => {
       const wrapper = mount(
         <CKANTextFilter

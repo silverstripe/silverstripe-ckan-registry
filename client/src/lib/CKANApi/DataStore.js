@@ -58,17 +58,39 @@ export default class {
     options.offset = offset;
 
     // Make the request and parse the result into a more usable format
-    return CKANApi.makeRequest(this.endpoint, 'datastore_search', options).then(
-      response => response.json().then(result => {
-        if (!result.success) {
-          return false;
-        }
+    return CKANApi
+      .makeRequest(this.endpoint, 'datastore_search', options)
+      .then(this.handleResponse);
+  }
 
-        return {
-          records: result.result.records,
-          total: result.result.total,
-        };
-      })
-    );
+  /**
+   * Run an SQL style search from a CKAN API by constructing a "Query" object with filters
+   *
+   * @param {Query} query
+   */
+  searchSql(query) {
+    return CKANApi
+      .makeRequest(this.endpoint, 'datastore_search_sql', { sql: query.parse(this.resource) })
+      .then(this.handleResponse);
+  }
+
+  /**
+   * Internal method used to handle a valid response from CKAN API.
+   *
+   * @protected
+   * @param {Promise} response
+   * @return {Promise}
+   */
+  handleResponse(response) {
+    return response.json().then(result => {
+      if (!result.success) {
+        return false;
+      }
+
+      return {
+        records: result.result.records,
+        total: result.result.total,
+      };
+    });
   }
 }
