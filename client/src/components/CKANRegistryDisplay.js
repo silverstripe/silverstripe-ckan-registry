@@ -1,12 +1,15 @@
 /* global window */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Griddle, { ColumnDefinition, RowDefinition } from 'griddle-react';
+import Griddle, { ColumnDefinition, RowDefinition, selectors, connect } from 'griddle-react';
+import { withHandlers } from 'recompose';
+import { compose } from 'redux';
 import classnames from 'classnames';
 import CKANApi from 'lib/CKANApi';
 import { Row, Col } from 'reactstrap';
 import CKANRegistryFilterContainer from 'components/CKANRegistryFilterContainer';
 import Query from 'lib/CKANApi/DataStore/Query';
+import { Redirect } from 'react-router-dom';
 
 class CKANRegistryDisplay extends Component {
   constructor(props) {
@@ -18,6 +21,7 @@ class CKANRegistryDisplay extends Component {
       query: this.resetQueryFilters(new Query(), props),
       currentPage: 1,
       recordCount: 0,
+      selectedRow: null,
     };
 
     this.handleGetPage = this.handleGetPage.bind(this);
@@ -42,6 +46,11 @@ class CKANRegistryDisplay extends Component {
   getGriddleProps() {
     const { pageSize } = this.props;
     const { data, currentPage, recordCount } = this.state;
+
+    const EnhanceWithRowData = connect((state, props) => ({
+      rowData: selectors.rowDataSelector(state, props)
+    }));
+
     return {
       data,
       pageProperties: {
@@ -56,6 +65,14 @@ class CKANRegistryDisplay extends Component {
       },
       components: {
         Layout: this.getGriddleLayoutHOC(),
+        RowEnhancer: compose(
+          EnhanceWithRowData,
+          withHandlers({
+            onClick: props => () => {
+              this.setState({ selectedRow: props.rowData.Id });
+            },
+          })
+        )
       },
     };
   }
@@ -312,7 +329,13 @@ class CKANRegistryDisplay extends Component {
   }
 
   render() {
-    const { className, fields } = this.props;
+    const { basePath, className, fields } = this.props;
+    const { selectedRow } = this.state;
+
+    // Send the user off to the right detail view if they've clicked on a row
+    if (selectedRow !== null) {
+      return <Redirect to={`${basePath}/view/${selectedRow}`} />;
+    }
 
     const invalidConfig = !fields || !fields.length;
     const classes = classnames(
