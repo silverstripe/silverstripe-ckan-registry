@@ -16,16 +16,20 @@ export default class {
    * @param {string[]} fields - The fields to return for each record
    * @param {string|object} term - A string term to search globally or an object of field : term
    * @param {boolean} distinct
+   * @param {number} limit
+   * @param {number} offset
    * @return {Promise}
    */
-  search(fields, term = null, distinct = false) {
+  search(fields, term = null, distinct = false, limit = 100, offset = 0) {
     if (!Array.isArray(fields) || !fields.length) {
-      return Promise.resolve(false);
+      return Promise.reject(false);
     }
 
     const options = {
       id: this.resource,
       fields: fields.map(encodeURIComponent).join(','),
+      // Always ensure a total is requested
+      include_total: true,
     };
 
     // If an invalid term is given then assume that it will return nothing
@@ -46,10 +50,12 @@ export default class {
       }
     }
 
-    // Add the distinct var if requested
+    // Add the distinct, limit and offset vars if requested
     if (distinct) {
       options.distinct = true;
     }
+    options.limit = limit;
+    options.offset = offset;
 
     // Make the request and parse the result into a more usable format
     return CKANApi.makeRequest(this.endpoint, 'datastore_search', options).then(

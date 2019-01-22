@@ -48,17 +48,21 @@ class CKANExampleApp extends Component {
   renderContent() {
     const { basePath } = this.props;
 
+    const passProps = {
+      ...this.props,
+    };
+
     return (
       <div className="ckan-registry__content">
         <Route
           path={basePath}
           exact
-          render={props => <CKANRegistryDisplay {...props} basePath={basePath} />}
+          render={props => <CKANRegistryDisplay {...props} {...passProps} />}
         />
 
         <Route
           path={`${basePath}/view/:item`}
-          render={props => <CKANRegistryDetailView {...props} basePath={basePath} />}
+          render={props => <CKANRegistryDetailView {...props} {...passProps} />}
         />
 
         <Route

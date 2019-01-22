@@ -21,9 +21,12 @@ describe('DataStore', () => {
     it('returns false when fields param is invalid or no fields are given', (done) => {
       const datastore = makeDataStore();
 
-      const promises = [null, false, 5, []].map(item => datastore.search(item).then(result => {
-        expect(result).toBe(false);
-      }));
+      const promises = [null, false, 5, []].map(item => datastore.search(item).then(
+        () => null,
+        result => {
+          expect(result).toBe(false);
+        }
+      ));
 
       Promise.all(promises).then(() => {
         expect(CKANApi.makeRequest.mock.calls).toHaveLength(0);

@@ -4,6 +4,7 @@ namespace SilverStripe\CKANRegistry\Page;
 
 use PageController;
 use SilverStripe\CKANRegistry\Model\Resource;
+use SilverStripe\CKANRegistry\Model\ResourceField;
 use SilverStripe\ORM\DataObject;
 
 class CKANRegistryPageController extends PageController
@@ -41,6 +42,23 @@ class CKANRegistryPageController extends PageController
             'name' => $resource->Name,
             'resourceName' => $resource->ResourceName,
             'basePath' => $this->getBasePath($holder),
+            'fields' => array_map(
+                function (ResourceField $field) {
+                    return [
+                        'OriginalLabel' => $field->OriginalLabel,
+                        'ReadableLabel' => $field->ReadableLabel,
+                        'ShowInResultsView' => $field->ShowInResultsView,
+                        'ShowInDetailView' => $field->ShowInDetailView,
+                        'DisplayConditions' => $field->DisplayConditions,
+                        'RemoveDuplicates' => $field->RemoveDuplicates,
+                    ];
+                },
+                $resource->Fields()->filterAny([
+                    'ShowInResultsView' => true,
+                    'ShowInDetailView' => true,
+                    'RemoveDuplicates' => true,
+                ])->Sort('Position', 'ASC')->toArray()
+            ),
         ];
 
         $this->extend('updateCKANClientConfig', $config);

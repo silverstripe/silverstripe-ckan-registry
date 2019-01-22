@@ -7,6 +7,7 @@ use SilverStripe\CKANRegistry\Forms\GridField\GridFieldDetailForm\ResourceFieldI
 use SilverStripe\CKANRegistry\Forms\GridFieldResourceTitle;
 use SilverStripe\CKANRegistry\Forms\ResourceLocatorField;
 use SilverStripe\CKANRegistry\Model\Resource;
+use SilverStripe\CKANRegistry\Model\ResourceField;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
@@ -28,6 +29,7 @@ use Symbiote\GridFieldExtensions\GridFieldOrderableRows;
  * and display a set of CMS configured columns.
  *
  * @method Resource DataResource
+ * @property  Resource DataResource
  */
 class CKANRegistryPage extends Page
 {
