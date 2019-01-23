@@ -93,6 +93,16 @@ class Query {
   }
 
   /**
+   * Clear the currently configured order (sort) on this query
+   *
+   * @return {Query} (self)
+   */
+  clearOrder() {
+    this.orderSpec = [];
+    return this;
+  }
+
+  /**
    * Parse this object into an SQL statement that can be sent through to a CKAN API endpoint.
    *
    * @param {string} resource
@@ -122,7 +132,7 @@ class Query {
 
     // Prep an order clause
     const orderClause = this.orderSpec.length
-      ? ` ${this.orderSpec.map(({ field, direction }) =>
+      ? ` ORDER BY ${this.orderSpec.map(({ field, direction }) =>
         `"${field.replace('"', '""')}" ${direction}`
       ).join(', ')}`
       : '';
