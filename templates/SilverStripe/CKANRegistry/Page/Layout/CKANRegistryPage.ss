@@ -1,3 +1,5 @@
+<% require css('silverstripe/ckan-registry: client/dist/styles/bundle.css') %>
+
 <div class="container">
     <section class="title">
         <div class="page-header">

@@ -73,7 +73,7 @@ describe('DataStore', () => {
       datastore.search(['foo', 'bar'], { foo: 'bin', bar: 'baz' });
       const options = CKANApi.makeRequest.mock.calls.shift()[2];
 
-      expect(options.q).toBe('{"foo":"bin","bar":"baz"}');
+      expect(options.filters).toBe('{"foo":"bin","bar":"baz"}');
     });
 
     it('gracefully handles object based term definitions that are empty', () => {

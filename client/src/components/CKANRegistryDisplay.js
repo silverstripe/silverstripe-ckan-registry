@@ -1,12 +1,15 @@
 /* global window */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Griddle, { ColumnDefinition, RowDefinition } from 'griddle-react';
+import Griddle, { ColumnDefinition, RowDefinition, selectors, connect } from 'griddle-react';
+import { withHandlers } from 'recompose';
+import { compose } from 'redux';
 import classnames from 'classnames';
 import CKANApi from 'lib/CKANApi';
 import { Row, Col } from 'reactstrap';
 import CKANRegistryFilterContainer from 'components/CKANRegistryFilterContainer';
 import Query from 'lib/CKANApi/DataStore/Query';
+import { Redirect } from 'react-router-dom';
 
 class CKANRegistryDisplay extends Component {
   constructor(props) {
@@ -18,6 +21,7 @@ class CKANRegistryDisplay extends Component {
       query: this.resetQueryFilters(new Query(), props),
       currentPage: 1,
       recordCount: 0,
+      selectedRow: null,
     };
 
     this.handleGetPage = this.handleGetPage.bind(this);
@@ -42,6 +46,11 @@ class CKANRegistryDisplay extends Component {
   getGriddleProps() {
     const { pageSize } = this.props;
     const { data, currentPage, recordCount } = this.state;
+
+    const EnhanceWithRowData = connect((state, props) => ({
+      rowData: selectors.rowDataSelector(state, props)
+    }));
+
     return {
       data,
       pageProperties: {
@@ -56,6 +65,14 @@ class CKANRegistryDisplay extends Component {
       },
       components: {
         Layout: this.getGriddleLayoutHOC(),
+        RowEnhancer: compose(
+          EnhanceWithRowData,
+          withHandlers({
+            onClick: props => () => {
+              this.setState({ selectedRow: props.rowData.Id });
+            },
+          })
+        )
       },
     };
   }
@@ -186,9 +203,15 @@ class CKANRegistryDisplay extends Component {
       // Create a new object and loop the existing. We do this to re-key the object
       const newRecord = {};
       Object.entries(record).forEach(([key, value]) => {
-        const readableLabel = fields
-          .find(field => field.OriginalLabel === key)
-          .ReadableLabel;
+        const currentField = fields.find(field => field.OriginalLabel === key);
+
+        // We always need to allow _id to exist, even if it's disabled via configuration
+        if (!currentField && key === '_id') {
+          newRecord.Id = value;
+          return; // continue
+        }
+
+        const readableLabel = currentField.ReadableLabel;
         newRecord[readableLabel] = value;
       });
       return newRecord;
@@ -212,9 +235,17 @@ class CKANRegistryDisplay extends Component {
 
     const dataStore = CKANApi.loadDatastore(endpoint, identifier);
 
+    const visibleFields = [
+      ...this.getVisibleFields(),
+    ];
+    if (!visibleFields.find(value => value === '_id')) {
+      // We always need "_id", even if it's hidden by configuration
+      visibleFields.push('_id');
+    }
+
     // Check if we have a query (and it has filters set)
     if (query && query.hasFilter()) {
-      query.fields = this.getVisibleFields();
+      query.fields = visibleFields;
       query.limit = pageSize;
       query.offset = offset;
       query.distinct = distinct;
@@ -224,7 +255,7 @@ class CKANRegistryDisplay extends Component {
     } else {
       // In this case we can use the simple "datastore_search" endpoint
       dataStore.search(
-        this.getVisibleFields(),
+        visibleFields,
         null, // No filtering
         distinct,
         pageSize,
@@ -312,7 +343,13 @@ class CKANRegistryDisplay extends Component {
   }
 
   render() {
-    const { className, fields } = this.props;
+    const { basePath, className, fields } = this.props;
+    const { selectedRow } = this.state;
+
+    // Send the user off to the right detail view if they've clicked on a row
+    if (selectedRow !== null) {
+      return <Redirect to={`${basePath}/view/${selectedRow}`} />;
+    }
 
     const invalidConfig = !fields || !fields.length;
     const classes = classnames(
@@ -372,6 +409,8 @@ CKANRegistryDisplay.propTypes = {
 CKANRegistryDisplay.defaultProps = {
   className: '',
   pageSize: 30,
+  spec: {},
+  fields: [],
 };
 
 export default CKANRegistryDisplay;

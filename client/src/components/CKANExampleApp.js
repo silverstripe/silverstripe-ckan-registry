@@ -18,32 +18,6 @@ import CKANRegistryDetailView from 'components/CKANRegistryDetailView';
  */
 class CKANExampleApp extends Component {
   /**
-   * Returns a title to display for each page
-   *
-   * @returns {string}
-   */
-  getTitle() {
-    let { name, resourceName } = this.props;
-    name = name || '';
-    resourceName = resourceName || '';
-    const separator = (name && resourceName) ? ' / ' : '';
-    return name + separator + resourceName;
-  }
-
-  /**
-   * Renders the header section, containing the page title
-   *
-   * @returns {HTMLElement}
-   */
-  renderHeader() {
-    return (
-      <section className="ckan-registry__header">
-        <h2 className="ckan-registry__title">{ this.getTitle() }</h2>
-      </section>
-    );
-  }
-
-  /**
    * Renders the content container and content components conditional on the
    * current route matching
    *
@@ -87,7 +61,6 @@ class CKANExampleApp extends Component {
     return (
       <BrowserRouter>
         <div className="ckan-registry">
-          { this.renderHeader() }
           { this.renderContent() }
         </div>
       </BrowserRouter>

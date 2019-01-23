@@ -46,7 +46,7 @@ export default class {
 
       if (terms.length) {
         // Nicely enough the expected format in this case is JSON :tada:
-        options.q = JSON.stringify(term);
+        options.filters = JSON.stringify(term);
       }
     }
 

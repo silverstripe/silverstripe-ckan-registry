@@ -112,7 +112,7 @@ class Query {
       ? ` WHERE (${this.filterBundles.map(bundle =>
         // Map those bundles - set "column" ILIKE '%field%' (and escape single quotes)
         bundle.map(({ column, term }) =>
-          `"${column.replace('"', '""')}" ILIKE '%${term.replace("'", "''")}%'`
+          `"${column.replace('"', '""')}" ILIKE '%${String(term).replace("'", "''")}%'`
         ).join(' OR ')
       ).join(') AND (')})`
       : '';
