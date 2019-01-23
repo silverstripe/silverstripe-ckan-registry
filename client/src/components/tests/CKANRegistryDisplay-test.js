@@ -46,9 +46,18 @@ describe('CKANRegistryDisplay', () => {
   });
 
   describe('render()', () => {
-    it('returns a Redirect when switching pages', () => {
+    it('renders nothing when no resource is specified', () => {
       const wrapper = shallow(
         <CKANRegistryDisplay />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.html()).toBeNull();
+    });
+
+    it('returns a Redirect when switching pages', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay spec={{ resource: 'something' }} />,
         { disableLifecycleMethods: true }
       );
 

@@ -53,6 +53,8 @@ class CKANRegistryPage extends Page
 
     private static $icon_class = 'font-icon-p-data';
 
+    private static $description = 'Display a data set from a CKAN resource';
+
     public function getCMSFields()
     {
         $this->beforeUpdateCMSFields(function (FieldList $fields) {

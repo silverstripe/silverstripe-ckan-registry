@@ -368,8 +368,13 @@ class CKANRegistryDisplay extends Component {
   }
 
   render() {
-    const { basePath, className, fields } = this.props;
+    const { spec: { resource }, basePath, className, fields } = this.props;
     const { selectedRow } = this.state;
+
+    // If no resource is configured then show nothing
+    if (!resource) {
+      return null;
+    }
 
     // Send the user off to the right detail view if they've clicked on a row
     if (selectedRow !== null) {
