@@ -5,6 +5,7 @@ namespace SilverStripe\CKANRegistry\Page;
 use PageController;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\CKANRegistry\Model\ResourceField;
+use SilverStripe\CKANRegistry\Model\ResourceFilter;
 use SilverStripe\ORM\DataObject;
 
 class CKANRegistryPageController extends PageController
@@ -59,6 +60,15 @@ class CKANRegistryPageController extends PageController
                     'RemoveDuplicates' => true,
                 ])->Sort('Position', 'ASC')->toArray()
             ),
+            'filters' => array_map(
+                function (ResourceFilter $filter) {
+                    $explodedClassName = explode('\\', get_class($filter));
+                    return [
+                        'type' => array_pop($explodedClassName),
+                    ] + $filter->getClientConfig();
+                },
+                $resource->Filters()->toArray()
+            )
         ];
 
         $this->extend('updateCKANClientConfig', $config);

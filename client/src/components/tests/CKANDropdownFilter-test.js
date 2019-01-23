@@ -18,7 +18,7 @@ describe('CKANDropdownFilter', () => {
       expect(wrapper.find('select').length).toBe(1);
     });
 
-    it('renders the provided selections as options', () => {
+    it('renders the provided selections as options and a blank first option', () => {
       const wrapper = mount(
         <CKANDropdownFilter
           id="123"
@@ -26,7 +26,8 @@ describe('CKANDropdownFilter', () => {
         />
       );
 
-      expect(wrapper.find('option').length).toBe(3);
+      expect(wrapper.find('option').length).toBe(4);
+      expect(wrapper.find('option').first().text()).toBe('');
     });
 
     it('renders a label for the select field when provided', () => {
@@ -40,35 +41,6 @@ describe('CKANDropdownFilter', () => {
 
       expect(wrapper.find('label').length).toBe(1);
       expect(wrapper.find('label').text()).toContain('Search things');
-    });
-
-    it('renders a hidden input field with columns in it', () => {
-      const wrapper = mount(
-        <CKANDropdownFilter
-          id="123"
-          allColumns={false}
-          columns={['name', 'number']}
-          selections={['foo']}
-        />
-      );
-
-      const columnsInput = wrapper.find('input[name="DropdownFilter[123][Columns]"]');
-      expect(columnsInput.length).toBe(1);
-      expect(columnsInput.props().value).toBe('["name","number"]');
-    });
-
-    it('renders a hidden input field with the "allColumns" value as an int', () => {
-      const wrapper = mount(
-        <CKANDropdownFilter
-          id="123"
-          allColumns
-          selections={['foo']}
-        />
-      );
-
-      const columnsInput = wrapper.find('input[name="DropdownFilter[123][AllColumns]"]');
-      expect(columnsInput.length).toBe(1);
-      expect(columnsInput.props().value).toBe(1);
     });
 
     it('adds the provided extraClass values', () => {

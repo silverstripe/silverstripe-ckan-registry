@@ -1,10 +1,13 @@
 /* global window */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Griddle from 'griddle-react';
+import Griddle, { ColumnDefinition, RowDefinition } from 'griddle-react';
 import classnames from 'classnames';
 import CKANApi from 'lib/CKANApi';
 import { Link } from 'react-router-dom';
+import { Row, Col } from 'reactstrap';
+import CKANRegistryFilterContainer from 'components/CKANRegistryFilterContainer';
+import Query from 'lib/CKANApi/DataStore/Query';
 
 class CKANRegistryDisplay extends Component {
   constructor(props) {
@@ -13,11 +16,13 @@ class CKANRegistryDisplay extends Component {
     this.state = {
       data: [],
       loading: true,
+      query: this.resetQueryFilters(new Query(), props),
       currentPage: 1,
       recordCount: 0,
     };
 
     this.handleGetPage = this.handleGetPage.bind(this);
+    this.handleFilter = this.handleFilter.bind(this);
   }
 
   componentDidMount() {
@@ -30,24 +35,14 @@ class CKANRegistryDisplay extends Component {
     }
   }
 
+  /**
+   * Return the props that will be passed to the base Griddle component
+   *
+   * @return {Object}
+   */
   getGriddleProps() {
     const { pageSize } = this.props;
     const { data, currentPage, recordCount } = this.state;
-
-    const GriddleLayout = ({ Table, Pagination, Filter }) => (
-      <div>
-        <div className="ckan-registry__filters">
-          <Filter />
-        </div>
-        <div className="ckan-registry__table">
-          <Table />
-        </div>
-        <div className="ckan-registry__pagination">
-          <Pagination />
-        </div>
-      </div>
-    );
-
     return {
       data,
       pageProperties: {
@@ -61,22 +56,135 @@ class CKANRegistryDisplay extends Component {
         onPrevious: () => { this.handleGetPage(this.state.currentPage - 1); },
       },
       components: {
-        Layout: GriddleLayout,
+        Layout: this.getGriddleLayoutHOC(),
       },
     };
   }
 
+  /**
+   * Get an HOC that is used to render the layout of the Griddle components
+   *
+   * @return {function({Table: *, Pagination: *, Filter: *}): *}
+   */
+  getGriddleLayoutHOC() {
+    return ({ Table, Pagination }) => (
+      <Row>
+        <Col md={2} className="ckan-registry__filters">
+          <CKANRegistryFilterContainer
+            {...this.props}
+            onFilter={this.handleFilter}
+            allColumns={this.getVisibleFields()}
+          />
+        </Col>
+        <Col md={10} className="ckan-registry__table">
+          <Table />
+          <Pagination />
+        </Col>
+      </Row>
+    );
+  }
+
+  /**
+   * Get the fields that are shown in the results view (and should be searched upon)
+   *
+   * @return {*}
+   */
+  getVisibleFields() {
+    return this.props.fields
+      .filter(field => parseInt(field.ShowInResultsView, 10) === 1)
+      .map(field => field.OriginalLabel);
+  }
+
+  /**
+   * Takes the given Query object and resets the filters to a default state
+   *
+   * @param {Query} query
+   * @param {Object} props Optionally provided to be used in place of `this.props`
+   * @return {Query}
+   */
+  resetQueryFilters(query, props) {
+    // eslint-disable-next-line no-unused-vars
+    const { filter } = props || this.props;
+
+    query.clearFilters();
+
+    // TODO implement the default filter functionality here... (and remove eslint exception above)
+
+    return query;
+  }
+
+  /**
+   * Handle a request to change to a specific page
+   *
+   * @param pageNumber
+   */
   handleGetPage(pageNumber) {
     this.setState({
       currentPage: pageNumber,
     });
   }
 
+  /**
+   * Handle a filter field update
+   *
+   * @param {Object} filterValues
+   */
+  handleFilter(filterValues) {
+    const { fields, filters, spec: { dataset } } = this.props;
+    const { query } = this.state;
+
+    // Clear any existing filter
+    this.resetQueryFilters(query);
+
+    // Loop through the filters and apply any values that may be in the given "filter values"
+    filters.forEach(filter => {
+      const stateKey = `${dataset}_${filter.label}`;
+
+      if (!filterValues.hasOwnProperty(stateKey)) {
+        return; // continue;
+      }
+
+      const value = filterValues[stateKey];
+
+      if (typeof value !== 'string' || !value.length) {
+        return; // continue;
+      }
+
+      // Check if the filter configuration implies that this should be a search on "all columns"
+      const isAllColumns = filter.allColumns.toString() === '1';
+
+      // For all columns we'll just search those that are "shown in results"
+      if (isAllColumns) {
+        query.filter(
+          fields
+            // We only apply the search term to fields that are visible on the table
+            .filter(({ OriginalLabel }) => this.getVisibleFields().includes(OriginalLabel))
+            // And we need to pull out the "original label" - the label it goes by on CKAN
+            .map(({ OriginalLabel }) => OriginalLabel),
+          value
+        );
+        return; // continue;
+      }
+
+      // Add our filter statement
+      query.filter(filter.columns.map(({ target }) => target), value);
+    });
+
+    this.loadData();
+  }
+
+  /**
+   * Load the data from CKAN for displaying in Griddle. Note this is usually trigger by lifecycle
+   * event (ie. componentDidUpdate)
+   */
   loadData() {
     const { spec: { endpoint, identifier }, fields, pageSize } = this.props;
-    const { currentPage } = this.state;
+    const { currentPage, query } = this.state;
 
+    // Define a closure that will convert rows in a response from CKAN into rows that are consumable
+    // by Griddle
     const recordMapper = record => {
+      // Create a new object and loop the existing. We do this to re-key the object
       const newRecord = {};
       Object.entries(record).forEach(([key, value]) => {
         const readableLabel = fields
@@ -87,25 +195,43 @@ class CKANRegistryDisplay extends Component {
       return newRecord;
     };
 
+    // Mark as loading
     this.setState({ loading: true });
-    CKANApi
-      .loadDatastore(endpoint, identifier)
-      .search(
-        fields
-          .filter(field => parseInt(field.ShowInResultsView, 10) === 1)
-          .map(field => field.OriginalLabel), // fields (select)
-        null, // search term (where)
-        false, // distinct
-        pageSize, // limit
-        (currentPage - 1) * pageSize // offset
-      )
-      .then(result => {
-        this.setState({
-          data: result.records ? result.records.map(recordMapper) : [],
-          recordCount: result.total,
-          loading: false,
-        });
+
+    // Calculate the offset
+    const offset = (currentPage - 1) * pageSize;
+    const distinct = true;
+
+    // Extract the handler for usage in the response promise
+    const handleResult = result => {
+      this.setState({
+        data: result.records ? result.records.map(recordMapper) : [],
+        recordCount: result.total,
+        loading: false,
       });
+    };
+
+    const dataStore = CKANApi.loadDatastore(endpoint, identifier);
+
+    // Check if we have a query (and it has filters set)
+    if (query && query.hasFilter()) {
+      query.fields = this.getVisibleFields();
+      query.limit = pageSize;
+      query.offset = offset;
+      query.distinct = distinct;
+
+      // Search using the SQL endpoint
+      dataStore.searchSql(query).then(handleResult);
+    } else {
+      // In this case we can use the simple "datastore_search" endpoint
+      dataStore.search(
+        this.getVisibleFields(),
+        null, // No filtering
+        distinct,
+        pageSize,
+        offset
+      ).then(handleResult);
+    }
   }
 
   /**
@@ -175,7 +301,19 @@ class CKANRegistryDisplay extends Component {
     return (
       <div className={classes}>
         { this.renderLoading() }
-        <Griddle {...this.getGriddleProps()} />
+        <Griddle {...this.getGriddleProps()}>
+          <RowDefinition>
+            {
+              this.getVisibleFields()
+                .map(field => {
+                  const id = fields.find(
+                    candidate => candidate.OriginalLabel === field
+                  ).ReadableLabel;
+                  return <ColumnDefinition key={id} id={id} />;
+                })
+            }
+          </RowDefinition>
+        </Griddle>
         { this.renderDownloadLink() }
 
         { /* example for adding a link using react-router */ }

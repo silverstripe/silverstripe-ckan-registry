@@ -10,8 +10,6 @@ import { FormGroup, Input, Label } from 'reactstrap';
  * E.g. "filter 'school_name' by the selected value"
  */
 const CKANDropdownFilter = ({
-  allColumns,
-  columns,
   extraClass,
   id,
   label,
@@ -32,19 +30,9 @@ const CKANDropdownFilter = ({
         name={`DropdownFilter[${id}][Search]`}
         onChange={handleChange}
       >
+        <option />
         { selections.map(value => <option key={value}>{ value }</option>) }
       </Input>
-
-      <Input
-        type="hidden"
-        name={`DropdownFilter[${id}][Columns]`}
-        value={JSON.stringify(columns)}
-      />
-      <Input
-        type="hidden"
-        name={`DropdownFilter[${id}][AllColumns]`}
-        value={allColumns ? 1 : 0}
-      />
     </FormGroup>
   );
 };
@@ -54,8 +42,6 @@ CKANDropdownFilter.propTypes = {
   selections: PropTypes.arrayOf(
     PropTypes.oneOfType([PropTypes.string, PropTypes.number])
   ).isRequired,
-  allColumns: PropTypes.bool,
-  columns: PropTypes.arrayOf(PropTypes.string),
   extraClass: PropTypes.string,
   label: PropTypes.string,
 };

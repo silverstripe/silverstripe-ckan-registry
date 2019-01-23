@@ -231,7 +231,10 @@ class CKANApi {
     let url = `${endpoint}api/${CKAN_VERSION}/action/${action}`;
 
     if (requestVars && Object.values(requestVars).length) {
-      url += `?${Object.entries(requestVars).map(([key, value]) => `${key}=${value}`).join('&')}`;
+      const queryString = Object.entries(requestVars)
+        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+        .join('&');
+      url += `?${queryString}`;
     }
 
     return fetch(url);
