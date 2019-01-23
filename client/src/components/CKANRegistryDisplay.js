@@ -409,6 +409,8 @@ CKANRegistryDisplay.propTypes = {
 CKANRegistryDisplay.defaultProps = {
   className: '',
   pageSize: 30,
+  spec: {},
+  fields: [],
 };
 
 export default CKANRegistryDisplay;
