@@ -58,6 +58,11 @@ class CKANRegistryDisplay extends Component {
         recordCount,
         pageSize,
       },
+      styleConfig: {
+        classNames: {
+          Table: 'griddle-table table table-hover',
+        },
+      },
       events: {
         onGetPage: this.handleGetPage,
         onNext: () => { this.handleGetPage(this.state.currentPage + 1); },

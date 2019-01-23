@@ -69,6 +69,11 @@ class ResourceFilter extends DataObject
             $allColumnsField = $fields->dataFieldByName('AllColumns');
             $allColumnsField->addExtraClass('ckan-columns__all-columns');
 
+            $fields->dataFieldByName('FilterLabel')->setDescription(_t(
+                __CLASS__ . '.FILTERLABEL_DESCRIPTION',
+                'Provide an appropriate label for the filter. For example, “Search locations”'
+            ));
+
             // Remove the scaffolded Filter Fields tab and the AllColumns field
             $fields->removeByName(['FilterFields', 'AllColumns']);
 
