@@ -22,10 +22,12 @@ class CKANRegistryDisplay extends Component {
       currentPage: 1,
       recordCount: 0,
       selectedRow: null,
+      sort: null,
     };
 
     this.handleGetPage = this.handleGetPage.bind(this);
     this.handleFilter = this.handleFilter.bind(this);
+    this.handleSort = this.handleSort.bind(this);
   }
 
   componentDidMount() {
@@ -33,7 +35,9 @@ class CKANRegistryDisplay extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.currentPage !== this.state.currentPage) {
+    const pageChanged = prevState.currentPage !== this.state.currentPage;
+    const sortChanged = prevState.sort !== this.state.sort;
+    if (pageChanged || sortChanged) {
       this.loadData();
     }
   }
@@ -67,6 +71,7 @@ class CKANRegistryDisplay extends Component {
         onGetPage: this.handleGetPage,
         onNext: () => { this.handleGetPage(this.state.currentPage + 1); },
         onPrevious: () => { this.handleGetPage(this.state.currentPage - 1); },
+        onSort: sort => { this.handleSort(sort); },
       },
       components: {
         Layout: this.getGriddleLayoutHOC(),
@@ -194,13 +199,23 @@ class CKANRegistryDisplay extends Component {
     this.loadData();
   }
 
+  handleSort(newSort) {
+    const { fields } = this.props;
+    const { id, sortAscending } = newSort;
+    const sortField = fields.find(field => field.ReadableLabel === id).OriginalLabel;
+
+    this.setState({
+      sort: { sortField, sortAscending },
+    });
+  }
+
   /**
    * Load the data from CKAN for displaying in Griddle. Note this is usually trigger by lifecycle
    * event (ie. componentDidUpdate)
    */
   loadData() {
     const { spec: { endpoint, identifier }, fields, pageSize } = this.props;
-    const { currentPage, query } = this.state;
+    const { currentPage, query, sort } = this.state;
 
     // Define a closure that will convert rows in a response from CKAN into rows that are consumable
     // by Griddle
@@ -254,6 +269,10 @@ class CKANRegistryDisplay extends Component {
       query.limit = pageSize;
       query.offset = offset;
       query.distinct = distinct;
+      if (sort) {
+        const { sortField, sortAscending } = sort;
+        query.clearOrder().order(sortField, sortAscending ? 'ASC' : 'DESC');
+      }
 
       // Search using the SQL endpoint
       dataStore.searchSql(query).then(handleResult);
@@ -264,7 +283,8 @@ class CKANRegistryDisplay extends Component {
         null, // No filtering
         distinct,
         pageSize,
-        offset
+        offset,
+        sort
       ).then(handleResult);
     }
   }
@@ -402,10 +422,10 @@ CKANRegistryDisplay.propTypes = {
   fields: PropTypes.arrayOf(PropTypes.shape({
     OriginalLabel: PropTypes.string,
     ReadableLabel: PropTypes.string,
-    ShowInResultsView: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
-    ShowInDetailView: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    ShowInResultsView: PropTypes.oneOf([1, 0, true, false]),
+    ShowInDetailView: PropTypes.oneOf([1, 0, true, false]),
     DisplayConditions: PropTypes.any,
-    RemoveDuplicates: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    RemoveDuplicates: PropTypes.oneOf([1, 0, true, false]),
   })),
   className: PropTypes.string,
   pageSize: PropTypes.number,

@@ -20,7 +20,14 @@ export default class {
    * @param {number} offset
    * @return {Promise}
    */
-  search(fields, term = null, distinct = false, limit = 100, offset = 0) {
+  search(
+    fields,
+    term = null,
+    distinct = false,
+    limit = 100,
+    offset = 0,
+    sort = null
+  ) {
     if (!Array.isArray(fields) || !fields.length) {
       return Promise.reject(false);
     }
@@ -56,6 +63,11 @@ export default class {
     }
     options.limit = limit;
     options.offset = offset;
+
+    if (sort) {
+      const { sortField, sortAscending } = sort;
+      options.sort = `${sortField} ${sortAscending ? 'ASC' : 'DESC'}`;
+    }
 
     // Make the request and parse the result into a more usable format
     return CKANApi
