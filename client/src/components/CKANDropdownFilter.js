@@ -14,7 +14,8 @@ const CKANDropdownFilter = ({
   id,
   label,
   selections,
-  onChange
+  onChange,
+  value,
 }) => {
   const classes = classnames(extraClass, 'form-group', 'ckan-registry__dropdown-filter');
   const inputId = `DropdownFilter_${id}_Search`;
@@ -27,11 +28,12 @@ const CKANDropdownFilter = ({
       <Input
         id={inputId}
         type="select"
+        value={value}
         name={`DropdownFilter[${id}][Search]`}
         onChange={handleChange}
       >
         <option />
-        { selections.map(value => <option key={value}>{ value }</option>) }
+        { selections.map(selection => <option key={selection}>{selection}</option>) }
       </Input>
     </FormGroup>
   );
