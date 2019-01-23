@@ -11,7 +11,12 @@ class CKANRegistryFilterContainer extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      inputValues: [],
+    };
+
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleClear = this.handleClear.bind(this);
   }
 
   /**
@@ -26,6 +31,23 @@ class CKANRegistryFilterContainer extends Component {
   }
 
   /**
+   * Handle a request to clear the filter form
+   *
+   * @param {Event} event
+   */
+  handleClear(event) {
+    event.preventDefault();
+
+    // Reset inputs
+    this.setState({
+      inputValues: [],
+    });
+
+    // Trigger an update of the table
+    this.props.onFilter([]);
+  }
+
+  /**
    * Render a specific filter
    *
    * @param {Object} filter
@@ -37,6 +59,7 @@ class CKANRegistryFilterContainer extends Component {
       id,
       key: id,
       label: filter.label,
+      value: this.state.inputValues[id] || '',
       onChange: input => {
         this.setState(existingState => ({ inputValues: {
           ...existingState.inputValues,
@@ -60,7 +83,19 @@ class CKANRegistryFilterContainer extends Component {
       <Form onSubmit={this.handleSubmit}>
         <h4>Filters</h4>
         { this.props.filters.map(filter => this.renderFilter(filter)) }
-        <Button color="primary">Search</Button>
+        <Button color="primary">{
+          window.i18n._t(
+            'CKANRegistryFilterContainer.SEARCH',
+            'Search'
+          )
+        }</Button>
+        &nbsp;
+        <Button color="default" onClick={this.handleClear}>{
+          window.i18n._t(
+            'CKANRegistryFilterContainer.CLEAR',
+            'Clear'
+          )
+        }</Button>
       </Form>
     );
   }
