@@ -203,9 +203,15 @@ class CKANRegistryDisplay extends Component {
       // Create a new object and loop the existing. We do this to re-key the object
       const newRecord = {};
       Object.entries(record).forEach(([key, value]) => {
-        const readableLabel = fields
-          .find(field => field.OriginalLabel === key)
-          .ReadableLabel;
+        const currentField = fields.find(field => field.OriginalLabel === key);
+
+        // We always need to allow _id to exist, even if it's disabled via configuration
+        if (!currentField && key === '_id') {
+          newRecord.Id = value;
+          return; // continue
+        }
+
+        const readableLabel = currentField.ReadableLabel;
         newRecord[readableLabel] = value;
       });
       return newRecord;
@@ -229,9 +235,17 @@ class CKANRegistryDisplay extends Component {
 
     const dataStore = CKANApi.loadDatastore(endpoint, identifier);
 
+    const visibleFields = [
+      ...this.getVisibleFields(),
+    ];
+    if (!visibleFields.find(value => value === '_id')) {
+      // We always need "_id", even if it's hidden by configuration
+      visibleFields.push('_id');
+    }
+
     // Check if we have a query (and it has filters set)
     if (query && query.hasFilter()) {
-      query.fields = this.getVisibleFields();
+      query.fields = visibleFields;
       query.limit = pageSize;
       query.offset = offset;
       query.distinct = distinct;
@@ -241,7 +255,7 @@ class CKANRegistryDisplay extends Component {
     } else {
       // In this case we can use the simple "datastore_search" endpoint
       dataStore.search(
-        this.getVisibleFields(),
+        visibleFields,
         null, // No filtering
         distinct,
         pageSize,
