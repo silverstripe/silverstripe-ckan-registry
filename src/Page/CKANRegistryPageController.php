@@ -8,6 +8,7 @@ use SilverStripe\CKANRegistry\Model\ResourceField;
 use SilverStripe\CKANRegistry\Model\ResourceFilter;
 use SilverStripe\Control\Director;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\View\Requirements;
 
 class CKANRegistryPageController extends PageController
 {
@@ -16,6 +17,14 @@ class CKANRegistryPageController extends PageController
         // The frontend components should take care of handling sub-URL routing from here.
         'view/$Item' => 'index',
     ];
+
+    protected function init()
+    {
+        parent::init();
+
+        Requirements::javascript('silverstripe/admin: client/dist/js/i18n.js');
+        Requirements::add_i18n_javascript('silverstripe/ckan-registry: client/lang');
+    }
 
     /**
      * Loads model data encapsulated as JSON in order to power front end technologies used to render that

@@ -85,11 +85,25 @@ class CKANRegistryDetailView extends Component {
     const { data, loading } = this.state;
 
     if (loading) {
-      return <p>Loading...</p>;
+      return (
+        <p>
+          {window.i18n._t(
+            'CKANRegistryDetailView.LOADING',
+            'Loading...'
+          )}
+        </p>
+      );
     }
 
     if (!data.length) {
-      return <p>No results found! 404 here?</p>;
+      return (
+        <p>
+          {window.i18n._t(
+            'CKANRegistryDetailView.NO_RESULTS',
+            'No results found!'
+          )}
+        </p>
+      );
     }
 
     return (
@@ -104,14 +118,17 @@ class CKANRegistryDetailView extends Component {
     );
   }
 
-
   render() {
     const { basePath } = this.props;
 
     return (
       <div className="ckan-registry__detail">
         { this.renderFields() }
-        <p><Link to={basePath}>&lt; Back</Link></p>
+        <p>
+          <Link to={basePath} className="ckan-registry__back-link">
+            &lt; {window.i18n._t('CKANRegistryDetailView.BACK', 'Back')}
+          </Link>
+        </p>
       </div>
     );
   }
