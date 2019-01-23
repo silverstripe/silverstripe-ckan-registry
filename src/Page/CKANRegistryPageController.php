@@ -6,6 +6,7 @@ use PageController;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\CKANRegistry\Model\ResourceField;
 use SilverStripe\CKANRegistry\Model\ResourceFilter;
+use SilverStripe\Control\Director;
 use SilverStripe\ORM\DataObject;
 
 class CKANRegistryPageController extends PageController
@@ -89,6 +90,6 @@ class CKANRegistryPageController extends PageController
         }
 
         $link = $holder->RelativeLink();
-        return '/' . trim($link, '/');
+        return Director::baseURL() . trim($link, '/');
     }
 }

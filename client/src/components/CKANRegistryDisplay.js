@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import Griddle, { ColumnDefinition, RowDefinition } from 'griddle-react';
 import classnames from 'classnames';
 import CKANApi from 'lib/CKANApi';
-import { Link } from 'react-router-dom';
 import { Row, Col } from 'reactstrap';
 import CKANRegistryFilterContainer from 'components/CKANRegistryFilterContainer';
 import Query from 'lib/CKANApi/DataStore/Query';
@@ -258,20 +257,57 @@ class CKANRegistryDisplay extends Component {
    * @returns {HTMLElement|null}
    */
   renderDownloadLink() {
-    const { downloadLink } = this.props;
-    if (!downloadLink) {
-      return null;
-    }
+    const { spec: { endpoint, identifier } } = this.props;
 
     return (
       <div className="ckan-registry__export">
         <a
           className="ckan-registry__button ckan-registry__button--export"
-          href={downloadLink}
+          href={`${endpoint}/datastore/dump/${identifier}`}
         >
           { window.i18n._t('CKANRegistryDisplay.DOWNLOAD', 'Export results to CSV') }
         </a>
       </div>
+    );
+  }
+
+  /**
+   * Renders a link to the resource on a CKAN site
+   *
+   * @returns {HTMLElement|null}
+   */
+  renderResourceLink() {
+    const { spec: { endpoint, dataset, identifier } } = this.props;
+    return (
+      <a href={`${endpoint}/dataset/${dataset}/resource/${identifier}`}>
+        {window.i18n.inject(
+          window.i18n._t(
+            'CKANRegistryDisplay.CKAN_LINK',
+            'View on {siteName}'
+          ), {
+            siteName: endpoint
+          }
+        )}
+      </a>
+    );
+  }
+
+  renderDataGrid() {
+    const { fields } = this.props;
+    return (
+      <Griddle {...this.getGriddleProps()}>
+        <RowDefinition>
+          {
+            this.getVisibleFields()
+              .map(field => {
+                const id = fields.find(
+                  candidate => candidate.OriginalLabel === field
+                ).ReadableLabel;
+                return <ColumnDefinition key={id} id={id} />;
+              })
+          }
+        </RowDefinition>
+      </Griddle>
     );
   }
 
@@ -285,7 +321,7 @@ class CKANRegistryDisplay extends Component {
       className
     );
 
-    if (!fields || !fields.length) {
+    if (invalidConfig) {
       const errorMessage = window.i18n._t(
         'CKANRegistryDisplay.NO_FIELDS',
         'There are no columns to show in this table.'
@@ -294,6 +330,10 @@ class CKANRegistryDisplay extends Component {
       return (
         <div className={classes}>
           <p>{errorMessage}</p>
+          <div className="ckan-registry__other-actions ckan-registry__other-actions--error">
+            { this.renderResourceLink() }
+            { this.renderDownloadLink() }
+          </div>
         </div>
       );
     }
@@ -301,39 +341,36 @@ class CKANRegistryDisplay extends Component {
     return (
       <div className={classes}>
         { this.renderLoading() }
-        <Griddle {...this.getGriddleProps()}>
-          <RowDefinition>
-            {
-              this.getVisibleFields()
-                .map(field => {
-                  const id = fields.find(
-                    candidate => candidate.OriginalLabel === field
-                  ).ReadableLabel;
-                  return <ColumnDefinition key={id} id={id} />;
-                })
-            }
-          </RowDefinition>
-        </Griddle>
-        { this.renderDownloadLink() }
-
-        { /* example for adding a link using react-router */ }
-        <Link to={`${this.props.basePath}/view/123`}>Go to item 123</Link>
+        { this.renderDataGrid() }
+        <div className="ckan-registry__other-actions">
+          { this.renderResourceLink() }
+          { this.renderDownloadLink() }
+        </div>
       </div>
     );
   }
 }
 
 CKANRegistryDisplay.propTypes = {
-  basePath: PropTypes.string,
+  spec: PropTypes.shape({
+    endpoint: PropTypes.string,
+    dataset: PropTypes.string,
+    identifier: PropTypes.string,
+  }),
+  fields: PropTypes.arrayOf(PropTypes.shape({
+    OriginalLabel: PropTypes.string,
+    ReadableLabel: PropTypes.string,
+    ShowInResultsView: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    ShowInDetailView: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+    DisplayConditions: PropTypes.any,
+    RemoveDuplicates: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  })),
   className: PropTypes.string,
-  downloadLink: PropTypes.string,
   pageSize: PropTypes.number,
 };
 
 CKANRegistryDisplay.defaultProps = {
-  basePath: '/',
   className: '',
-  downloadLink: '',
   pageSize: 30,
 };
 
