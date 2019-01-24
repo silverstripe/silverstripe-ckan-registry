@@ -16,9 +16,9 @@ describe('CKANRegistryDisplay', () => {
       const wrapper = shallow(
         <CKANRegistryDisplay
           fields={[
-            { ReadableLabel: 'Foo', OriginalLabel: 'foo', ShowInResultsView: '0' },
-            { ReadableLabel: 'Bar', OriginalLabel: 'bar', ShowInResultsView: '1' },
-            { ReadableLabel: 'Baz', OriginalLabel: 'baz', ShowInResultsView: '1' },
+            { ReadableLabel: 'Foo', OriginalLabel: 'foo', ShowInResultsView: false },
+            { ReadableLabel: 'Bar', OriginalLabel: 'bar', ShowInResultsView: true },
+            { ReadableLabel: 'Baz', OriginalLabel: 'baz', ShowInResultsView: true },
           ]}
         />,
         { disableLifecycleMethods: true }

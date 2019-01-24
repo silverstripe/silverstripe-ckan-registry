@@ -59,10 +59,10 @@ class CKANRegistryPageController extends PageController
                     return [
                         'OriginalLabel' => $field->OriginalLabel,
                         'ReadableLabel' => $field->ReadableLabel,
-                        'ShowInResultsView' => $field->ShowInResultsView,
-                        'ShowInDetailView' => $field->ShowInDetailView,
+                        'ShowInResultsView' => (bool) $field->ShowInResultsView,
+                        'ShowInDetailView' => (bool) $field->ShowInDetailView,
                         'DisplayConditions' => json_decode($field->DisplayConditions, true),
-                        'RemoveDuplicates' => $field->RemoveDuplicates,
+                        'RemoveDuplicates' => (bool) $field->RemoveDuplicates,
                     ];
                 },
                 $resource->Fields()->filterAny([

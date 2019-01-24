@@ -117,7 +117,7 @@ class CKANRegistryDisplay extends Component {
    */
   getVisibleFields() {
     return this.props.fields
-      .filter(field => parseInt(field.ShowInResultsView, 10) === 1)
+      .filter(field => field.ShowInResultsView)
       .map(field => field.OriginalLabel);
   }
 
@@ -422,10 +422,10 @@ CKANRegistryDisplay.propTypes = {
   fields: PropTypes.arrayOf(PropTypes.shape({
     OriginalLabel: PropTypes.string,
     ReadableLabel: PropTypes.string,
-    ShowInResultsView: PropTypes.oneOf([1, 0, true, false]),
-    ShowInDetailView: PropTypes.oneOf([1, 0, true, false]),
+    ShowInResultsView: PropTypes.bool,
+    ShowInDetailView: PropTypes.bool,
     DisplayConditions: PropTypes.any,
-    RemoveDuplicates: PropTypes.oneOf([1, 0, true, false]),
+    RemoveDuplicates: PropTypes.bool,
   })),
   className: PropTypes.string,
   pageSize: PropTypes.number,
