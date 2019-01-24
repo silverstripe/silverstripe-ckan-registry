@@ -94,7 +94,7 @@ class CKANApi {
   }
 
   /**
-   * Takes a CKAN resource specification and attempts toe generate a URL from it.
+   * Takes a CKAN resource specification and attempts to generate a URL from it.
    * Returns false if a URL cannot be generated from the given detail.
    * Opposite of the parseURI method
    *

@@ -8,7 +8,8 @@
 
 ## Overview
 
-Watch this space
+The SilverStripe CKAN Registry module lets CMS authors easily create pages in their SilverStripe websites which can
+pull in and display dynamic data from [CKAN](https://ckan.org/) data sets.
 
 ## Installation
 
@@ -18,24 +19,7 @@ $ composer require silverstripe/ckan-registry 1.0.x-dev
 
 ## Documentation
 
-### Making API calls to a CKAN API
-
-#### Backend requests
-
-When requests are made from the SilverStripe CMS, a `SilverStripe\CKANRegistry\Service\ClientInterface` implementation
-is used. This service is responsible for making requests to a CKAN API from the backend. It must be passed a `Resource`
-model, and will return the raw response from the API endpoint for that `Resource` via the `getData()` method.
-Optionally, you can also pass an "action" and an "id" field name from the `Resource`. These will be used to determine
-which endpoint action on the CKAN API is used, and which `Resource` field is used as the "id" argument in the request.
-
-Two methods are available for quick retrieval of data:
-
-* `getPackage()`: Returns the metadata for the dataset ("package_show" action in CKAN)
-* `getSearchData()`: Returns the column information for the given package ("datastore_search" action in CKAN)
-
-The default implementation of this interface is `SilverStripe\CKANRegistry\Service\Client`, which uses GuzzleHttp to
-communicate with the CKAN API endpoint. You can configure additional Guzzle options via the extension point in
-`getClientOptions()` if needed, for example if configuring proxy settings for the requests.
+Developer documentation [is available in the "docs" directory](docs/index.md).
 
 ## Versioning
 
@@ -56,4 +40,4 @@ for any bugs you've found, or features you're missing.
 
 ## License
 
-This module is released under the [BSD 3-Clause License](LICENSE)
+This module is released under the [BSD 3-Clause License](LICENSE).
