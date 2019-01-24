@@ -34,6 +34,13 @@ class CKANRegistryDisplay extends Component {
     this.loadData();
   }
 
+  /**
+   * Determines whether to re-load data from the CKAN API when parts of the props or
+   * state change
+   *
+   * @param {object} prevProps
+   * @param {object} prevState
+   */
   componentDidUpdate(prevProps, prevState) {
     const pageChanged = prevState.currentPage !== this.state.currentPage;
     const sortChanged = prevState.sort !== this.state.sort;
@@ -122,20 +129,49 @@ class CKANRegistryDisplay extends Component {
   }
 
   /**
+   * Finds all visible fields that have configured "ResultConditions", e.g. fields
+   * that should only show data in them that match certain conditions. When found,
+   * these will be applied as query filters before the data is loaded.
+   *
+   * @param {Query} query
+   */
+  applyDefaultFilters(query) {
+    const { fields } = this.props;
+
+    fields
+      .filter(field => {
+        if (!field.DisplayConditions) {
+          return false;
+        }
+        // Don't filter on columns that aren't in the displayed dataset or don't have
+        // any configured display conditions defined
+        return field.DisplayConditions.length && field.ShowInDetailView;
+      })
+      .forEach((field) => {
+        field.DisplayConditions.forEach((displayCondition) => {
+          // Add our filter statement
+          query.filter(
+            field.OriginalLabel, // column
+            displayCondition['match-text'], // term
+            true, // strict
+            // NB: input format is a numeric string e.g. "0" or "1"
+            //    0: must not match
+            //    1: must match
+            Boolean(parseInt(displayCondition['match-select'], 10)) // match
+          );
+        });
+      });
+  }
+
+  /**
    * Takes the given Query object and resets the filters to a default state
    *
    * @param {Query} query
-   * @param {Object} props Optionally provided to be used in place of `this.props`
    * @return {Query}
    */
-  resetQueryFilters(query, props) {
-    // eslint-disable-next-line no-unused-vars
-    const { filter } = props || this.props;
-
+  resetQueryFilters(query) {
     query.clearFilters();
-
-    // TODO implement the default filter functionality here... (and remove eslint exception above)
-
+    this.applyDefaultFilters(query);
     return query;
   }
 

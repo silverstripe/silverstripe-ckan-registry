@@ -31,11 +31,20 @@ class Query {
    * Filter the given columns by the given term using an "OR". If you want to "AND" the columns you
    * should call this method multiple times.
    *
-   * @param {string[]|string} columns
-   * @param {string} term
+   * Examples:
+   *
+   *   query('Foo', 'Bar')               -> WHERE "Foo" ILIKE '%Bar%'
+   *   query('Foo', 'Bar', true)         -> WHERE "Foo" ILIKE 'Bar'
+   *   query('Foo', 'Bar', false, false) -> WHERE "Foo" NOT ILIKE '%Bar%'
+   *   query('Foo', 'Bar', true, false)  -> WHERE "Foo" NOT ILIKE 'Bar'
+   *
+   * @param {string[]|string} columns The column(s) to filter
+   * @param {string} term             The value to filter the column(s) against
+   * @param {boolean} strict          If false, `%` loose edge matching characters will be used
+   * @param {boolean} match           Whether the term should match the column
    * @return {Query} (self)
    */
-  filter(columns, term) {
+  filter(columns, term, strict = false, match = true) {
     if (!Array.isArray(columns)) {
       // Assert we're dealing with an array or a string
       if (typeof columns !== 'string') {
@@ -46,6 +55,8 @@ class Query {
       this.filterBundles.push([{
         column: columns,
         term,
+        strict,
+        match,
       }]);
 
       return this;
@@ -57,6 +68,8 @@ class Query {
       bundle.push({
         column,
         term,
+        strict,
+        match,
       });
     });
     // Add to our list of "bundles" to be joined with an "AND"
@@ -121,9 +134,14 @@ class Query {
     const whereClause = this.filterBundles.length
       ? ` WHERE (${this.filterBundles.map(bundle =>
         // Map those bundles - set "column" ILIKE '%field%' (and escape single quotes)
-        bundle.map(({ column, term }) =>
-          `"${column.replace('"', '""')}" ILIKE '%${String(term).replace("'", "''")}%'`
-        ).join(' OR ')
+        bundle.map(({ column, term, strict, match }) => {
+          const queryColumn = column.replace('"', '""');
+          const queryTerm = String(term).replace("'", "''");
+          const edgeMatch = strict ? '' : '%';
+          const matchType = match ? 'ILIKE' : 'NOT ILIKE';
+
+          return `"${queryColumn}" ${matchType} '${edgeMatch}${queryTerm}${edgeMatch}'`;
+        }).join(' OR ')
       ).join(') AND (')})`
       : '';
 
