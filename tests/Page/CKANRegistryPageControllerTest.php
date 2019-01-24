@@ -41,6 +41,27 @@ class CKANRegistryPageControllerTest extends SapphireTest
         $this->assertSame('/animal-centers', $config['basePath'], 'Without a page, basePath should be root');
     }
 
+    public function testCKANClientConfigDecodesResultConditions()
+    {
+        /** @var CKANRegistryPage $page */
+        $page = $this->objFromFixture(CKANRegistryPage::class, 'animal_centers');
+
+        $controller = new CKANRegistryPageController($page);
+        $config = $controller->getCKANClientConfig($page);
+
+        $this->assertNotEmpty($config['fields']);
+        $this->assertContains([
+            'OriginalLabel' => 'city',
+            'ReadableLabel' => 'City',
+            'ShowInResultsView' => 1,
+            'ShowInDetailView' => 1,
+            'DisplayConditions' => [
+                ['match-text' => 'Auckland']
+            ],
+            'RemoveDuplicates' => 0,
+        ], $config['fields'], 'DisplayConditions are decoded from stored JSON format');
+    }
+
     /**
      * @param string $relativeLink
      * @param string $expected
