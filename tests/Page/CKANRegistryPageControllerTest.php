@@ -56,7 +56,7 @@ class CKANRegistryPageControllerTest extends SapphireTest
             'ShowInResultsView' => 1,
             'ShowInDetailView' => 1,
             'DisplayConditions' => [
-                ['match-text' => 'Auckland']
+                ['match-select' => '1', 'match-text' => 'Auckland']
             ],
             'RemoveDuplicates' => 0,
         ], $config['fields'], 'DisplayConditions are decoded from stored JSON format');

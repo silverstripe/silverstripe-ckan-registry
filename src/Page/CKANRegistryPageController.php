@@ -2,7 +2,6 @@
 
 namespace SilverStripe\CKANRegistry\Page;
 
-use const JSON_PRETTY_PRINT;
 use PageController;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\CKANRegistry\Model\ResourceField;

@@ -19,6 +19,6 @@ SilverStripe\CKANRegistry\Model\ResourceField:
     Type: text
     ShowInResultsView: 1
     ShowInDetailView: 1
-    DisplayConditions: '{"0":{"match-text":"Auckland"}}'
+    DisplayConditions: '{"0":{"match-select":"1","match-text":"Auckland"}}'
     RemoveDuplicates: 0
     ResourceID: =>SilverStripe\CKANRegistry\Model\Resource.animal_centers
