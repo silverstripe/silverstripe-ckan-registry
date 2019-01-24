@@ -17,8 +17,8 @@ class CKANResultConditionsField extends Component {
     super(props);
 
     const value = props.value && props.value[0] ? props.value[0] : {
-      'match-select': props.matchTypeDefault,
-      'match-test': '',
+      'match-select': props.data.matchTypeDefault,
+      'match-text': '',
     };
 
     // Set initial state values
@@ -138,16 +138,19 @@ class CKANResultConditionsField extends Component {
   /**
    * Renders a hidden input containing a JSON serialised set of values for this field
    *
-   * @returns {DOMElement}
+   * @returns {HTMLElement}
    */
   renderHiddenInput() {
     const { name } = this.props;
+
+    const rawValue = this.getValue();
+    const value = rawValue[0]['match-text'].length ? JSON.stringify(rawValue) : null;
 
     return (
       <input
         type="hidden"
         name={name}
-        value={JSON.stringify(this.getValue())}
+        value={value}
       />
     );
   }
