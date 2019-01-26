@@ -6,14 +6,14 @@ Provided with this module are some important classes and models for scaffolding 
 in the CMS:
 
 * `CKANRegistryPage`: a page type for the CMS
-* `Resource`: a representation of a CKAN dataset
-* `ResourceField`: a representation of a column from the CKAN dataset
+* `Resource`: a representation of a CKAN dataset resource
+* `ResourceField`: a representation of a column from the CKAN dataset resource
 * `ResourceFilter`: a configurable filter for frontend users
 
 ### CKAN Registry Page
 
 The page type that ships with this module is separated from regular page types to ensure that CMS users can get
-started with this module immediately after instllation, and so that it doesn't interfere with default pages in the
+started with this module immediately after installation, and so that it doesn't interfere with default pages in the
 CMS. Its code is largely for GridField formatting and inserting custom FormField components to manage the data set
 attached to the page (see `Resource` model).
 
@@ -22,7 +22,7 @@ The controller class for `CKANRegistryPage` provides a catch all handler for the
 
 ### Resource model
 
-A `Resource` model represents a CKAN dataset and is attached from a `CKANRegistryPage` (or other DataObject) via
+A `Resource` model represents a CKAN dataset resource and is attached from a `CKANRegistryPage` (or other DataObject) via
 a `has_one` relationship `$page->DataResource()`.
 
 The primary purpose of this model is to contain fields (`ResourceField`) and filters (`ResourceFilter`).
@@ -83,7 +83,8 @@ stored in a JSON blob.
   to query and process the data, and then allow a CMS user to select a resource from within that dataset
 * `CKANPresentedOptionsField`: "Presented options" are a either a selection of checkboxes, or a free text input field
   for the user to define a list of the presented options that will be applied for a given dropdown filter in the CMS.
-  If using a checkbox set, the user can adjust the default delimiter field.
+  If using a checkbox set, the user can adjust the default delimiter field. It suggests options by loading data from
+  the CKAN API.
 * `CKANResultConditionsField`: allows a CMS user to set one condition for displaying the column if the contents of
   it match or do not match a given string.
 ---

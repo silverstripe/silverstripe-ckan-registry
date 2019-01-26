@@ -47,7 +47,7 @@ The `Datastore` is responsible for wrapping searching into a common API, and has
 
 * `search()`: performs a search against the CKAN datastore given a variety of search columns, terms, limiting, and
   sorting options (see [`datastore_search`](https://docs.ckan.org/en/2.8/maintaining/datastore.html#ckanext.datastore.logic.action.datastore_search))
-* `searchSql()`: creates a `Query` instance and uses it to perform a SQL based search (see
+* `searchSql()`: takes a `Query` instance and uses it to perform a SQL based search (see
   [`datastore_search_sql`](https://docs.ckan.org/en/2.8/maintaining/datastore.html#ckanext.datastore.logic.action.datastore_search_sql))
 
 The `Query` class is used to construct a SQL query for CKAN by providing a set of methods that can be used from within
@@ -77,10 +77,10 @@ The default implementation of this interface is `ResourcePopulator`, and provide
 
 * `populateMetadata(Resource $resource)`: will gather metadata about the resource and/or dataset. The default
   implementation stores the dataset name and resource name as DB fields on the resource model.
-* `populateFields(Resource $resource()`: will create and attach `ResourceField` instances to the `Resource` for each
+* `populateFields(Resource $resource)`: will create and attach `ResourceField` instances to the `Resource` for each
   column in the resource's configured CKAN dataset.
 
-`ResourcePopulator` (default implementation) also takes responsibility for validating the `Resource` model is
+`ResourcePopulator` (default implementation) also takes responsibility for validating that the `Resource` model is
 adequately configured and will convert the CKAN field name into a default human readable label which can be adjusted
 in the CMS afterwards. Note that these methods are protected, and not covered under the `ResourcePopulatorInterface`
 specification.

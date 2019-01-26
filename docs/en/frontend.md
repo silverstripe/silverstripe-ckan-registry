@@ -5,6 +5,8 @@
 This module ships with an example frontend application written in React. This can be used as a guide/example of how
 to implement a decoupled frontend application for the CKAN dataset configuration set up in the backend.
 
+You don't have to implement your own application as the example is enabled out of the box.
+
 ### Dependencies
 
 * [React](https://reactjs.org)
