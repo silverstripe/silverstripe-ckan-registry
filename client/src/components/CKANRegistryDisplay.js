@@ -143,9 +143,13 @@ class CKANRegistryDisplay extends Component {
         if (!field.DisplayConditions) {
           return false;
         }
+
         // Don't filter on columns that aren't in the displayed dataset or don't have
         // any configured display conditions defined
-        return field.DisplayConditions.length && field.ShowInDetailView;
+        return field.ShowInDetailView && field.DisplayConditions.filter(condition =>
+          // Ensure conditions have valid configuration
+          condition.hasOwnProperty('match-text') && condition['match-text'].length
+        ).length;
       })
       .forEach((field) => {
         field.DisplayConditions.forEach((displayCondition) => {
