@@ -85,9 +85,9 @@ describe('CKANRegistryDisplay', () => {
       expect(query.hasFilter()).toBe(true);
 
       const parsedQuery = query.parse('testing');
-      expect(parsedQuery).toContain('"Location" ILIKE \'Australia\'');
-      expect(parsedQuery).toContain('"Hometown" NOT ILIKE \'Canberra\'');
-      expect(parsedQuery).not.toContain('"Birthplace" ILIKE \'Melbourne\'');
+      expect(parsedQuery).toContain('"Location" ILIKE \'%Australia%\'');
+      expect(parsedQuery).toContain('"Hometown" NOT ILIKE \'%Canberra%\'');
+      expect(parsedQuery).not.toContain('"Birthplace" ILIKE \'%Melbourne%\'');
     });
   });
 

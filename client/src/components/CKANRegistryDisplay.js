@@ -153,7 +153,7 @@ class CKANRegistryDisplay extends Component {
           query.filter(
             field.OriginalLabel, // column
             displayCondition['match-text'], // term
-            true, // strict
+            false, // strict
             // NB: input format is a numeric string e.g. "0" or "1"
             //    0: must not match
             //    1: must match
