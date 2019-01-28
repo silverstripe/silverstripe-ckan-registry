@@ -81,8 +81,8 @@ class Query {
   /**
    * Add an "ORDER BY" clause on the query for the given field
    *
-   * @param field
-   * @param direction
+   * @param {string} field
+   * @param {string} direction
    */
   order(field, direction = 'ASC') {
     this.orderSpec.push({
@@ -92,9 +92,9 @@ class Query {
   }
 
   /**
-   * Ensure
+   * Ensure results returned are distinct on the given field
    *
-   * @param field
+   * @param {string} field
    */
   distinctOn(field) {
     if (this.distinct === true) {
