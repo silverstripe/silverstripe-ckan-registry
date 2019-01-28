@@ -175,7 +175,13 @@ class CKANRegistryDisplay extends Component {
    */
   resetQueryFilters(query) {
     query.clearFilters();
+
+    // Attach default filters ("display conditions")
     this.applyDefaultFilters(query);
+
+    // Add a default sort
+    query.order('_id');
+
     return query;
   }
 
@@ -282,7 +288,6 @@ class CKANRegistryDisplay extends Component {
 
     // Calculate the offset
     const offset = (currentPage - 1) * pageSize;
-    const distinct = true;
 
     // Extract the handler for usage in the response promise
     const handleResult = result => {
@@ -295,20 +300,29 @@ class CKANRegistryDisplay extends Component {
 
     const dataStore = CKANApi.loadDatastore(endpoint, identifier);
 
-    const visibleFields = [
-      ...this.getVisibleFields(),
-    ];
-    if (!visibleFields.find(value => value === '_id')) {
+    const visibleFields = this.getVisibleFields();
+    if (!visibleFields.includes('_id')) {
       // We always need "_id", even if it's hidden by configuration
       visibleFields.push('_id');
     }
 
+    // Build up "distinct on"
+    const distinctFields = fields
+      .filter(field => field.RemoveDuplicates)
+      .map(field => field.OriginalLabel);
+
     // Check if we have a query (and it has filters set)
-    if (query && query.hasFilter()) {
+    if (distinctFields.length || (query && query.hasFilter())) {
       query.fields = visibleFields;
       query.limit = pageSize;
       query.offset = offset;
-      query.distinct = distinct;
+
+      query.clearDistinct();
+
+      if (distinctFields.length) {
+        distinctFields.forEach(field => { query.distinctOn(field); });
+      }
+
       if (sort) {
         const { sortField, sortAscending } = sort;
         query.clearOrder().order(sortField, sortAscending ? 'ASC' : 'DESC');
@@ -321,7 +335,7 @@ class CKANRegistryDisplay extends Component {
       dataStore.search(
         visibleFields,
         null, // No filtering
-        distinct,
+        false,
         pageSize,
         offset,
         sort

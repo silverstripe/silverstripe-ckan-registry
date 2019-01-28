@@ -9,7 +9,7 @@ class Query {
    * @param {Array} fields
    * @param {number} limit
    * @param {number} offset
-   * @param {Boolean} distinct
+   * @param {Boolean|Object} distinct
    */
   constructor(fields = [], limit = 30, offset = 0, distinct = false) {
     this.limit = limit;
@@ -78,11 +78,35 @@ class Query {
     return this;
   }
 
+  /**
+   * Add an "ORDER BY" clause on the query for the given field
+   *
+   * @param field
+   * @param direction
+   */
   order(field, direction = 'ASC') {
     this.orderSpec.push({
       field,
       direction,
     });
+  }
+
+  /**
+   * Ensure
+   *
+   * @param field
+   */
+  distinctOn(field) {
+    if (this.distinct === true) {
+      // The user has marked the whole query as distinct...
+      return;
+    }
+
+    if (!Array.isArray(this.distinct)) {
+      this.distinct = [];
+    }
+
+    this.distinct.push(field);
   }
 
   /**
@@ -116,6 +140,16 @@ class Query {
   }
 
   /**
+   * Clear the currently configured distinct configuration on this query
+   *
+   * @return {Query}
+   */
+  clearDistinct() {
+    this.distinct = false;
+    return this;
+  }
+
+  /**
    * Parse this object into an SQL statement that can be sent through to a CKAN API endpoint.
    *
    * @param {string} resource
@@ -127,8 +161,29 @@ class Query {
       throw Error('This query cannot be parsed as there are no fields to select');
     }
 
+    const quoteField = field => `"${field.replace('"', '""')}"`;
+    let distinct = '';
+    let join = '';
+
+    // Prep distinct if enabled
+    if (Array.isArray(this.distinct)) {
+      const distinctFields = this.distinct.map(quoteField).join(', ');
+      join = ` INNER JOIN (SELECT DISTINCT ON (${distinctFields}) "_id"`;
+      join += ` FROM "${resource}"`;
+      join += ` ORDER BY ${distinctFields}) q USING ("_id")`;
+
+      // '_id' must be in the result set
+      if (!this._fields.includes('_id')) {
+        this._fields.push('_id');
+      }
+    } else if (this.distinct) {
+      distinct = 'DISTINCT ';
+    } else {
+      distinct = '';
+    }
+
     // Prep the fields to select
-    const fields = this._fields.map(field => `"${field}"`).join(', ');
+    const fields = this._fields.map(quoteField).join(', ');
 
     // Prep the where by mapping all our "OR bundles" and joining them with "AND"
     const whereClause = this.filterBundles.length
@@ -145,9 +200,6 @@ class Query {
       ).join(') AND (')})`
       : '';
 
-    // Prep distinct if enabled
-    const distinct = this.distinct ? 'DISTINCT ' : '';
-
     // Prep an order clause
     const orderClause = this.orderSpec.length
       ? ` ORDER BY ${this.orderSpec.map(({ field, direction }) =>
@@ -162,7 +214,7 @@ class Query {
     const endClause = whereClause + orderClause + limitClause;
 
     // Combine it all together
-    return `SELECT ${distinct}${fields} FROM "${resource}" ${endClause}`;
+    return `SELECT ${distinct}${fields} FROM "${resource}"${join}${endClause}`;
   }
 }
 
