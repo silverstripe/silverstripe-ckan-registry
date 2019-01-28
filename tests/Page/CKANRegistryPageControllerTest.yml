@@ -11,3 +11,14 @@ SilverStripe\CKANRegistry\Page\CKANRegistryPage:
     Title: Animal Centers
     URLSegment: animal-centers
     DataResourceID: =>SilverStripe\CKANRegistry\Model\Resource.animal_centers
+
+SilverStripe\CKANRegistry\Model\ResourceField:
+  city:
+    OriginalLabel: city
+    ReadableLabel: City
+    Type: text
+    ShowInResultsView: 1
+    ShowInDetailView: 1
+    DisplayConditions: '{"0":{"match-select":"1","match-text":"Auckland"}}'
+    RemoveDuplicates: 0
+    ResourceID: =>SilverStripe\CKANRegistry\Model\Resource.animal_centers

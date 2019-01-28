@@ -58,7 +58,7 @@ class CKANRegistryDetailView extends Component {
       .loadDatastore(endpoint, identifier)
       .search(
         fields
-          .filter(field => parseInt(field.ShowInDetailView, 10) === 1)
+          .filter(field => field.ShowInDetailView)
           .map(field => field.OriginalLabel), // fields (select)
         { // search terms (where)
           _id: params.item

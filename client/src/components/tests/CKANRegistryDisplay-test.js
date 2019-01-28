@@ -4,6 +4,7 @@ import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15.4/build/index';
 import CKANRegistryDisplay from '../CKANRegistryDisplay';
 import i18n from 'i18n';
+import Query from 'lib/CKANApi/DataStore/Query';
 import { Redirect } from 'react-router-dom';
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -16,9 +17,9 @@ describe('CKANRegistryDisplay', () => {
       const wrapper = shallow(
         <CKANRegistryDisplay
           fields={[
-            { ReadableLabel: 'Foo', OriginalLabel: 'foo', ShowInResultsView: '0' },
-            { ReadableLabel: 'Bar', OriginalLabel: 'bar', ShowInResultsView: '1' },
-            { ReadableLabel: 'Baz', OriginalLabel: 'baz', ShowInResultsView: '1' },
+            { ReadableLabel: 'Foo', OriginalLabel: 'foo', ShowInResultsView: false },
+            { ReadableLabel: 'Bar', OriginalLabel: 'bar', ShowInResultsView: true },
+            { ReadableLabel: 'Baz', OriginalLabel: 'baz', ShowInResultsView: true },
           ]}
         />,
         { disableLifecycleMethods: true }
@@ -42,6 +43,51 @@ describe('CKANRegistryDisplay', () => {
 
       wrapper.instance().handleGetPage(123);
       expect(wrapper.state().currentPage).toBe(123);
+    });
+  });
+
+  describe('applyDefaultFilters()', () => {
+    it('takes fields with ResultConditions and pushes query filters for them', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          fields={[
+            {
+              OriginalLabel: 'Location',
+              ShowInDetailView: true,
+              DisplayConditions: [{
+                'match-select': '1',
+                'match-text': 'Australia',
+              }],
+            },
+            {
+              OriginalLabel: 'Hometown',
+              ShowInDetailView: true,
+              DisplayConditions: [{
+                'match-select': '0',
+                'match-text': 'Canberra',
+              }],
+            },
+            {
+              OriginalLabel: 'Birthplace',
+              ShowInDetailView: false,
+              DisplayConditions: [{
+                'match-select': '1',
+                'match-text': 'Melbourne',
+              }],
+            },
+          ]}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      const query = new Query(['Name']);
+      wrapper.instance().applyDefaultFilters(query);
+      expect(query.hasFilter()).toBe(true);
+
+      const parsedQuery = query.parse('testing');
+      expect(parsedQuery).toContain('"Location" ILIKE \'%Australia%\'');
+      expect(parsedQuery).toContain('"Hometown" NOT ILIKE \'%Canberra%\'');
+      expect(parsedQuery).not.toContain('"Birthplace" ILIKE \'%Melbourne%\'');
     });
   });
 

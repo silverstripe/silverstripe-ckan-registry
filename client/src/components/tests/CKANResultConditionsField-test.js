@@ -116,6 +116,20 @@ describe('CKANResultConditionsField', () => {
       expect(wrapper.find(MockTextField).length).toBe(1);
     });
 
+    it('renders a single field with the correct name attribute', () => {
+      const wrapper = shallow(
+        <CKANResultConditionsField
+          name="foo"
+          TextFieldComponent={MockTextField}
+          SelectComponent={MockSelectField}
+        />
+      );
+
+      expect(wrapper.find('[name="foo"]').length).toBe(1);
+    });
+  });
+
+  describe('renderHiddenInput()', () => {
     it('renders a hidden input containing a serialized value', () => {
       const wrapper = shallow(
         <CKANResultConditionsField
@@ -133,19 +147,51 @@ describe('CKANResultConditionsField', () => {
 
       const hiddenInput = wrapper.find('input[type="hidden"]');
       expect(hiddenInput.length).toBe(1);
+      expect(hiddenInput.props().value).toContain('match-select');
+      expect(hiddenInput.props().value).toContain('match-text');
       expect(hiddenInput.props().value).toContain('Wellington Zoo');
     });
 
-    it('renders a single field with the correct name attribute', () => {
+    it('has an empty value when no match text has been entered', () => {
       const wrapper = shallow(
         <CKANResultConditionsField
           name="foo"
+          value={null}
           TextFieldComponent={MockTextField}
           SelectComponent={MockSelectField}
         />
       );
 
-      expect(wrapper.find('[name="foo"]').length).toBe(1);
+      const hiddenInput = wrapper.find('input[type="hidden"]');
+      expect(hiddenInput.length).toBe(1);
+      expect(hiddenInput.props().value).toBeFalsy();
+    });
+
+    it('sets value after text input has changed and clears when emptying', () => {
+      const wrapper = shallow(
+        <CKANResultConditionsField
+          name="foo"
+          value={null}
+          TextFieldComponent={MockTextField}
+          SelectComponent={MockSelectField}
+        />
+      );
+
+      wrapper.setState({
+        0: {
+          'foo-match-select': '1',
+          'foo-match-text': 'Hello world',
+        }
+      });
+      expect(wrapper.find('input[type="hidden"]').props().value).toContain('Hello world');
+
+      wrapper.setState({
+        0: {
+          'foo-match-select': '1',
+          'foo-match-text': '',
+        }
+      });
+      expect(wrapper.find('input[type="hidden"]').props().value).toBeFalsy();
     });
   });
 });
