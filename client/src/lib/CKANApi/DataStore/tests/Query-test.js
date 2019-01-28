@@ -5,6 +5,7 @@ describe('Query', () => {
   beforeEach(() => {
     query.clearFilters();
     query.clearOrder();
+    query.clearDistinct();
   });
 
   describe('filter()', () => {
@@ -118,6 +119,24 @@ describe('Query', () => {
     it('selects from the given resource (table)', () => {
       const result = query.parse('testing');
       expect(result).toContain('FROM "testing"');
+    });
+
+    it('does not do DISTINCT queries by default', () => {
+      expect(query.parse('testing')).not.toContain('DISTINCT');
+    });
+
+    it('can be set to produce a full DISTINCT query', () => {
+      query.distinct = true;
+
+      expect(query.parse('testing')).toContain('SELECT DISTINCT "Name"');
+    });
+
+    it('can produce a query to handle distinct per column', () => {
+      query.distinctOn('Name');
+
+      expect(query.parse('testing')).toContain(
+        ' INNER JOIN (SELECT DISTINCT ON ("Name") "_id" FROM "testing" ORDER BY "Name") q USING ("_id")'
+      );
     });
   });
 });

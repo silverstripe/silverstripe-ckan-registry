@@ -55,6 +55,8 @@ your JavaScript code:
 
 * `fields()`: set the fields to return
 * `filter()`: add a filter (where condition)
+* `order()`: set the order for the query
+* `distinctOn()`: add an inner join to ensure that rows returned are distinct/unique in given field
 
 For more information on any of these classes, please see the source code in `client/src/lib/`.
 

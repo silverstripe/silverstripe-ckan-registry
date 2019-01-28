@@ -1,4 +1,4 @@
-/* global window */
+/* global window jest */
 import React from 'react';
 import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-15.4/build/index';
@@ -38,6 +38,11 @@ describe('CKANRegistryDisplay', () => {
         <CKANRegistryDisplay />,
         { disableLifecycleMethods: true }
       );
+
+      // Mock the `loadData` method on the component as enzyme will not prevent lifecycle events for
+      // setState
+      wrapper.instance().loadData = jest.fn();
+      wrapper.update();
 
       expect(wrapper.state().currentPage).toBe(1);
 
