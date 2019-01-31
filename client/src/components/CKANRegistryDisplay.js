@@ -10,6 +10,7 @@ import { Row, Col } from 'reactstrap';
 import CKANRegistryFilterContainer from 'components/CKANRegistryFilterContainer';
 import Query from 'lib/CKANApi/DataStore/Query';
 import { Redirect } from 'react-router-dom';
+import 'url-search-params-polyfill';
 
 class CKANRegistryDisplay extends Component {
   constructor(props) {
@@ -18,11 +19,10 @@ class CKANRegistryDisplay extends Component {
     this.state = {
       data: [],
       loading: true,
-      query: this.resetQueryFilters(new Query(), props),
-      currentPage: 1,
       recordCount: 0,
       selectedRow: null,
-      sort: null,
+      filterValues: {},
+      ...this.getStateDefaults()
     };
 
     this.handleGetPage = this.handleGetPage.bind(this);
@@ -44,7 +44,12 @@ class CKANRegistryDisplay extends Component {
   componentDidUpdate(prevProps, prevState) {
     const pageChanged = prevState.currentPage !== this.state.currentPage;
     const sortChanged = prevState.sort !== this.state.sort;
-    if (pageChanged || sortChanged) {
+
+    if (
+      pageChanged
+      || sortChanged
+      || JSON.stringify(prevState.filterValues) !== JSON.stringify(this.state.filterValues)
+    ) {
       this.loadData();
     }
   }
@@ -55,8 +60,8 @@ class CKANRegistryDisplay extends Component {
    * @return {Object}
    */
   getGriddleProps() {
-    const { pageSize } = this.props;
-    const { data, currentPage, recordCount } = this.state;
+    const { pageSize, fields } = this.props;
+    const { data, currentPage, recordCount, sort } = this.state;
 
     const EnhanceWithRowData = connect((state, props) => ({
       rowData: selectors.rowDataSelector(state, props)
@@ -78,7 +83,7 @@ class CKANRegistryDisplay extends Component {
         onGetPage: this.handleGetPage,
         onNext: () => { this.handleGetPage(this.state.currentPage + 1); },
         onPrevious: () => { this.handleGetPage(this.state.currentPage - 1); },
-        onSort: sort => { this.handleSort(sort); },
+        onSort: newSort => { this.handleSort(newSort); },
       },
       components: {
         Layout: this.getGriddleLayoutHOC(),
@@ -91,6 +96,10 @@ class CKANRegistryDisplay extends Component {
           })
         )
       },
+      sortProperties: sort && [{
+        id: fields.find(field => field.OriginalLabel === sort.sortField).ReadableLabel,
+        sortAscending: sort.sortAscending,
+      }]
     };
   }
 
@@ -100,6 +109,7 @@ class CKANRegistryDisplay extends Component {
    * @return {function({Table: *, Pagination: *, Filter: *}): *}
    */
   getGriddleLayoutHOC() {
+    const { filterValues } = this.state;
     return ({ Table, Pagination }) => (
       <Row>
         <Col md={2} className="ckan-registry__filters">
@@ -107,6 +117,7 @@ class CKANRegistryDisplay extends Component {
             {...this.props}
             onFilter={this.handleFilter}
             allColumns={this.getVisibleFields()}
+            defaultValues={filterValues}
           />
         </Col>
         <Col md={10} className="ckan-registry__table">
@@ -115,6 +126,50 @@ class CKANRegistryDisplay extends Component {
         </Col>
       </Row>
     );
+  }
+
+  /**
+   * Get some default state values that require a bit of pre-processing
+   *
+   * @return {Object}
+   */
+  getStateDefaults() {
+    const { spec: { dataset }, urlKeys } = this.props;
+
+    // Check search query for some state overrides
+    const params = new URLSearchParams(this.props.location.search || '');
+
+    let currentPage = 1;
+    if (params.has(urlKeys.page)) {
+      currentPage = parseInt(params.get(urlKeys.page), 10);
+    }
+
+    let sort = null;
+    if (params.has(urlKeys.sort)) {
+      sort = {
+        sortField: params.get(urlKeys.sort),
+        sortAscending: params.get(urlKeys.sortDirection) === 'ASC',
+      };
+    }
+
+    const filterValues = {};
+
+    // Loop the params and find those that are pertinent to filters
+    params.forEach((value, key) => {
+      const match = key.match(`^${urlKeys.filter}\\[(\\d+)]$`);
+
+      if (!match) {
+        return; // continue
+      }
+
+      filterValues[`${dataset}_${match[1]}`] = params.get(key);
+    });
+
+    return {
+      currentPage,
+      sort,
+      filterValues,
+    };
   }
 
   /**
@@ -135,7 +190,7 @@ class CKANRegistryDisplay extends Component {
    *
    * @param {Query} query
    */
-  applyDefaultFilters(query) {
+  applyResultConditionsFilters(query) {
     const { fields } = this.props;
 
     fields
@@ -168,6 +223,51 @@ class CKANRegistryDisplay extends Component {
   }
 
   /**
+   * Given a list of filter values (values that are set for each filter), apply those filters to the
+   * given query object
+   *
+   * @param {Query} query
+   * @param {Object} filterValues
+   */
+  applyFilterValues(query, filterValues) {
+    const { fields, filters, spec: { dataset } } = this.props;
+
+    // Loop through the filters and apply any values that may be in the given "filter values"
+    filters.forEach(filter => {
+      const stateKey = `${dataset}_${filter.id}`;
+
+      if (!filterValues.hasOwnProperty(stateKey)) {
+        return; // continue;
+      }
+
+      const value = filterValues[stateKey];
+
+      if (typeof value !== 'string' || !value.length) {
+        return; // continue;
+      }
+
+      // Check if the filter configuration implies that this should be a search on "all columns"
+      const isAllColumns = filter.allColumns.toString() === '1';
+
+      // For all columns we'll just search those that are "shown in results"
+      if (isAllColumns) {
+        query.filter(
+          fields
+          // We only apply the search term to fields that are visible on the table
+            .filter(({ OriginalLabel }) => this.getVisibleFields().includes(OriginalLabel))
+            // And we need to pull out the "original label" - the label it goes by on CKAN
+            .map(({ OriginalLabel }) => OriginalLabel),
+          value
+        );
+        return; // continue;
+      }
+
+      // Add our filter statement
+      query.filter(filter.columns.map(({ target }) => target), value);
+    });
+  }
+
+  /**
    * Takes the given Query object and resets the filters to a default state
    *
    * @param {Query} query
@@ -177,7 +277,7 @@ class CKANRegistryDisplay extends Component {
     query.clearFilters();
 
     // Attach default filters ("display conditions")
-    this.applyDefaultFilters(query);
+    this.applyResultConditionsFilters(query);
 
     // Add a default sort
     query.order('_id');
@@ -202,49 +302,15 @@ class CKANRegistryDisplay extends Component {
    * @param {Object} filterValues
    */
   handleFilter(filterValues) {
-    const { fields, filters, spec: { dataset } } = this.props;
-    const { query } = this.state;
-
-    // Clear any existing filter
-    this.resetQueryFilters(query);
-
-    // Loop through the filters and apply any values that may be in the given "filter values"
-    filters.forEach(filter => {
-      const stateKey = `${dataset}_${filter.label}`;
-
-      if (!filterValues.hasOwnProperty(stateKey)) {
-        return; // continue;
-      }
-
-      const value = filterValues[stateKey];
-
-      if (typeof value !== 'string' || !value.length) {
-        return; // continue;
-      }
-
-      // Check if the filter configuration implies that this should be a search on "all columns"
-      const isAllColumns = filter.allColumns.toString() === '1';
-
-      // For all columns we'll just search those that are "shown in results"
-      if (isAllColumns) {
-        query.filter(
-          fields
-            // We only apply the search term to fields that are visible on the table
-            .filter(({ OriginalLabel }) => this.getVisibleFields().includes(OriginalLabel))
-            // And we need to pull out the "original label" - the label it goes by on CKAN
-            .map(({ OriginalLabel }) => OriginalLabel),
-          value
-        );
-        return; // continue;
-      }
-
-      // Add our filter statement
-      query.filter(filter.columns.map(({ target }) => target), value);
+    this.setState({
+      filterValues,
     });
-
-    this.loadData();
   }
 
+  /**
+   * Handle a request to change the sort direction/column
+   * @param newSort
+   */
   handleSort(newSort) {
     const { fields } = this.props;
     const { id, sortAscending } = newSort;
@@ -260,8 +326,15 @@ class CKANRegistryDisplay extends Component {
    * event (ie. componentDidUpdate)
    */
   loadData() {
-    const { spec: { endpoint, identifier }, fields, pageSize } = this.props;
-    const { currentPage, query, sort } = this.state;
+    const {
+      spec: { endpoint, dataset, identifier },
+      fields,
+      pageSize,
+      location: { pathname, search },
+      history,
+      urlKeys,
+    } = this.props;
+    const { currentPage, filterValues, sort } = this.state;
 
     // Define a closure that will convert rows in a response from CKAN into rows that are consumable
     // by Griddle
@@ -293,7 +366,6 @@ class CKANRegistryDisplay extends Component {
     const handleResult = result => {
       this.setState({
         data: result.records ? result.records.map(recordMapper) : [],
-        recordCount: result.total,
         loading: false,
       });
     };
@@ -311,12 +383,17 @@ class CKANRegistryDisplay extends Component {
       .filter(field => field.RemoveDuplicates)
       .map(field => field.OriginalLabel);
 
+    // Create the query
+    const query = new Query(visibleFields, pageSize, offset);
+
+    // Clear any existing filter
+    this.resetQueryFilters(query);
+
+    // Apply the filters to the query
+    this.applyFilterValues(query, filterValues);
+
     // Check if we have a query (and it has filters set)
     if (distinctFields.length || (query && query.hasFilter())) {
-      query.fields = visibleFields;
-      query.limit = pageSize;
-      query.offset = offset;
-
       query.clearDistinct();
 
       if (distinctFields.length) {
@@ -329,7 +406,18 @@ class CKANRegistryDisplay extends Component {
       }
 
       // Search using the SQL endpoint
-      dataStore.searchSql(query).then(handleResult);
+      dataStore.countSql(query).then(count => {
+        if (!count) {
+          handleResult({
+            records: false,
+          });
+        } else {
+          this.setState({
+            recordCount: count,
+          });
+          dataStore.searchSql(query).then(handleResult);
+        }
+      });
     } else {
       // In this case we can use the simple "datastore_search" endpoint
       dataStore.search(
@@ -339,7 +427,47 @@ class CKANRegistryDisplay extends Component {
         pageSize,
         offset,
         sort
-      ).then(handleResult);
+      ).then(result => {
+        this.setState({
+          recordCount: result.total,
+        });
+        handleResult(result);
+      });
+    }
+
+    // Update the URL params for sort and current page. Filters at this point include default
+    // filters applied through "ResultConditions". The URL is updated with filters in handleFilter
+    const urlParams = new URLSearchParams(search);
+
+    if (sort) {
+      const { sortField, sortAscending } = sort;
+      urlParams.set(urlKeys.sort, sortField);
+      urlParams.set(urlKeys.sortDirection, sortAscending ? 'ASC' : 'DESC');
+    }
+
+    if (currentPage > 1) {
+      urlParams.set(urlKeys.page, currentPage);
+    } else {
+      urlParams.delete(urlKeys.page);
+    }
+
+    // Clear existing filters
+    Array.from(urlParams.keys()).forEach(key => {
+      if (key.match(`^${urlKeys.filter}\\[\\d+]`)) {
+        urlParams.delete(key);
+      }
+    });
+
+    // Add new ones
+    const fieldPrefixLength = `${dataset}_`.length;
+    Object.entries(filterValues).forEach(([index, value]) => {
+      urlParams.set(`${urlKeys.filter}[${index.substring(fieldPrefixLength)}]`, value);
+    });
+
+    // Compile search and push to history if applicable
+    const newSearch = `?${urlParams.toString()}`;
+    if (newSearch !== search) {
+      history.push(pathname + newSearch);
     }
   }
 
@@ -498,6 +626,11 @@ CKANRegistryDisplay.propTypes = {
   })),
   className: PropTypes.string,
   pageSize: PropTypes.number,
+  urlKeys: PropTypes.shape({
+    filter: PropTypes.string,
+    sort: PropTypes.string,
+    page: PropTypes.string,
+  }),
 };
 
 CKANRegistryDisplay.defaultProps = {
@@ -505,6 +638,12 @@ CKANRegistryDisplay.defaultProps = {
   pageSize: 30,
   spec: {},
   fields: [],
+  urlKeys: {
+    filter: 'filter',
+    sort: 'sort',
+    page: 'page',
+    sortDirection: 'sortdirection'
+  },
 };
 
 export default CKANRegistryDisplay;

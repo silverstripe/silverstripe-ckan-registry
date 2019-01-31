@@ -87,6 +87,23 @@ export default class {
   }
 
   /**
+   * Run a count of records on the given query
+   *
+   * @param {Query} query
+   */
+  countSql(query) {
+    return CKANApi
+      .makeRequest(this.endpoint, 'datastore_search_sql', { sql: query.parseCount(this.resource) })
+      .then(response => response.json().then(result => {
+        if (!result.success) {
+          return false;
+        }
+
+        return result.result.records[0].count;
+      }));
+  }
+
+  /**
    * Internal method used to handle a valid response from CKAN API.
    *
    * @protected

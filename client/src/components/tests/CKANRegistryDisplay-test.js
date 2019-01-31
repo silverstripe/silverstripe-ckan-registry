@@ -21,6 +21,7 @@ describe('CKANRegistryDisplay', () => {
             { ReadableLabel: 'Bar', OriginalLabel: 'bar', ShowInResultsView: true },
             { ReadableLabel: 'Baz', OriginalLabel: 'baz', ShowInResultsView: true },
           ]}
+          location={{ search: '' }}
         />,
         { disableLifecycleMethods: true }
       );
@@ -35,7 +36,9 @@ describe('CKANRegistryDisplay', () => {
   describe('handleGetPage()', () => {
     it('sets the page number to the state', () => {
       const wrapper = shallow(
-        <CKANRegistryDisplay />,
+        <CKANRegistryDisplay
+          location={{ search: '' }}
+        />,
         { disableLifecycleMethods: true }
       );
 
@@ -51,7 +54,7 @@ describe('CKANRegistryDisplay', () => {
     });
   });
 
-  describe('applyDefaultFilters()', () => {
+  describe('applyResultConditionsFilters()', () => {
     it('takes fields with ResultConditions and pushes query filters for them', () => {
       const wrapper = shallow(
         <CKANRegistryDisplay
@@ -81,12 +84,13 @@ describe('CKANRegistryDisplay', () => {
               }],
             },
           ]}
+          location={{ search: '' }}
         />,
         { disableLifecycleMethods: true }
       );
 
       const query = new Query(['Name']);
-      wrapper.instance().applyDefaultFilters(query);
+      wrapper.instance().applyResultConditionsFilters(query);
       expect(query.hasFilter()).toBe(true);
 
       const parsedQuery = query.parse('testing');
@@ -99,7 +103,9 @@ describe('CKANRegistryDisplay', () => {
   describe('render()', () => {
     it('renders nothing when no resource is specified', () => {
       const wrapper = shallow(
-        <CKANRegistryDisplay />,
+        <CKANRegistryDisplay
+          location={{ search: '' }}
+        />,
         { disableLifecycleMethods: true }
       );
 
@@ -108,7 +114,7 @@ describe('CKANRegistryDisplay', () => {
 
     it('returns a Redirect when switching pages', () => {
       const wrapper = shallow(
-        <CKANRegistryDisplay spec={{ identifier: 'something' }} />,
+        <CKANRegistryDisplay spec={{ identifier: 'something' }} location={{ search: '' }} />,
         { disableLifecycleMethods: true }
       );
 

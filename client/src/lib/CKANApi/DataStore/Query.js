@@ -156,6 +156,43 @@ class Query {
    * @return {string}
    */
   parse(resource) {
+    const { distinct, fields, join, where, order, limit } = this._parseClauses(resource);
+
+    // Combine all the clauses after "FROM {table}" into one const
+    const endClause = where + order + limit;
+
+    // Combine it all together
+    return `SELECT ${distinct}${fields} FROM "${resource}"${join}${endClause}`;
+  }
+
+  /**
+   * Parse this object into an SQL statement that will count all records and can be sent through to
+   * a CKAN API endpoint. This includes distinct and filter options but ignores limit and offset.
+   *
+   * @param {string} resource
+   * @return {string}
+   */
+  parseCount(resource) {
+    const { join, where } = this._parseClauses(resource);
+
+    return `SELECT count(*) FROM "${resource}"${join}${where}`;
+  }
+
+  /**
+   * Parse various SQL clauses from the state of this object
+   *
+   * @param resource
+   * @return {{
+   *   limit: string,
+   *   distinct: string,
+   *   where: string,
+   *   join: string,
+   *   fields: string,
+   *   order: string
+   * }}
+   * @private
+   */
+  _parseClauses(resource) {
     // Assert we have fields
     if (!this._fields.length) {
       throw Error('This query cannot be parsed as there are no fields to select');
@@ -186,7 +223,7 @@ class Query {
     const fields = this._fields.map(quoteField).join(', ');
 
     // Prep the where by mapping all our "OR bundles" and joining them with "AND"
-    const whereClause = this.filterBundles.length
+    const where = this.filterBundles.length
       ? ` WHERE (${this.filterBundles.map(bundle =>
         // Map those bundles - set "column" ILIKE '%field%' (and escape single quotes)
         bundle.map(({ column, term, strict, match }) => {
@@ -201,20 +238,16 @@ class Query {
       : '';
 
     // Prep an order clause
-    const orderClause = this.orderSpec.length
+    const order = this.orderSpec.length
       ? ` ORDER BY ${this.orderSpec.map(({ field, direction }) =>
         `"${field.replace('"', '""')}" ${direction}`
       ).join(', ')}`
       : '';
 
     // Prep a limit clause
-    const limitClause = ` LIMIT ${this.limit} OFFSET ${this.offset}`;
+    const limit = ` LIMIT ${this.limit} OFFSET ${this.offset}`;
 
-    // Combine all the clauses after "FROM {table}" into one const
-    const endClause = whereClause + orderClause + limitClause;
-
-    // Combine it all together
-    return `SELECT ${distinct}${fields} FROM "${resource}"${join}${endClause}`;
+    return { distinct, fields, join, where, order, limit };
   }
 }
 

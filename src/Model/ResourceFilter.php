@@ -138,6 +138,7 @@ class ResourceFilter extends DataObject
     public function getClientConfig()
     {
         return [
+            'id' => $this->ID,
             'label' => $this->FilterLabel,
             'allColumns' => $this->AllColumns,
             'columns' => $this->AllColumns ? null : array_map(function (ResourceField $field) {

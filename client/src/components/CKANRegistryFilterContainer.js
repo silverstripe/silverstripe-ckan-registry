@@ -12,7 +12,7 @@ class CKANRegistryFilterContainer extends Component {
     super(props);
 
     this.state = {
-      inputValues: [],
+      inputValues: props.defaultValues || [],
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -54,7 +54,7 @@ class CKANRegistryFilterContainer extends Component {
    * @return {*}
    */
   renderFilter(filter) {
-    const id = `${this.props.spec.dataset}_${filter.label}`;
+    const id = `${this.props.spec.dataset}_${filter.id}`;
     const sharedProps = {
       id,
       key: id,
