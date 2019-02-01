@@ -19,7 +19,7 @@ $ composer require silverstripe/ckan-registry 1.0.x-dev
 
 ## Documentation
 
-Developer documentation [is available in the "docs" directory](docs/index.md).
+Developer documentation [is available in the "docs" directory](docs/en/index.md).
 
 ## Versioning
 
