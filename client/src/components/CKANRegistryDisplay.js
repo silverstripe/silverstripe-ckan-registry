@@ -22,7 +22,7 @@ class CKANRegistryDisplay extends Component {
       recordCount: 0,
       selectedRow: null,
       filterValues: {},
-      ...this.getStateDefaults()
+      ...this.getStateFromLocation()
     };
 
     this.handleGetPage = this.handleGetPage.bind(this);
@@ -32,6 +32,13 @@ class CKANRegistryDisplay extends Component {
 
   componentDidMount() {
     this.loadData();
+
+    // Bind to the user hitting the "back" button in the web browser
+    if (window) {
+      window.onpopstate = () => {
+        this.setState(state => ({ ...state, ...this.getStateFromLocation() }));
+      };
+    }
   }
 
   /**
@@ -132,11 +139,11 @@ class CKANRegistryDisplay extends Component {
    *
    * @return {Object}
    */
-  getStateDefaults() {
-    const { spec: { dataset }, urlKeys } = this.props;
+  getStateFromLocation() {
+    const { spec: { dataset }, urlKeys, location: { search } } = this.props;
 
     // Check search query for some state overrides
-    const params = new URLSearchParams(this.props.location.search || '');
+    const params = new URLSearchParams(search || '');
 
     let currentPage = 1;
     if (params.has(urlKeys.page)) {

@@ -94,7 +94,7 @@ describe('CKANRegistryDisplay', () => {
     });
   });
 
-  describe('getStateDefaults()', () => {
+  describe('getStateFromLocation()', () => {
     it('parses the current page from URL search parameters', () => {
       let wrapper = shallow(
         <CKANRegistryDisplay
@@ -103,7 +103,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      let stateDefaults = wrapper.instance().getStateDefaults();
+      let stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.currentPage).toBe(45);
 
       wrapper = shallow(
@@ -114,7 +114,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      stateDefaults = wrapper.instance().getStateDefaults();
+      stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.currentPage).toBe(45);
     });
 
@@ -126,7 +126,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      let stateDefaults = wrapper.instance().getStateDefaults();
+      let stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.sort).toMatchObject({
         sortField: 'Foo',
         sortAscending: true,
@@ -140,7 +140,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      stateDefaults = wrapper.instance().getStateDefaults();
+      stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.sort).toMatchObject({
         sortField: 'Bin',
         sortAscending: false,
@@ -157,7 +157,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      let stateDefaults = wrapper.instance().getStateDefaults();
+      let stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.filterValues).toMatchObject({
         [`${dataset}_1`]: 'Foo',
       });
@@ -171,7 +171,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      stateDefaults = wrapper.instance().getStateDefaults();
+      stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.filterValues).toMatchObject({
         [`${dataset}_21`]: 'Baz',
         [`${dataset}_92`]: 'Bin',
