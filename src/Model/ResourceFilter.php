@@ -140,7 +140,7 @@ class ResourceFilter extends DataObject
         return [
             'id' => $this->ID,
             'label' => $this->FilterLabel,
-            'allColumns' => $this->AllColumns,
+            'allColumns' => (bool) $this->AllColumns,
             'columns' => $this->AllColumns ? null : array_map(function (ResourceField $field) {
                 return [
                     'label' => $field->ReadableLabel,

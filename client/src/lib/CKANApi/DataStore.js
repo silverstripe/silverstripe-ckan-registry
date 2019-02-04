@@ -18,6 +18,7 @@ export default class {
    * @param {boolean} distinct
    * @param {number} limit
    * @param {number} offset
+   * @param {{ sortField: {string}, sortAscending: {boolean} }} sort
    * @return {Promise}
    */
   search(

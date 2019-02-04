@@ -43,11 +43,10 @@ class CKANRegistryDisplay extends Component {
    */
   componentDidUpdate(prevProps, prevState) {
     const pageChanged = prevState.currentPage !== this.state.currentPage;
-    const sortChanged = prevState.sort !== this.state.sort;
 
     if (
       pageChanged
-      || sortChanged
+      || JSON.stringify(prevState.sort) !== JSON.stringify(this.state.sort)
       || JSON.stringify(prevState.filterValues) !== JSON.stringify(this.state.filterValues)
     ) {
       this.loadData();
@@ -230,7 +229,15 @@ class CKANRegistryDisplay extends Component {
    * @param {Object} filterValues
    */
   applyFilterValues(query, filterValues) {
-    const { fields, filters, spec: { dataset } } = this.props;
+    const { filters, spec: { dataset } } = this.props;
+
+    // Parse visible fields now for usage within the loop
+    const visibleFields = this.getVisibleFields();
+
+    // Skip if we have invalid filters
+    if (!Array.isArray(filters)) {
+      return;
+    }
 
     // Loop through the filters and apply any values that may be in the given "filter values"
     filters.forEach(filter => {
@@ -246,17 +253,11 @@ class CKANRegistryDisplay extends Component {
         return; // continue;
       }
 
-      // Check if the filter configuration implies that this should be a search on "all columns"
-      const isAllColumns = filter.allColumns.toString() === '1';
-
       // For all columns we'll just search those that are "shown in results"
-      if (isAllColumns) {
+      if (filter.allColumns) {
         query.filter(
-          fields
           // We only apply the search term to fields that are visible on the table
-            .filter(({ OriginalLabel }) => this.getVisibleFields().includes(OriginalLabel))
-            // And we need to pull out the "original label" - the label it goes by on CKAN
-            .map(({ OriginalLabel }) => OriginalLabel),
+          visibleFields,
           value
         );
         return; // continue;
@@ -466,7 +467,7 @@ class CKANRegistryDisplay extends Component {
 
     // Compile search and push to history if applicable
     const newSearch = `?${urlParams.toString()}`;
-    if (newSearch !== search) {
+    if (history && newSearch !== search) {
       history.push(pathname + newSearch);
     }
   }
@@ -623,6 +624,19 @@ CKANRegistryDisplay.propTypes = {
     ShowInDetailView: PropTypes.bool,
     DisplayConditions: PropTypes.any,
     RemoveDuplicates: PropTypes.bool,
+  })),
+  filters: PropTypes.arrayOf(PropTypes.shape({
+    allColumns: PropTypes.bool,
+    columns: PropTypes.oneOfType([
+      PropTypes.oneOf([null]),
+      PropTypes.arrayOf(PropTypes.shape({
+        label: PropTypes.string,
+        target: PropTypes.string,
+      }))
+    ]),
+    id: PropTypes.number,
+    label: PropTypes.string,
+    type: PropTypes.string,
   })),
   className: PropTypes.string,
   pageSize: PropTypes.number,
