@@ -61,7 +61,9 @@ class Resource extends DataObject
                 ->each(function (ResourceFilter $filter) {
                     $filter->delete();
                 })
-                ->add(ResourceFilter::create());
+                ->add(ResourceFilter::create([
+                    'FilterLabel' => _t(self::class . '.DEFAULT_FILTER_LABEL', 'Search'),
+                ]));
         }
 
         parent::onAfterWrite();
