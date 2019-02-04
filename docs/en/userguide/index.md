@@ -3,6 +3,8 @@
 The CKAN Registry module adds a new **CKAN Registry Page** page type to the CMS, allowing a content author to add
 pages that display data coming from an external CKAN resource in a table format to website visitors.
 
+[CKAN](https://ckan.org/) (Comprehensive Knowledge Archive Network) is a powerful data management system that makes collections of data accessible – by providing tools to streamline publishing, sharing, finding and using data. It is used by national and local governments, research institutions, and other organizations who collect a lot of data.
+
 <div class="note" markdown="1">
 For the purpose of this user guide we will reference [data.govt.nz](https://catalogue.data.govt.nz) as our CKAN
 instance. This could easily be any CKAN instance that has API access enabled.
@@ -32,7 +34,7 @@ Changing the resource and saving the page will reset all configuration to defaul
 ![Changing the resource data is pulled from](_images/change-resource.png)
 
 The list of fields has two checkboxes: **Results** and **Detail**. The former disabled by default and the latter
-enabled by default for all records. These options control whether the column will be displayed in the list results 
+enabled by default for all records. These options control whether the column will be displayed in the list results
 view and detail view respectively, and will be explained in detail in the next section.
 
 <div class="note" markdown="1">
