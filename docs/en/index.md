@@ -6,6 +6,6 @@
 * [Using the CKAN API clients](api-clients.md)
 * [Integration notes](notes.md)
 
-# User documentation
+# User help
 
-[Features and usage](user/user-documentation.md)
+* [Overview and features](userguide/index.md)
