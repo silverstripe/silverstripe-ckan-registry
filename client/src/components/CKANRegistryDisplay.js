@@ -386,10 +386,20 @@ class CKANRegistryDisplay extends Component {
    *
    * @returns {HTMLElement|null}
    */
-  renderResourceLink() {
-    const { spec: { endpoint, dataset, identifier } } = this.props;
+  renderDatasetLink() {
+    const { spec: { endpoint, dataset } } = this.props;
+
+    if (!endpoint || !dataset) {
+      return null;
+    }
+
+    // Strip any trailing slash if it exists
     return (
-      <a href={`${endpoint}/dataset/${dataset}/resource/${identifier}`}>
+      <a
+        href={`${endpoint.replace(/\/$/, '')}/dataset/${dataset}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {window.i18n.inject(
           window.i18n._t(
             'CKANRegistryDisplay.CKAN_LINK',
@@ -452,7 +462,7 @@ class CKANRegistryDisplay extends Component {
         <div className={classes}>
           <p>{errorMessage}</p>
           <div className="ckan-registry__other-actions ckan-registry__other-actions--error">
-            { this.renderResourceLink() }
+            { this.renderDatasetLink() }
             { this.renderDownloadLink() }
           </div>
         </div>
@@ -464,7 +474,7 @@ class CKANRegistryDisplay extends Component {
         { this.renderLoading() }
         { this.renderDataGrid() }
         <div className="ckan-registry__other-actions">
-          { this.renderResourceLink() }
+          { this.renderDatasetLink() }
           { this.renderDownloadLink() }
         </div>
       </div>
