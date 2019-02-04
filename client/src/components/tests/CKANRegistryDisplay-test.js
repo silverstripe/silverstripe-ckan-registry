@@ -96,17 +96,19 @@ describe('CKANRegistryDisplay', () => {
 
   describe('getStateFromLocation()', () => {
     it('parses the current page from URL search parameters', () => {
-      let wrapper = shallow(
+      const wrapper = shallow(
         <CKANRegistryDisplay
           location={{ search: '?page=45' }}
         />,
         { disableLifecycleMethods: true }
       );
 
-      let stateDefaults = wrapper.instance().getStateFromLocation();
+      const stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.currentPage).toBe(45);
+    });
 
-      wrapper = shallow(
+    it('parses the current page from URL search parameters', () => {
+      const wrapper = shallow(
         <CKANRegistryDisplay
           location={{ search: '?foo=45' }}
           urlKeys={{ page: 'foo' }}
@@ -114,25 +116,27 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      stateDefaults = wrapper.instance().getStateFromLocation();
+      const stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.currentPage).toBe(45);
     });
 
     it('parses the sort attributes from URL search parameters', () => {
-      let wrapper = shallow(
+      const wrapper = shallow(
         <CKANRegistryDisplay
           location={{ search: '?sort=Foo&sortdirection=ASC' }}
         />,
         { disableLifecycleMethods: true }
       );
 
-      let stateDefaults = wrapper.instance().getStateFromLocation();
+      const stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.sort).toMatchObject({
         sortField: 'Foo',
         sortAscending: true,
       });
+    });
 
-      wrapper = shallow(
+    it('parses the sort attributes from URL search parameters with custom URL keys', () => {
+      const wrapper = shallow(
         <CKANRegistryDisplay
           location={{ search: '?foo=Bin&bar=DESC' }}
           urlKeys={{ sort: 'foo', sortDirection: 'bar' }}
@@ -140,7 +144,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      stateDefaults = wrapper.instance().getStateFromLocation();
+      const stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.sort).toMatchObject({
         sortField: 'Bin',
         sortAscending: false,
@@ -149,7 +153,7 @@ describe('CKANRegistryDisplay', () => {
 
     it('parses the filter parameters from URL search parameters', () => {
       const dataset = 'testing';
-      let wrapper = shallow(
+      const wrapper = shallow(
         <CKANRegistryDisplay
           spec={{ dataset }}
           location={{ search: '?filter[1]=Foo' }}
@@ -157,12 +161,15 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      let stateDefaults = wrapper.instance().getStateFromLocation();
+      const stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.filterValues).toMatchObject({
         [`${dataset}_1`]: 'Foo',
       });
+    });
 
-      wrapper = shallow(
+    it('parses the filter parameters from URL search parameters', () => {
+      const dataset = 'testing';
+      const wrapper = shallow(
         <CKANRegistryDisplay
           spec={{ dataset }}
           location={{ search: '?foo[92]=Bin&foo[21]=Baz' }}
@@ -171,7 +178,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      stateDefaults = wrapper.instance().getStateFromLocation();
+      const stateDefaults = wrapper.instance().getStateFromLocation();
       expect(stateDefaults.filterValues).toMatchObject({
         [`${dataset}_21`]: 'Baz',
         [`${dataset}_92`]: 'Bin',

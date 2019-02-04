@@ -12,13 +12,13 @@ describe('Query', () => {
         expect(() => {
           query.fields = value;
         }).toThrow('Query.fields must be an Array');
-
-        expect(() => {
-          query.fields = [];
-          query.fields = ['one'];
-          query.fields = ['one', 'two', 'three', 'four'];
-        }).not.toThrow();
       });
+
+      expect(() => {
+        query.fields = [];
+        query.fields = ['one'];
+        query.fields = ['one', 'two', 'three', 'four'];
+      }).not.toThrow();
     });
   });
 

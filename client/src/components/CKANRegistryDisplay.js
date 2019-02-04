@@ -651,6 +651,7 @@ CKANRegistryDisplay.propTypes = {
     filter: PropTypes.string,
     sort: PropTypes.string,
     page: PropTypes.string,
+    sortDirection: PropTypes.string,
   }),
 };
 
