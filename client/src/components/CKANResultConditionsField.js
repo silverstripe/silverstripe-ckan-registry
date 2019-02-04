@@ -144,7 +144,7 @@ class CKANResultConditionsField extends Component {
     const { name } = this.props;
 
     const rawValue = this.getValue();
-    const value = rawValue[0]['match-text'].length ? JSON.stringify(rawValue) : null;
+    const value = rawValue[0]['match-text'].length ? JSON.stringify(rawValue) : '';
 
     return (
       <input

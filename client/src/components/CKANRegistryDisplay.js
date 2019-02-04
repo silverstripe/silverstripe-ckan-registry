@@ -422,11 +422,11 @@ class CKANRegistryDisplay extends Component {
   }
 
   render() {
-    const { spec: { resource }, basePath, className, fields } = this.props;
+    const { spec: { identifier }, basePath, className, fields } = this.props;
     const { selectedRow } = this.state;
 
     // If no resource is configured then show nothing
-    if (!resource) {
+    if (!identifier) {
       return null;
     }
 

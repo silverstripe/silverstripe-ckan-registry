@@ -108,7 +108,7 @@ describe('CKANRegistryDisplay', () => {
 
     it('returns a Redirect when switching pages', () => {
       const wrapper = shallow(
-        <CKANRegistryDisplay spec={{ resource: 'something' }} />,
+        <CKANRegistryDisplay spec={{ identifier: 'something' }} />,
         { disableLifecycleMethods: true }
       );
 
