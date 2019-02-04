@@ -353,6 +353,25 @@ describe('CKANRegistryDisplay', () => {
     });
   });
 
+  describe('handleFilter()', () => {
+    it('resets the current page to page 1', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          fields={testFields}
+          location={{ search: '?page=12' }}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      // Prevent data from loading
+      mockLoadData(wrapper);
+
+      expect(wrapper.state('currentPage')).toBe(12);
+      wrapper.instance().handleFilter({ testing_1: 'Test' });
+      expect(wrapper.state('currentPage')).toBe(1);
+    });
+  });
+
   describe('handleSort()', () => {
     it('maps the given sort to its "OriginalLabel', () => {
       const wrapper = shallow(
@@ -373,6 +392,23 @@ describe('CKANRegistryDisplay', () => {
         sortField: 'foo',
         sortAscending: true,
       });
+    });
+
+    it('resets the current page to page 1', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          fields={testFields}
+          location={{ search: '?page=12' }}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      // Prevent data from loading
+      mockLoadData(wrapper);
+
+      expect(wrapper.state('currentPage')).toBe(12);
+      wrapper.instance().handleSort({ id: 'Foo', sortAscending: true });
+      expect(wrapper.state('currentPage')).toBe(1);
     });
   });
 
@@ -600,7 +636,7 @@ describe('CKANRegistryDisplay', () => {
 
     it('returns a Redirect when switching pages', () => {
       const wrapper = shallow(
-        <CKANRegistryDisplay spec={{ identifier: 'something' }} location={{ search: '' }} />,
+        <CKANRegistryDisplay spec={{ identifier: 'something' }} />,
         { disableLifecycleMethods: true }
       );
 

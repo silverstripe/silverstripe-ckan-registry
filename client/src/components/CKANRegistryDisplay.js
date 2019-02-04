@@ -305,13 +305,16 @@ class CKANRegistryDisplay extends Component {
   }
 
   /**
-   * Handle a filter field update
+   * Handle an update to the filter values this component will filter by. This accepts only a
+   * replacement of the filter values and will not combine with existing values.
    *
    * @param {Object} filterValues
    */
   handleFilter(filterValues) {
     this.setState({
       filterValues,
+      // Always return to the first page on filter
+      currentPage: 1,
     });
   }
 
@@ -326,6 +329,7 @@ class CKANRegistryDisplay extends Component {
 
     this.setState({
       sort: { sortField, sortAscending },
+      currentPage: 1,
     });
   }
 
@@ -665,6 +669,9 @@ CKANRegistryDisplay.defaultProps = {
     sort: 'sort',
     page: 'page',
     sortDirection: 'sortdirection'
+  },
+  location: {
+    search: null,
   },
 };
 
