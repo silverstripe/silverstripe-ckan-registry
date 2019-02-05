@@ -47,7 +47,7 @@ class Resource extends DataObject
      */
     public function onAfterWrite()
     {
-        if ($this->isChanged('Identifier')) {
+        if ($this->Identifier && $this->isChanged('Identifier')) {
             $this->Fields()->each(function (ResourceField $field) {
                 $field->delete();
             });
@@ -61,7 +61,9 @@ class Resource extends DataObject
                 ->each(function (ResourceFilter $filter) {
                     $filter->delete();
                 })
-                ->add(ResourceFilter::create());
+                ->add(ResourceFilter::create([
+                    'FilterLabel' => _t(self::class . '.DEFAULT_FILTER_LABEL', 'Search'),
+                ]));
         }
 
         parent::onAfterWrite();
@@ -74,7 +76,7 @@ class Resource extends DataObject
      */
     public function onBeforeWrite()
     {
-        if ($this->isChanged('Identifier')) {
+        if ($this->Identifier && $this->isChanged('Identifier')) {
             /** @var ResourcePopulatorInterface $populator */
             $populator = Injector::inst()->get(ResourcePopulatorInterface::class);
             $populator->populateMetadata($this);

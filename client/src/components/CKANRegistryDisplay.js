@@ -386,10 +386,20 @@ class CKANRegistryDisplay extends Component {
    *
    * @returns {HTMLElement|null}
    */
-  renderResourceLink() {
-    const { spec: { endpoint, dataset, identifier } } = this.props;
+  renderDatasetLink() {
+    const { spec: { endpoint, dataset } } = this.props;
+
+    if (!endpoint || !dataset) {
+      return null;
+    }
+
+    // Strip any trailing slash if it exists
     return (
-      <a href={`${endpoint}/dataset/${dataset}/resource/${identifier}`}>
+      <a
+        href={`${endpoint.replace(/\/$/, '')}/dataset/${dataset}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {window.i18n.inject(
           window.i18n._t(
             'CKANRegistryDisplay.CKAN_LINK',
@@ -422,8 +432,13 @@ class CKANRegistryDisplay extends Component {
   }
 
   render() {
-    const { basePath, className, fields } = this.props;
+    const { spec: { identifier }, basePath, className, fields } = this.props;
     const { selectedRow } = this.state;
+
+    // If no resource is configured then show nothing
+    if (!identifier) {
+      return null;
+    }
 
     // Send the user off to the right detail view if they've clicked on a row
     if (selectedRow !== null) {
@@ -447,7 +462,7 @@ class CKANRegistryDisplay extends Component {
         <div className={classes}>
           <p>{errorMessage}</p>
           <div className="ckan-registry__other-actions ckan-registry__other-actions--error">
-            { this.renderResourceLink() }
+            { this.renderDatasetLink() }
             { this.renderDownloadLink() }
           </div>
         </div>
@@ -459,7 +474,7 @@ class CKANRegistryDisplay extends Component {
         { this.renderLoading() }
         { this.renderDataGrid() }
         <div className="ckan-registry__other-actions">
-          { this.renderResourceLink() }
+          { this.renderDatasetLink() }
           { this.renderDownloadLink() }
         </div>
       </div>
