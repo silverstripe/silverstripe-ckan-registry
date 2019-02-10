@@ -14,6 +14,18 @@
     .col-action_SetOrderOrder {
       width: 1px;
     }
+
+    @include media-breakpoint-down(sm) {
+      // Make the Readable Label column the default visible on mobile
+      .col-Reorder,
+      .col-reorder {
+        display: none;
+      }
+
+      .col-ReadableLabel {
+        display: table-cell;
+      }
+    }
   }
 
   // Center the inline editable checkboxes in the columns GridField
@@ -44,5 +56,21 @@
   // Initially hide the filter fields/columns sources select. Javascript will show it if needed.
   &__filter-fields.field {
     display: none;
+  }
+}
+
+.ckan-filters {
+  .grid-field__table {
+    @include media-breakpoint-down(sm) {
+      // Make the Filter Label column the default visible on mobile
+      .col-Reorder,
+      .col-reorder {
+        display: none;
+      }
+
+      .col-FilterLabel {
+        display: table-cell;
+      }
+    }
   }
 }

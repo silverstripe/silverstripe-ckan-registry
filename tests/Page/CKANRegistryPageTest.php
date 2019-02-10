@@ -36,9 +36,19 @@ class CKANRegistryPageTest extends SapphireTest
         /** @var CKANRegistryPage $page */
         $page = $this->objFromFixture(CKANRegistryPage::class, 'animal_centers');
 
-        $field = $page->getCMSFields()->fieldByName('Root.Data.DataColumns');
+        $field = $page->getCMSFields()->dataFieldByName('DataColumns');
         $this->assertInstanceOf(GridField::class, $field, 'Columns GridField was not found in fields');
         $this->assertTrue($field->hasClass('ckan-columns'), 'Columns GridField should have unique class');
+    }
+
+    public function testFiltersGridFieldHasUniqueClassName()
+    {
+        /** @var CKANRegistryPage $page */
+        $page = $this->objFromFixture(CKANRegistryPage::class, 'animal_centers');
+
+        $field = $page->getCMSFields()->dataFieldByName('DataFilters');
+        $this->assertInstanceOf(GridField::class, $field, 'Filters GridField was not found in fields');
+        $this->assertTrue($field->hasClass('ckan-filters'), 'Filters GridField should have unique class');
     }
 
     public function testNoDataColumnsGridFieldGetsAddedWhenNoResourceIsDefined()
