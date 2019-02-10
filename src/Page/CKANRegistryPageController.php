@@ -77,7 +77,7 @@ class CKANRegistryPageController extends PageController
                         'type' => array_pop($explodedClassName),
                     ] + $filter->getClientConfig();
                 },
-                $resource->Filters()->toArray()
+                $resource->Filters()->sort('Order')->toArray()
             )
         ];
 
