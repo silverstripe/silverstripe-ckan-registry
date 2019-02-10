@@ -7,7 +7,25 @@ to implement a decoupled frontend application for the CKAN dataset configuration
 
 You don't have to implement your own application as the example is enabled out of the box.
 
-### Dependencies
+### Getting started
+
+The most important part of the frontend application is its ability to read the frontend client configuration schema,
+which is a JSON representation of the CMS configured endpoint, columns, and filters for the CKAN dataset.
+
+This can be achieved in one of two ways:
+
+* Append `/schema` to any CKAN Registry Page's frontend URL (e.g. `http://example.com/my-ckan-page/schema`) to fetch
+  the schema with an XHR request (for example)
+* Use `$CKANClientConfig` in a SilverStripe template to inject it as a data attribute (for example)
+
+The `CKANExampleApp` example entry point component fetches the schema as a sub URL of the current request URL and passes
+the schema to its child components as props. You can find an example of this in the `componentDidMount()` lifecycle
+method.
+
+This is important since it is framework agnostic and would apply to anyone wanting to develop their own custom frontend
+interface.
+
+### Example app dependencies
 
 * [React](https://reactjs.org)
 * [react-router-dom](https://www.npmjs.com/package/react-router-dom)

@@ -1,11 +1,25 @@
 import Query from 'lib/CKANApi/DataStore/Query';
 
 describe('Query', () => {
-  const query = new Query(['Name', 'Date']);
+  let query;
   beforeEach(() => {
-    query.clearFilters();
-    query.clearOrder();
-    query.clearDistinct();
+    query = new Query(['Name', 'Date']);
+  });
+
+  describe('fields setter', () => {
+    it('Only allows arrays', () => {
+      [true, false, 23, {}, { test: 1 }, undefined, null, () => {}].forEach(value => {
+        expect(() => {
+          query.fields = value;
+        }).toThrow('Query.fields must be an Array');
+      });
+
+      expect(() => {
+        query.fields = [];
+        query.fields = ['one'];
+        query.fields = ['one', 'two', 'three', 'four'];
+      }).not.toThrow();
+    });
   });
 
   describe('filter()', () => {
@@ -35,6 +49,24 @@ describe('Query', () => {
     });
   });
 
+  describe('clearOrder()', () => {
+    it('clears existing order specification', () => {
+      query.order('something');
+      expect(query.orderSpec).not.toHaveLength(0);
+      query.clearOrder();
+      expect(query.orderSpec).toHaveLength(0);
+    });
+  });
+
+  describe('clearDistinct()', () => {
+    it('clears existing distinct specification', () => {
+      query = new Query(['test'], [], 30, 0, true);
+      expect(query.distinct).toBe(true);
+      query.clearDistinct();
+      expect(query.distinct).toBe(false);
+    });
+  });
+
   describe('parse()', () => {
     it('throws an error when not fields have been defined', () => {
       expect(() => {
@@ -49,7 +81,7 @@ describe('Query', () => {
     });
 
     it('adds distinct to the select when specified', () => {
-      const distinctQuery = new Query(['Name'], 30, 0, true);
+      const distinctQuery = new Query(['Name'], [], 30, 0, true);
       const result = distinctQuery.parse('testing');
       expect(result).toContain('DISTINCT "Name"');
     });
@@ -110,7 +142,7 @@ describe('Query', () => {
     });
 
     it('adds a limit and offset', () => {
-      const limitedQuery = new Query(['Name'], 30, 15);
+      const limitedQuery = new Query(['Name'], [], 30, 15);
       const result = limitedQuery.parse('testing');
       expect(result).toContain('LIMIT 30');
       expect(result).toContain('OFFSET 15');
@@ -133,10 +165,71 @@ describe('Query', () => {
 
     it('can produce a query to handle distinct per column', () => {
       query.distinctOn('Name');
-
       expect(query.parse('testing')).toContain(
         ' INNER JOIN (SELECT DISTINCT ON ("Name") "_id" FROM "testing" ORDER BY "Name") q USING ("_id")'
       );
+
+      query.distinctOn('Date');
+      expect(query.parse('testing')).toContain(
+        ' INNER JOIN (SELECT DISTINCT ON ("Name", "Date") "_id" FROM "testing" ORDER BY "Name", "Date") q USING ("_id")'
+      );
+    });
+
+    it('will keep global distinct over column based distinct', () => {
+      query = new Query(['Name'], [], 30, 0, true);
+      query.distinctOn('Name');
+
+      expect(query.parse('testing')).toContain('SELECT DISTINCT "Name"');
+
+      query = new Query(['Name', 'Date'], [], 30, 0);
+      query.distinctOn('Name');
+      query.distinct = true;
+      query.distinctOn('Date');
+
+      expect(query.parse('testing')).toContain('SELECT DISTINCT "Name"');
+    });
+
+    it('casts numeric fields as text', () => {
+      query = new Query(
+        ['SchoolID'],
+        [{ label: 'SchoolID', type: 'numeric' }]
+      );
+      query.filter('SchoolID', '123');
+
+      expect(query.parse('helloworld')).toContain('CAST("SchoolID" AS TEXT) ILIKE \'%123%\'');
+    });
+  });
+
+  describe('parseCount()', () => {
+    it('generates a count query', () => {
+      expect(query.parseCount('testing')).toBe('SELECT count(*) FROM "testing"');
+    });
+
+    it('preserves where statements', () => {
+      query.filter('test', 'something');
+      expect(query.parseCount('testing'))
+        .toBe('SELECT count(*) FROM "testing" WHERE ("test" ILIKE \'%something%\')');
+    });
+
+    it('preserves DISTINCT on queries', () => {
+      query.distinctOn('test');
+
+      const parsedQuery = query.parseCount('testing');
+      expect(parsedQuery).toContain(
+        ' INNER JOIN (SELECT DISTINCT ON ("test") "_id" FROM "testing" ORDER BY "test") q USING ("_id")'
+      );
+    });
+
+    it('discards all other clauses', () => {
+      query = new Query(['test'], [], 30, 10);
+      query.order('test');
+
+      const parsedQuery = query.parseCount('testing');
+
+      expect(parsedQuery).toContain('SELECT count(*) FROM');
+      expect(parsedQuery).not.toContain('ORDER BY');
+      expect(parsedQuery).not.toContain('LIMIT');
+      expect(parsedQuery).not.toContain('OFFSET');
     });
   });
 });

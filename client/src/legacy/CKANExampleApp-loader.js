@@ -13,7 +13,6 @@ window.document.addEventListener('DOMContentLoaded', () => {
     }
     element.classList.add('loaded');
 
-    const configuration = JSON.parse(element.dataset.configuration);
-    ReactDOM.render(<CKANExampleApp {...configuration} />, element);
+    ReactDOM.render(<CKANExampleApp />, element);
   });
 });

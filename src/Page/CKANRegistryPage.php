@@ -7,7 +7,6 @@ use SilverStripe\CKANRegistry\Forms\GridField\GridFieldDetailForm\ResourceFieldI
 use SilverStripe\CKANRegistry\Forms\GridFieldResourceTitle;
 use SilverStripe\CKANRegistry\Forms\ResourceLocatorField;
 use SilverStripe\CKANRegistry\Model\Resource;
-use SilverStripe\CKANRegistry\Model\ResourceField;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\GridField\GridField;
@@ -127,6 +126,7 @@ class CKANRegistryPage extends Page
                     ]);
 
                 $resourceFilters = GridField::create('DataFilters', '', $resource->Filters(), $filtersConfig);
+                $resourceFilters->addExtraClass('ckan-filters');
 
                 $fields->addFieldToTab('Root.Filters', $resourceFilters);
             }

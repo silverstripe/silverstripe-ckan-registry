@@ -7,15 +7,23 @@ use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\CKANRegistry\Model\ResourceField;
 use SilverStripe\CKANRegistry\Model\ResourceFilter;
 use SilverStripe\Control\Director;
+use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\View\Requirements;
 
 class CKANRegistryPageController extends PageController
 {
+    private static $allowed_actions = [
+        'readSchema',
+    ];
+
     private static $url_handlers = [
-        // Route all requests for this page, including sub-URLs, to the index action.
-        // The frontend components should take care of handling sub-URL routing from here.
+        // The "view" action is routed to index. The frontend implementation should take care of the frontend
+        // routing for sub URLs. We will route /schema and /view/123/schema to the readSchema method though.
+        'GET view/$Item/schema' => 'readSchema',
         'view/$Item' => 'index',
+        'GET schema' => 'readSchema',
     ];
 
     protected function init()
@@ -62,6 +70,7 @@ class CKANRegistryPageController extends PageController
                         'ShowInDetailView' => (bool) $field->ShowInDetailView,
                         'DisplayConditions' => json_decode($field->DisplayConditions, true),
                         'RemoveDuplicates' => (bool) $field->RemoveDuplicates,
+                        'Type' => $field->Type,
                     ];
                 },
                 $resource->Fields()->filterAny([
@@ -77,13 +86,26 @@ class CKANRegistryPageController extends PageController
                         'type' => array_pop($explodedClassName),
                     ] + $filter->getClientConfig();
                 },
-                $resource->Filters()->toArray()
+                $resource->Filters()->sort('Order')->toArray()
             )
         ];
 
         $this->extend('updateCKANClientConfig', $config);
 
         return $config;
+    }
+
+    /**
+     * Returns the frontend application client configuration schema
+     *
+     * @param HTTPRequest $request
+     */
+    public function readSchema(HTTPRequest $request)
+    {
+        $response = HTTPResponse::create()
+            ->addHeader('Content-Type', 'application/json')
+            ->setBody(json_encode($this->getCKANClientConfig()));
+        return $response;
     }
 
     /**

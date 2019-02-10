@@ -1,7 +1,7 @@
-/* global document */
+/* global document, window */
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { BrowserRouter, Route, Redirect } from 'react-router-dom';
+import fetch from 'isomorphic-fetch';
 import CKANRegistryDisplay from 'components/CKANRegistryDisplay';
 import CKANRegistryDetailView from 'components/CKANRegistryDetailView';
 
@@ -17,6 +17,24 @@ import CKANRegistryDetailView from 'components/CKANRegistryDetailView';
  * example.
  */
 class CKANExampleApp extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      schema: null,
+    };
+  }
+
+  /**
+   * When the component has mounted, fetch the client schema configuration
+   */
+  componentDidMount() {
+    const schemaPath = `${window.location.pathname}/schema`;
+    fetch(schemaPath)
+      .then(response => response.json())
+      .then(schema => this.setState({ schema }));
+  }
+
   /**
    * Renders the content container and content components conditional on the
    * current route matching
@@ -24,9 +42,20 @@ class CKANExampleApp extends Component {
    * @returns {HTMLElement}
    */
   renderContent() {
-    const { basePath } = this.props;
+    const { schema } = this.state;
+
+    // Display a loading indicator while the schema is fetched
+    if (schema === null) {
+      return (
+        <p className="ckan-registry__loading">
+          { window.i18n._t('CKANRegistryDisplay.LOADING', 'Loading...') }
+        </p>
+      );
+    }
+    const { basePath } = schema;
 
     const passProps = {
+      ...schema,
       ...this.props,
     };
 
@@ -67,23 +96,5 @@ class CKANExampleApp extends Component {
     );
   }
 }
-
-CKANExampleApp.propTypes = {
-  basePath: PropTypes.string,
-  name: PropTypes.string,
-  resourceName: PropTypes.string,
-  spec: PropTypes.shape({
-    dataset: PropTypes.string,
-    endpoint: PropTypes.string,
-    identifier: PropTypes.string,
-  }),
-};
-
-CKANExampleApp.defaultProps = {
-  basePath: '/',
-  name: '',
-  resourceName: '',
-  spec: {},
-};
 
 export default CKANExampleApp;

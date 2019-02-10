@@ -11,13 +11,14 @@ const makeDataStore = (
 ) => new DataStore(endpoint, resource);
 
 describe('DataStore', () => {
-  describe('search', () => {
-    beforeEach(() => {
-      // Clear all instances and calls to constructor and all methods:
-      CKANApi.mockClear();
-      CKANApi.makeRequest.mockReturnValue(Promise.resolve({ json: () => Promise.resolve(false) }));
-    });
+  beforeEach(() => {
+    // Clear all instances and calls to constructor and all methods:
+    CKANApi.mockClear();
+    CKANApi.makeRequest.mockClear();
+    CKANApi.makeRequest.mockReturnValue(Promise.resolve({ json: () => Promise.resolve(false) }));
+  });
 
+  describe('search', () => {
     it('returns false when fields param is invalid or no fields are given', (done) => {
       const datastore = makeDataStore();
 
@@ -99,6 +100,27 @@ describe('DataStore', () => {
       expect(otherOptions).not.toHaveProperty('distinct');
     });
 
+    it('correctly adds the sort option when specified', () => {
+      const datastore = makeDataStore();
+
+      datastore.search(['test'], null, false, 100, 0, {
+        sortField: 'test',
+        sortAscending: false
+      });
+
+      const options = CKANApi.makeRequest.mock.calls.shift()[2];
+
+      expect(options.sort).toBe('test DESC');
+
+      datastore.search(['test'], null, false, 100, 0, {
+        sortField: 'blah',
+        sortAscending: true
+      });
+      const otherOptions = CKANApi.makeRequest.mock.calls.shift()[2];
+
+      expect(otherOptions.sort).toBe('blah ASC');
+    });
+
     it('assumes invalid terms will return false', (done) => {
       const datastore = makeDataStore();
 
@@ -109,7 +131,6 @@ describe('DataStore', () => {
     });
 
     it('parses valid results correctly', (done) => {
-      CKANApi.mockClear();
       CKANApi.makeRequest.mockReturnValue(Promise.resolve({
         json: () => Promise.resolve({
           success: true,
@@ -127,6 +148,141 @@ describe('DataStore', () => {
           records: 'records',
           total: 'total',
         });
+        done();
+      });
+    });
+  });
+
+  describe('searchSql', () => {
+    let query;
+    beforeEach(() => {
+      query = {
+        parse: jest.fn(),
+      };
+    });
+
+    it('calls the parse function on the query', () => {
+      const datastore = makeDataStore();
+
+      datastore.searchSql(query);
+      expect(query.parse).toHaveBeenCalled();
+    });
+
+    it('passes provided SQL to the relevant endpoint', () => {
+      const sql = 'SELECT * FROM password';
+      query.parse.mockReturnValue(sql);
+
+      const datastore = makeDataStore();
+      datastore.searchSql(query);
+
+      const [endpoint, action, options] = CKANApi.makeRequest.mock.calls.shift();
+
+      expect(endpoint).toBe('http://ckan.example.com');
+      expect(action).toBe('datastore_search_sql');
+      expect(options).toMatchObject({ sql });
+    });
+
+    it('handles a valid response correctly', done => {
+      CKANApi.makeRequest.mockReturnValue(Promise.resolve({
+        json: () => Promise.resolve({
+          success: true,
+          result: {
+            records: 'records',
+            total: 'total',
+          }
+        }),
+      }));
+
+      const datastore = makeDataStore();
+
+      datastore.searchSql(query).then(result => {
+        expect(result).toMatchObject({
+          records: 'records',
+          total: 'total',
+        });
+        done();
+      });
+    });
+
+    it('handles an invalid response correctly', done => {
+      CKANApi.makeRequest.mockReturnValue(Promise.resolve({
+        json: () => Promise.resolve({
+          success: false,
+        }),
+      }));
+
+      const datastore = makeDataStore();
+
+      datastore.searchSql(query).then(result => {
+        expect(result).toBe(false);
+        done();
+      });
+    });
+  });
+
+  describe('countSql', () => {
+    let query;
+    beforeEach(() => {
+      query = {
+        parseCount: jest.fn(),
+      };
+      // Clear all instances and calls to constructor and all methods:
+      CKANApi.mockClear();
+      CKANApi.makeRequest.mockReturnValue(Promise.resolve({ json: () => Promise.resolve(false) }));
+    });
+
+    it('calls the parseCount function on the query', () => {
+      const datastore = makeDataStore();
+
+      datastore.countSql(query);
+      expect(query.parseCount).toHaveBeenCalled();
+    });
+
+    it('passes provided SQL to the relevant endpoint', () => {
+      const sql = 'SELECT count(*) FROM password';
+      query.parseCount.mockReturnValue(sql);
+
+      const datastore = makeDataStore();
+      datastore.countSql(query);
+
+      const [endpoint, action, options] = CKANApi.makeRequest.mock.calls.shift();
+
+      expect(endpoint).toBe('http://ckan.example.com');
+      expect(action).toBe('datastore_search_sql');
+      expect(options).toMatchObject({ sql });
+    });
+
+    it('handles a valid response correctly', done => {
+      CKANApi.makeRequest.mockReturnValue(Promise.resolve({
+        json: () => Promise.resolve({
+          success: true,
+          result: {
+            records: [
+              { count: 123 }
+            ]
+          }
+        }),
+      }));
+
+      const datastore = makeDataStore();
+
+      datastore.countSql(query).then(result => {
+        expect(result).toBe(123);
+        done();
+      });
+    });
+
+    it('handles an invalid response correctly', done => {
+      CKANApi.makeRequest.mockReturnValue(Promise.resolve({
+        json: () => Promise.resolve({
+          success: false,
+        }),
+      }));
+
+      const datastore = makeDataStore();
+
+      datastore.countSql(query).then(result => {
+        expect(result).toBe(false);
         done();
       });
     });
