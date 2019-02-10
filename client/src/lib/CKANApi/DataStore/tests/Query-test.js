@@ -60,7 +60,7 @@ describe('Query', () => {
 
   describe('clearDistinct()', () => {
     it('clears existing distinct specification', () => {
-      query = new Query(['test'], 30, 0, true);
+      query = new Query(['test'], [], 30, 0, true);
       expect(query.distinct).toBe(true);
       query.clearDistinct();
       expect(query.distinct).toBe(false);
@@ -81,7 +81,7 @@ describe('Query', () => {
     });
 
     it('adds distinct to the select when specified', () => {
-      const distinctQuery = new Query(['Name'], 30, 0, true);
+      const distinctQuery = new Query(['Name'], [], 30, 0, true);
       const result = distinctQuery.parse('testing');
       expect(result).toContain('DISTINCT "Name"');
     });
@@ -142,7 +142,7 @@ describe('Query', () => {
     });
 
     it('adds a limit and offset', () => {
-      const limitedQuery = new Query(['Name'], 30, 15);
+      const limitedQuery = new Query(['Name'], [], 30, 15);
       const result = limitedQuery.parse('testing');
       expect(result).toContain('LIMIT 30');
       expect(result).toContain('OFFSET 15');
@@ -176,17 +176,27 @@ describe('Query', () => {
     });
 
     it('will keep global distinct over column based distinct', () => {
-      query = new Query(['Name'], 30, 0, true);
+      query = new Query(['Name'], [], 30, 0, true);
       query.distinctOn('Name');
 
       expect(query.parse('testing')).toContain('SELECT DISTINCT "Name"');
 
-      query = new Query(['Name', 'Date'], 30, 0);
+      query = new Query(['Name', 'Date'], [], 30, 0);
       query.distinctOn('Name');
       query.distinct = true;
       query.distinctOn('Date');
 
       expect(query.parse('testing')).toContain('SELECT DISTINCT "Name"');
+    });
+
+    it('casts numeric fields as text', () => {
+      query = new Query(
+        ['SchoolID'],
+        [{ label: 'SchoolID', type: 'numeric' }]
+      );
+      query.filter('SchoolID', '123');
+
+      expect(query.parse('helloworld')).toContain('CAST("SchoolID" AS TEXT) ILIKE \'%123%\'');
     });
   });
 
@@ -211,7 +221,7 @@ describe('Query', () => {
     });
 
     it('discards all other clauses', () => {
-      query = new Query(['test'], 30, 10);
+      query = new Query(['test'], [], 30, 10);
       query.order('test');
 
       const parsedQuery = query.parseCount('testing');

@@ -4,14 +4,16 @@
  */
 class Query {
   /**
-   * Optional contstructor args - these can also be set as properties
+   * Optional constructor args - these can also be set as properties
    *
-   * @param {Array} fields
+   * @param {string[]} fields         An array of field names to search on
+   * @param {object[]} fieldTypes     An array of label: type objects defining column types
    * @param {number} limit
    * @param {number} offset
    * @param {Boolean|Object} distinct
    */
-  constructor(fields = [], limit = 30, offset = 0, distinct = false) {
+  constructor(fields = [], fieldTypes = [], limit = 30, offset = 0, distinct = false) {
+    this.fieldTypes = fieldTypes;
     this.limit = limit;
     this.offset = offset;
     this.distinct = distinct;
@@ -227,12 +229,18 @@ class Query {
       ? ` WHERE (${this.filterBundles.map(bundle =>
         // Map those bundles - set "column" ILIKE '%field%' (and escape single quotes)
         bundle.map(({ column, term, strict, match }) => {
-          const queryColumn = column.replace('"', '""');
+          const columnName = column.replace('"', '""');
+          // Check for defined field types, and perform casting if necessary
+          const columnFieldType = this.fieldTypes.filter(fieldType => fieldType.label === column);
+          const queryColumn = columnFieldType.length && columnFieldType[0].type === 'numeric'
+            ? `CAST("${columnName}" AS TEXT)`
+            : `"${columnName}"`;
+
           const queryTerm = String(term).replace("'", "''");
           const edgeMatch = strict ? '' : '%';
           const matchType = match ? 'ILIKE' : 'NOT ILIKE';
 
-          return `"${queryColumn}" ${matchType} '${edgeMatch}${queryTerm}${edgeMatch}'`;
+          return `${queryColumn} ${matchType} '${edgeMatch}${queryTerm}${edgeMatch}'`;
         }).join(' OR ')
       ).join(') AND (')})`
       : '';

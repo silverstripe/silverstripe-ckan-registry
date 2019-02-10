@@ -70,6 +70,7 @@ class CKANRegistryPageController extends PageController
                         'ShowInDetailView' => (bool) $field->ShowInDetailView,
                         'DisplayConditions' => json_decode($field->DisplayConditions, true),
                         'RemoveDuplicates' => (bool) $field->RemoveDuplicates,
+                        'Type' => $field->Type,
                     ];
                 },
                 $resource->Fields()->filterAny([

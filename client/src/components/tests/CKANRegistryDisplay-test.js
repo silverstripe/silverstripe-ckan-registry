@@ -24,9 +24,9 @@ DataStore.mockImplementation(() => ({
 }));
 
 const testFields = [
-  { ReadableLabel: 'Foo', OriginalLabel: 'foo', ShowInResultsView: false },
-  { ReadableLabel: 'Bar', OriginalLabel: 'bar', ShowInResultsView: true },
-  { ReadableLabel: 'Baz', OriginalLabel: 'baz', ShowInResultsView: true },
+  { ReadableLabel: 'Foo', OriginalLabel: 'foo', ShowInResultsView: false, Type: 'text' },
+  { ReadableLabel: 'Bar', OriginalLabel: 'bar', ShowInResultsView: true, Type: 'text' },
+  { ReadableLabel: 'Baz', OriginalLabel: 'baz', ShowInResultsView: true, Type: 'numeric' },
 ];
 
 const mockLoadData = wrapper => {
@@ -200,6 +200,23 @@ describe('CKANRegistryDisplay', () => {
       expect(result).not.toContain('foo');
       expect(result).toContain('bar');
       expect(result).toContain('baz');
+    });
+  });
+
+  describe('getVisibleFieldTypes()', () => {
+    it('returns field label and types for visible fields', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          fields={testFields}
+          location={{ search: '' }}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      const result = wrapper.instance().getVisibleFieldTypes();
+      expect(result).not.toContainEqual({ label: 'foo', type: 'text' });
+      expect(result).toContainEqual({ label: 'bar', type: 'text' });
+      expect(result).toContainEqual({ label: 'baz', type: 'numeric' });
     });
   });
 

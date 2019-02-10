@@ -190,6 +190,20 @@ class CKANRegistryDisplay extends Component {
   }
 
   /**
+   * Get the "Type" for each visible field
+   *
+   * @returns {object[]}
+   */
+  getVisibleFieldTypes() {
+    return this.props.fields
+      .filter(field => field.ShowInResultsView)
+      .map(field => ({
+        label: field.OriginalLabel,
+        type: field.Type,
+      }));
+  }
+
+  /**
    * Finds all visible fields that have configured "ResultConditions", e.g. fields
    * that should only show data in them that match certain conditions. When found,
    * these will be applied as query filters before the data is loaded.
@@ -385,9 +399,11 @@ class CKANRegistryDisplay extends Component {
     const dataStore = CKANApi.loadDatastore(endpoint, identifier);
 
     const visibleFields = this.getVisibleFields();
+    const visibleFieldTypes = this.getVisibleFieldTypes();
     if (!visibleFields.includes('_id')) {
       // We always need "_id", even if it's hidden by configuration
       visibleFields.push('_id');
+      visibleFieldTypes.push({ label: '_id', type: 'text' });
     }
 
     // Build up "distinct on"
@@ -396,7 +412,7 @@ class CKANRegistryDisplay extends Component {
       .map(field => field.OriginalLabel);
 
     // Create the query
-    const query = new Query(visibleFields, pageSize, offset);
+    const query = new Query(visibleFields, visibleFieldTypes, pageSize, offset);
 
     // Clear any existing filter
     this.resetQueryFilters(query);
