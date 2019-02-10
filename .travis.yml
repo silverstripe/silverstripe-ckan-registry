@@ -22,6 +22,8 @@ matrix:
       env: DB=MYSQL RECIPE_VERSION=4.4.x-dev PDO=1 PHPUNIT_COVERAGE_TEST=1
     - php: 7.2
       env: DB=MYSQL RECIPE_VERSION=4.x-dev PHPUNIT_TEST=1
+    - php: 7.3
+      env: DB=MYSQL RECIPE_VERSION=4.x-dev PHPUNIT_TEST=1
     - php: 7.2
       env: DB=MYSQL RECIPE_VERSION=4.3.x-dev NPM_TEST=1
     #- php: 7.0
