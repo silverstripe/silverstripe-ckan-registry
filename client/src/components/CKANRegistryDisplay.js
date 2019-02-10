@@ -118,7 +118,7 @@ class CKANRegistryDisplay extends Component {
     const { filterValues } = this.state;
     return ({ Table, Pagination }) => (
       <Row>
-        <Col md={2} className="ckan-registry__filters">
+        <Col md={3} lg={2} className="ckan-registry__filters">
           <CKANRegistryFilterContainer
             {...this.props}
             onFilter={this.handleFilter}
@@ -126,7 +126,7 @@ class CKANRegistryDisplay extends Component {
             defaultValues={filterValues}
           />
         </Col>
-        <Col md={10} className="ckan-registry__table">
+        <Col md={9} lg={10} className="ckan-registry__table">
           <Table />
           <Pagination />
         </Col>
