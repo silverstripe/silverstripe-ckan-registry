@@ -18,7 +18,7 @@ This can be achieved in one of two ways:
   the schema with an XHR request (for example)
 * Use `$CKANClientConfig` in a SilverStripe template to inject it as a data attribute (for example)
 
-The `CKANExampleApp` example entrypoint component fetches the schema as a sub URL of the current request URL and passes
+The `CKANExampleApp` example entry point component fetches the schema as a sub URL of the current request URL and passes
 the schema to its child components as props. You can find an example of this in the `componentDidMount()` lifecycle
 method.
 
