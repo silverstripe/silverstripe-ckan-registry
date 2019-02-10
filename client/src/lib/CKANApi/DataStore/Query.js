@@ -232,7 +232,7 @@ class Query {
           const columnName = column.replace('"', '""');
           // Check for defined field types, and perform casting if necessary
           const columnFieldType = this.fieldTypes.filter(fieldType => fieldType.label === column);
-          const queryColumn = columnFieldType.length && columnFieldType[0].type === 'numeric'
+          const queryColumn = columnFieldType.length && columnFieldType[0].type !== 'text'
             ? `CAST("${columnName}" AS TEXT)`
             : `"${columnName}"`;
 
