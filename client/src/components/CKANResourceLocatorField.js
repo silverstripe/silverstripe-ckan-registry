@@ -32,6 +32,8 @@ class CKANResourceLocatorField extends Component {
       forceInvalidTimeout: null,
       // Whether the user has been warned about changing resources yet, so we don't do it twice
       changesNotified: false,
+      // Whether the component is initially constructed and mounting
+      isMounting: true,
     };
 
     // Prep a property to store a ref to the hidden input that holds the value of this field
@@ -74,12 +76,12 @@ class CKANResourceLocatorField extends Component {
    * @returns {string|null}
    */
   getInvalidURLMessage() {
-    const { currentDataset, spec, forceInvalid } = this.state;
+    const { currentDataset, spec, forceInvalid, isMounting } = this.state;
     const message = { type: 'error' };
 
     // If there's no "spec" then there's no URL that looks valid yet
     // Or if there's a "currentDataset" then the field is valid
-    if (!forceInvalid && (!spec || currentDataset)) {
+    if (isMounting || (!forceInvalid && (!spec || currentDataset))) {
       return null;
     }
 
@@ -203,6 +205,7 @@ class CKANResourceLocatorField extends Component {
     // assume the field is invalid.
     const handleErrorResponse = () => this.setState({
       validationPending: false,
+      isMounting: false,
       spec: null,
       currentDataset: null,
     });
@@ -224,6 +227,7 @@ class CKANResourceLocatorField extends Component {
             this.setState({
               spec: newSpec,
               uri: CKANApi.generateURI(newSpec) || '',
+              isMounting: false,
             });
 
             // Rerun a validate so that the dataset is now loaded
@@ -263,6 +267,7 @@ class CKANResourceLocatorField extends Component {
           validationPending: false,
           spec,
           currentDataset: dataset || null,
+          isMounting: false,
         });
       }, handleErrorResponse
     );
