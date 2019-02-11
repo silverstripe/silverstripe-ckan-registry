@@ -121,8 +121,11 @@ class ResourcePopulator implements ResourcePopulatorInterface
         // Swap out certain characters with spaces
         $name = str_replace(['_', '-'], ' ', $name);
 
-        // Remove non-alphanumeric characters
-        $name = trim(preg_replace('/[^\w\s]/', '', $name));
+        // Remove some non-alphanumeric characters
+        $name = trim(preg_replace('/[^\/\w\s]/', '', $name));
+
+        // Remove extra spaces around slashes
+        $name = str_replace(' / ', '/', $name);
 
         return ucfirst($name);
     }
