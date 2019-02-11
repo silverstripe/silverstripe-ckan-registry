@@ -427,7 +427,7 @@ class CKANPresentedOptionsField extends Component {
 
     const innerContent = suggestedOptions.length ?
       suggestedOptions.map((option, index) => (
-        <FormGroup key={option} className="ckan-presented-options__option-group">
+        <FormGroup key={option} className="ckan-presented-options__option-group" check>
           <Input
             id={`${fieldName}-${index}`}
             type="checkbox"
