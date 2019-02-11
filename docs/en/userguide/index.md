@@ -1,3 +1,6 @@
+title: CKAN Registry
+summary: Display data from an external CKAN resource
+
 # CKAN Registry
 
 ## Table of contents
