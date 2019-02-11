@@ -1,5 +1,19 @@
-.ckan-registry__table {
-  .griddle-row {
-    cursor: pointer;
+$pagination-margin: 5px;
+
+.ckan-registry {
+  &__table {
+    .griddle-row {
+      cursor: pointer;
+    }
+  }
+
+  &__pagination {
+    &-next {
+      margin-left: $pagination-margin;
+    }
+
+    &-previous {
+      margin-right: $pagination-margin;
+    }
   }
 }

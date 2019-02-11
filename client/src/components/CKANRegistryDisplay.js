@@ -83,6 +83,10 @@ class CKANRegistryDisplay extends Component {
       styleConfig: {
         classNames: {
           Table: 'griddle-table table table-hover',
+          Pagination: 'ckan-registry__pagination form-inline',
+          PageDropdown: 'ckan-registry__pagination-dropdown form-control',
+          PreviousButton: 'ckan-registry__pagination-previous btn btn-default',
+          NextButton: 'ckan-registry__pagination-next btn btn-default',
         },
       },
       events: {
