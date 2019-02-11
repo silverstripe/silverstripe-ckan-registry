@@ -1,26 +1,19 @@
 title: CKAN Registry
 summary: Display data from an external CKAN resource
 
-# CKAN Registry
-
-## Table of contents
+## Features
 
 * [Loading resource data](#loading-resource-data)
-  * [Changing resource data](#changing-resource-data)
-  * [Configuring data columns](#configuring-data-columns)
+* [Changing resource data](#changing-resource-data)
+* [Configuring data columns](#configuring-data-columns)
 * [Configuring how fields are displayed](#fields)
 * [Configuring how users can filter data](#filters)
-  * [Configuring a text filter](#configuring-a-text-filter)
-  * [Configuring a dropdown filter](#configuring-a-dropdown-filter)
-    * [Select from all options](#dropdown-options)
-    * [Splitting delimited cell values](#dropdown-delimiter)
-      * [Manual selection](#dropdown-manual-selection)
 
 The CKAN Registry module adds a new **CKAN Registry Page** page type to the CMS, allowing a content author to add
 pages that allow customisation and display data of data from an external [CKAN](https://ckan.org/) resource to
 website visitors.
 
-[CKAN](https://ckan.org/) (Comprehensive Knowledge Archive Network) is a powerful data management system that makes collections of data accessible – by providing tools to streamline publishing, sharing, finding and using data. It is used by national and local governments, research institutions, and other organizations who collect a lot of data.
+[CKAN](https://ckan.org/) (Comprehensive Knowledge Archive Network) is a powerful data management system that makes collections of data accessible – by providing tools to streamline publishing, sharing, finding and using data. It is used by national and local governments, research institutions, and other organisations who collect a lot of data.
 
 <div class="note" markdown="1">
 For the purpose of this user guide we will reference [data.govt.nz](https://catalogue.data.govt.nz) as our CKAN
