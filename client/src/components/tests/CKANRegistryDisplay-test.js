@@ -94,6 +94,61 @@ describe('CKANRegistryDisplay', () => {
     });
   });
 
+  describe('hasValidConfig()', () => {
+    it('returns false when no fields are passed as props', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          location={{ search: '' }}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.instance().hasValidConfig()).toBe(false);
+    });
+
+    it('returns false when fields list is empty', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          fields={[]}
+          location={{ search: '' }}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.instance().hasValidConfig()).toBe(false);
+    });
+
+    it('returns false when no fields are configured to be displayed', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          fields={[
+            { ShowInResultsView: false, ReadableLabel: 'foo' },
+            { ShowInResultsView: false, ReadableLabel: 'bar' },
+            { ShowInResultsView: false, ReadableLabel: 'baz' },
+          ]}
+          location={{ search: '' }}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.instance().hasValidConfig()).toBe(false);
+    });
+
+    it('returns true when valid', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          fields={[
+            { ShowInResultsView: true, ReadableLabel: 'foo' },
+          ]}
+          location={{ search: '' }}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.instance().hasValidConfig()).toBe(true);
+    });
+  });
+
   describe('getStateFromLocation()', () => {
     it('parses the current page from URL search parameters', () => {
       const wrapper = shallow(
@@ -478,6 +533,7 @@ describe('CKANRegistryDisplay', () => {
     it('calls datastore.search when simple configuration is provided', () => {
       shallow(
         <CKANRegistryDisplay
+          spec={{ endpoint: 'foo', dataset: 'bar', identifier: 'baz' }}
           fields={testFields}
           location={{ search: '' }}
         />
@@ -498,6 +554,7 @@ describe('CKANRegistryDisplay', () => {
     it('adheres to page size being configured as a prop', () => {
       shallow(
         <CKANRegistryDisplay
+          spec={{ endpoint: 'foo', dataset: 'bar', identifier: 'baz' }}
           fields={testFields}
           pageSize={100}
           location={{ search: '' }}
@@ -519,6 +576,7 @@ describe('CKANRegistryDisplay', () => {
     it('still uses basic search for basic sort', () => {
       shallow(
         <CKANRegistryDisplay
+          spec={{ endpoint: 'foo', dataset: 'bar', identifier: 'baz' }}
           fields={testFields}
           location={{ search: '?sort=bar&sortdirection=ASC' }}
         />
@@ -539,6 +597,7 @@ describe('CKANRegistryDisplay', () => {
     it('sets offset correctly when viewing pages', () => {
       shallow(
         <CKANRegistryDisplay
+          spec={{ endpoint: 'foo', dataset: 'bar', identifier: 'baz' }}
           fields={testFields}
           location={{ search: '?page=3' }}
         />
@@ -559,6 +618,7 @@ describe('CKANRegistryDisplay', () => {
     it('switches to SQL search on filters', () => {
       shallow(
         <CKANRegistryDisplay
+          spec={{ endpoint: 'foo', dataset: 'bar', identifier: 'baz' }}
           fields={testFields}
           filters={[
             { id: 1, allColumns: false, columns: [{ target: 'foo' }] },
@@ -578,6 +638,7 @@ describe('CKANRegistryDisplay', () => {
     it('adheres to page size prop when using SQL search', () => {
       shallow(
         <CKANRegistryDisplay
+          spec={{ endpoint: 'foo', dataset: 'bar', identifier: 'baz' }}
           fields={testFields}
           filters={[
             { id: 1, allColumns: false, columns: [{ target: 'foo' }] },
@@ -597,6 +658,7 @@ describe('CKANRegistryDisplay', () => {
     it('sets page correctly when using SQL search', () => {
       shallow(
         <CKANRegistryDisplay
+          spec={{ endpoint: 'foo', dataset: 'bar', identifier: 'baz' }}
           fields={testFields}
           filters={[
             { id: 1, allColumns: false, columns: [{ target: 'foo' }] },
@@ -616,13 +678,14 @@ describe('CKANRegistryDisplay', () => {
       const historyMock = { push: jest.fn() };
       const wrapper = shallow(
         <CKANRegistryDisplay
+
           fields={testFields}
           filters={[
             { id: 1, allColumns: false, columns: [{ target: 'foo' }] },
             { id: 2, allColumns: true, columns: null },
           ]}
           location={{ pathname: 'path', search: '' }}
-          spec={{ dataset: 'dataset' }}
+          spec={{ endpoint: 'foo', dataset: 'dataset', identifier: 'baz' }}
           history={historyMock}
         />
       );
@@ -640,7 +703,7 @@ describe('CKANRegistryDisplay', () => {
   });
 
   describe('render()', () => {
-    it('renders nothing when no resource is specified', () => {
+    it('renders message when no resource is specified', () => {
       const wrapper = shallow(
         <CKANRegistryDisplay
           location={{ search: '' }}
@@ -648,7 +711,7 @@ describe('CKANRegistryDisplay', () => {
         { disableLifecycleMethods: true }
       );
 
-      expect(wrapper.html()).toBeNull();
+      expect(wrapper.html()).toContain('There are no columns');
     });
 
     it('returns a Redirect when switching pages', () => {
@@ -659,6 +722,47 @@ describe('CKANRegistryDisplay', () => {
 
       wrapper.setState({ selectedRow: 123 });
       expect(wrapper.find(Redirect).length).toBe(1);
+    });
+  });
+
+  describe('renderDownloadLink()', () => {
+    it('does not render the link when spec endpoint is missing', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay spec={{ identifier: 'something' }} />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.find('.ckan-registry__export')).toHaveLength(0);
+    });
+
+    it('does not render the link when spec identifier is missing', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay spec={{ endpoint: 'something' }} />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.find('.ckan-registry__export')).toHaveLength(0);
+    });
+
+    it('does not render the link when config is not valid', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay fields={[]} spec={{ identifier: 'something' }} />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.find('.ckan-registry__export')).toHaveLength(0);
+    });
+
+    it('renders a download link', () => {
+      const wrapper = shallow(
+        <CKANRegistryDisplay
+          fields={testFields}
+          spec={{ endpoint: 'foo', identifier: 'something' }}
+        />,
+        { disableLifecycleMethods: true }
+      );
+
+      expect(wrapper.find('.ckan-registry__export')).toHaveLength(1);
     });
   });
 });
