@@ -82,6 +82,11 @@ class PresentedOptionsField extends TextField
         ];
     }
 
+    public function performReadonlyTransformation()
+    {
+        return clone $this->setReadonly(true);
+    }
+
     /**
      * @return Resource
      */

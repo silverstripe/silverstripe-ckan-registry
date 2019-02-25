@@ -40,6 +40,11 @@ class ResultConditionsField extends TextField
         return 'ckan-result-conditions';
     }
 
+    public function performReadonlyTransformation()
+    {
+        return clone $this->setReadonly(true);
+    }
+
     public function getSchemaDataDefaults()
     {
         $data = parent::getSchemaDataDefaults();

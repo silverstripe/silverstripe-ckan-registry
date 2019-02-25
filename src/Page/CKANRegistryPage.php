@@ -86,6 +86,11 @@ class CKANRegistryPage extends Page
                 $resourceFields = GridField::create('DataColumns', '', $resource->Fields(), $columnsConfig);
                 $resourceFields->addExtraClass('ckan-columns');
 
+                $resourceFields->setReadonlyComponents(array_merge(
+                    $resourceFields->getReadonlyComponents(),
+                    [GridFieldResourceTitle::class]
+                ));
+
                 // Configure inline editable checkboxes for the two boolean fields
                 $before = null;
                 $editableColumns = $injector->create(GridFieldEditableColumns::class);

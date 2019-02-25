@@ -15,7 +15,7 @@ jQuery.entwine('ss', ($) => {
         name: this.attr('name'),
         ...schemaData,
         defaultEndpoint: schemaData.defaultEndpoint || null,
-        description: schemaData.description.html || '',
+        description: (schemaData.description && schemaData.description.html) || '',
         value: value ? JSON.parse(value) : undefined,
       };
 

@@ -42,6 +42,7 @@ class GridFieldResourceTitle implements GridField_HTMLProvider
         $data = ArrayData::create([
             'Resource' => $this->resource,
             'EditLinkTitle' => _t(__CLASS__ . '.EDIT_LINK_TITLE', 'Edit resource'),
+            'ReadOnly' => $gridField->isReadonly(),
         ]);
         $result = $data->renderWith(__CLASS__);
 

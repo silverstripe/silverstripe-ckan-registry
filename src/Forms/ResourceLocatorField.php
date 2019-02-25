@@ -80,6 +80,15 @@ class ResourceLocatorField extends FormField
         ]);
     }
 
+    public function performReadonlyTransformation()
+    {
+        // Clear out the description that's only relevant when the field is editable.
+        $this->setDescription('');
+
+        return clone $this->setReadonly(true);
+    }
+
+
     public function setValue($value, $data = null)
     {
         // Handle the case where this is being set as a legitimate "spec" containing endpoint, dataset and resource

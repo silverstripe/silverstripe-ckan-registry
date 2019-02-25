@@ -155,7 +155,28 @@ class CKANResultConditionsField extends Component {
     );
   }
 
+  /**
+   * Render a simple <p> tag for read only mode
+   *
+   * @returns {HTMLElement|null}
+   */
+  renderReadOnly() {
+    const { data: { source } } = this.props;
+    const input = this.getInputValue();
+    const type = source.find(candidate => candidate.value === this.getSelectValue()).title;
+
+    if (!type || !input) {
+      return null;
+    }
+
+    return <p className="form-control-static readonly">{type}: {input}</p>;
+  }
+
   render() {
+    if (this.props.readOnly) {
+      return this.renderReadOnly();
+    }
+
     return (
       <div className="ckan-result-conditions">
         <Row form>
@@ -182,6 +203,7 @@ CKANResultConditionsField.propTypes = {
     })),
     matchTypeDefault: PropTypes.string,
   }),
+  readOnly: PropTypes.bool,
   TextFieldComponent: PropTypes.oneOfType([
     React.PropTypes.string,
     React.PropTypes.func
@@ -192,6 +214,7 @@ CKANResultConditionsField.propTypes = {
 CKANResultConditionsField.defaultProps = {
   value: {},
   data: {},
+  readOnly: false,
 };
 
 export { CKANResultConditionsField as Component };
