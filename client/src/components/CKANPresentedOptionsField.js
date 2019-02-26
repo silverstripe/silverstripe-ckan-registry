@@ -336,7 +336,7 @@ class CKANPresentedOptionsField extends Component {
     // If there's no value saved, reset the selected options
     let selections = this.state.selections;
     if (!this.props.value || !this.props.value.selections || !this.props.value.selections.length) {
-      selections = newOptions;
+      selections = [...newOptions];
     }
 
     this.setState({
