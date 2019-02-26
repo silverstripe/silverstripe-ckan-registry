@@ -42,6 +42,13 @@
   &__resource-select {
     flex: 1;
   }
+
+  // Override read-only styling
+  .readonly .form__field-holder & {
+    background-color: $body-bg;
+    border: none;
+    padding: 0;
+  }
 }
 
 // Specificity for overwriting form width styles needs to be high:

@@ -6,4 +6,10 @@
   &__column-right {
     padding-left: 0;
   }
+
+  // Override read-only styling
+  .readonly .form__field-holder & {
+    background-color: $body-bg;
+    border: none;
+  }
 }
