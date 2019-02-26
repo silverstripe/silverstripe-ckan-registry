@@ -144,8 +144,8 @@ class CKANPresentedOptionsField extends Component {
 
       this.setState({
         suggestedOptions,
-        // Ensure a clone of options is taken (.slice(0)) so that suggested options is not altered
-        selections: selections.length ? selections : suggestedOptions.slice(0),
+        // Ensure a clone of options is taken ([...array]) so that suggested options is not altered
+        selections: selections.length ? selections : [...suggestedOptions],
         loading: false,
       });
 

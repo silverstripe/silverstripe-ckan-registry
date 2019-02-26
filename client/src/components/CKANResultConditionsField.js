@@ -163,13 +163,13 @@ class CKANResultConditionsField extends Component {
   renderReadOnly() {
     const { data: { source } } = this.props;
     const input = this.getInputValue();
-    const type = source.find(candidate => candidate.value === this.getSelectValue()).title;
+    const type = source.find(candidate => candidate.value === this.getSelectValue());
 
-    if (!type || !input) {
+    if (!type) {
       return null;
     }
 
-    return <p className="form-control-static readonly">{type}: {input}</p>;
+    return <p className="form-control-static readonly">{type.title}: {input}</p>;
   }
 
   render() {

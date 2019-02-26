@@ -82,10 +82,13 @@ class ResourceLocatorField extends FormField
 
     public function performReadonlyTransformation()
     {
-        // Clear out the description that's only relevant when the field is editable.
-        $this->setDescription('');
+        // Set read only and clone to maintain immutability
+        $clone = clone $this->setReadonly(true);
 
-        return clone $this->setReadonly(true);
+        // Clear out the description that's only relevant when the field is editable.
+        $clone->setDescription('');
+
+        return $clone;
     }
 
 

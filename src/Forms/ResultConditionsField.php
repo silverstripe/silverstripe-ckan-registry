@@ -42,6 +42,12 @@ class ResultConditionsField extends TextField
 
     public function performReadonlyTransformation()
     {
+        // If we have no value then defer to the parent that renders a "none" field
+        $value = trim($this->Value());
+        if (empty($value)) {
+            return parent::performReadonlyTransformation();
+        }
+
         return clone $this->setReadonly(true);
     }
 
