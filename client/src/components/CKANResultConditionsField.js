@@ -50,7 +50,7 @@ class CKANResultConditionsField extends Component {
    * @returns {string}
    */
   getSelectValue() {
-    return this.state[0][this.getFieldName('match-select')];
+    return `${this.state[0][this.getFieldName('match-select')]}`;
   }
 
   /**
@@ -163,7 +163,7 @@ class CKANResultConditionsField extends Component {
   renderReadOnly() {
     const { data: { source } } = this.props;
     const input = this.getInputValue();
-    const type = source.find(candidate => candidate.value === this.getSelectValue());
+    const type = source.find(candidate => `${candidate.value}` === this.getSelectValue());
 
     if (!type) {
       return null;
