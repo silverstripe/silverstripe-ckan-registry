@@ -182,4 +182,14 @@ class ResourceFilter extends DataObject
             . '</span>'
         );
     }
+
+    /**
+     * Use the filter label for GridField CRUD operation result messages
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->FilterLabel;
+    }
 }

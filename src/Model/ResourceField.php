@@ -110,4 +110,14 @@ class ResourceField extends DataObject
         });
         return parent::getCMSFields();
     }
+
+    /**
+     * Use the readable label for GridField CRUD operation result messages
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->ReadableLabel;
+    }
 }
