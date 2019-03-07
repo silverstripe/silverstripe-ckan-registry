@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Redirect } from 'react-router-dom';
 import fetch from 'isomorphic-fetch';
 import CKANRegistryDisplay from 'components/CKANRegistryDisplay';
 import CKANRegistryDetailView from 'components/CKANRegistryDetailView';
+import 'url-search-params-polyfill';
 
 /**
  * An example React app showing how you could build a frontend for the CKAN registry
@@ -29,7 +30,9 @@ class CKANExampleApp extends Component {
    * When the component has mounted, fetch the client schema configuration
    */
   componentDidMount() {
-    const schemaPath = `${window.location.pathname}/schema`;
+    const params = new URLSearchParams(window.location.search || '');
+    const stage = params.has('stage') ? `?stage=${params.get('stage')}` : '';
+    const schemaPath = `${window.location.pathname}/schema${stage}`;
     fetch(schemaPath)
       .then(response => response.json())
       .then(schema => this.setState({ schema }));
@@ -47,9 +50,9 @@ class CKANExampleApp extends Component {
     // Display a loading indicator while the schema is fetched
     if (schema === null) {
       return (
-        <p className="ckan-registry__loading">
+        <div className="ckan-registry__loading">
           { window.i18n._t('CKANRegistryDisplay.LOADING', 'Loading...') }
-        </p>
+        </div>
       );
     }
     const { basePath } = schema;

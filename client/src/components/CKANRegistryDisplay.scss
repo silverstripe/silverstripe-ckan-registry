@@ -7,6 +7,18 @@ $pagination-margin: 5px;
     }
   }
 
+  &__results {
+    &:not(&--loading) .ckan-registry__loading-container {
+      display: none;
+    }
+
+    &--loading {
+      .ckan-registry__table {
+        display: none;
+      }
+    }
+  }
+
   &__pagination {
     &-next {
       margin-left: $pagination-margin;
@@ -15,5 +27,9 @@ $pagination-margin: 5px;
     &-previous {
       margin-right: $pagination-margin;
     }
+  }
+
+  &__other-actions {
+    margin-top: 10px;
   }
 }

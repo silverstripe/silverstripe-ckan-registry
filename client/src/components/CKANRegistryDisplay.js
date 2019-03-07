@@ -130,9 +130,14 @@ class CKANRegistryDisplay extends Component {
             defaultValues={filterValues}
           />
         </Col>
+        <Col md={9} lg={10} className="ckan-registry__loading-container">
+          <div className="ckan-registry__loading">
+            { window.i18n._t('CKANRegistryDisplay.LOADING', 'Loading...') }
+          </div>
+        </Col>
         <Col md={9} lg={10} className="ckan-registry__table">
-          <Table />
-          <Pagination />
+          { <Table /> }
+          { <Pagination /> }
         </Col>
       </Row>
     );
@@ -530,24 +535,6 @@ class CKANRegistryDisplay extends Component {
   }
 
   /**
-   * Renders a loading message if "loading" is true in the state
-   *
-   * @returns {HTMLElement|null}
-   */
-  renderLoading() {
-    const { loading } = this.state;
-    if (!loading) {
-      return null;
-    }
-
-    return (
-      <p className="ckan-registry__loading">
-        { window.i18n._t('CKANRegistryDisplay.LOADING', 'Loading...') }
-      </p>
-    );
-  }
-
-  /**
    * Renders a download/export to CSV link
    *
    * @returns {HTMLElement|null}
@@ -624,7 +611,7 @@ class CKANRegistryDisplay extends Component {
 
   render() {
     const { basePath, className } = this.props;
-    const { selectedRow } = this.state;
+    const { selectedRow, loading } = this.state;
 
     // Send the user off to the right detail view if they've clicked on a row
     if (selectedRow !== null) {
@@ -634,7 +621,8 @@ class CKANRegistryDisplay extends Component {
     const invalidConfig = !this.hasValidConfig();
 
     const classes = classnames(
-      'ckan-registry',
+      'ckan-registry__results',
+      { 'ckan-registry__results--loading': loading },
       { 'ckan-registry__error': invalidConfig },
       className
     );
@@ -658,7 +646,6 @@ class CKANRegistryDisplay extends Component {
 
     return (
       <div className={classes}>
-        { this.renderLoading() }
         { this.renderDataGrid() }
         <div className="ckan-registry__other-actions">
           { this.renderDatasetLink() }
