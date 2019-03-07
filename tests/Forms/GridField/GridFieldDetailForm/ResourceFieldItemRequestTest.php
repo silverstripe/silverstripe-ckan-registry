@@ -113,7 +113,7 @@ class ResourceFieldItemRequestTest extends SapphireTest
 
         // Build the gridfield and component
         $config = GridFieldConfig::create();
-        $detailForm = new GridFieldDetailForm;
+        $detailForm = new GridFieldDetailForm();
         $config->addComponent($detailForm->setItemRequestClass(ResourceFieldItemRequest::class));
         $gridField = new GridField('Test', 'Test', $resource->Fields(), $config);
         $formMock = $this->createMock(Form::class);
@@ -138,8 +138,8 @@ class ResourceFieldItemRequestTest extends SapphireTest
 
     protected function assertArrayEqualsInOrder($expected, $actual)
     {
-        $message = 'Failed asserting array in order. Expected '.print_r($expected, true).
-            '. Actual: '.print_r($actual, true);
+        $message = 'Failed asserting array in order. Expected ' . print_r($expected, true) .
+            '. Actual: ' . print_r($actual, true);
 
         foreach ($actual as $key => $value) {
             $expectedKey = key($expected);

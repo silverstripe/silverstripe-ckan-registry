@@ -12,7 +12,8 @@ class ResourceFieldTest extends SapphireTest
 
     public function testDisplayConditionsAreRenderedAsResultConditionsField()
     {
-        $fields = (new ResourceField)->getCMSFields();
+        $field = new ResourceField();
+        $fields = $field->getCMSFields();
 
         $field = $fields->dataFieldByName('DisplayConditions');
         $this->assertNotNull($field, 'DisplayConditions field was not scaffolded');
@@ -21,5 +22,12 @@ class ResourceFieldTest extends SapphireTest
             $field,
             'DisplayConditions should be rendered as a ResultConditionsField'
         );
+    }
+
+    public function testTitleShouldBeFilterLabel()
+    {
+        $field = new ResourceField();
+        $field->ReadableLabel = 'My field name';
+        $this->assertSame('My field name', $field->getTitle());
     }
 }
