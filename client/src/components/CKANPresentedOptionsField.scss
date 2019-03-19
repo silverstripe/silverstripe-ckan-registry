@@ -18,7 +18,7 @@
       position: relative;
     }
 
-    .form-group {
+    .form-check {
       margin-bottom: 0;
     }
   }
@@ -49,5 +49,12 @@
 
   .form__field-description {
     font-style: italic;
+  }
+
+  // Override read-only styling
+  .readonly .form__field-holder & {
+    background-color: $body-bg;
+    border: none;
+    padding: 0;
   }
 }

@@ -9,7 +9,6 @@ import debounce from 'lodash/debounce';
 import { inject } from 'lib/Injector';
 import fieldHolder from 'components/FieldHolder/FieldHolder';
 import classNames from 'classnames';
-import URLInput from './CKANResourceLocatorField/URLInput';
 
 class CKANResourceLocatorField extends Component {
   constructor(props) {
@@ -189,7 +188,8 @@ class CKANResourceLocatorField extends Component {
         // Show the field as invalid after an amount of time
         forceInvalidTimeout: setTimeout(() => this.setState({
           forceInvalid: true,
-        }), 2000)
+        }), 2000),
+        currentDataset: null,
       });
 
       return;
@@ -280,18 +280,23 @@ class CKANResourceLocatorField extends Component {
    */
   renderResourceSelect() {
     const { uri, currentDataset, spec } = this.state;
-    const { SelectComponent, name } = this.props;
+    const { name, readOnly, SelectComponent, TextFieldComponent } = this.props;
 
     // Create some props that'll be shared by the disabled input and the select component
     const sharedProps = {
       title: i18n._t('CKANResourceLocatorField.RESOURCE_NAME', 'Resource name'),
-      extraClass: 'form-field--no-divider stacked',
+      extraClass: 'stacked',
     };
 
-    // If we're not valid then we'll render just a simple disabled input in place of the select
-    if (!currentDataset || !uri || !uri.length) {
-      const Field = fieldHolder(Input);
-      return <Field {...sharedProps} type="text" disabled />;
+    // If we're not valid or read-only then we'll render just a simple disabled input in place of
+    // the select
+    if (readOnly || !currentDataset || !uri || !uri.length) {
+      let value = '';
+      if (spec && spec.resource && currentDataset) {
+        const resource = currentDataset.resources.find(candidate => candidate.id === spec.resource);
+        value = resource.name || resource.description || resource.id;
+      }
+      return <TextFieldComponent {...sharedProps} type="text" disabled value={value} />;
     }
 
     const unavailableMessage = i18n._t(
@@ -308,9 +313,10 @@ class CKANResourceLocatorField extends Component {
       description: !resource.datastore_active ? unavailableMessage : null,
     }));
 
+    let message = null;
+
     // Find the current resource that might be selected
     const selectedResource = resources.find(resource => resource.value === spec.resource);
-    let message = null;
     // If the user has somehow selected an invalid resource (disabled option) we'll give a message
     if (selectedResource && selectedResource.disabled) {
       message = {
@@ -335,11 +341,17 @@ class CKANResourceLocatorField extends Component {
   /**
    * Renders a hidden input containing the value of this field to be saved
    *
-   * @returns {Input}
+   * @returns {Input|null}
    */
   renderHiddenInput() {
     const { spec, validationMessage } = this.state;
-    const value = !spec || validationMessage ? null : JSON.stringify(spec);
+    const value = !spec || validationMessage ? '' : JSON.stringify(spec);
+    const { readOnly } = this.props;
+
+    // Don't bother with an input if the field is readonly
+    if (readOnly) {
+      return null;
+    }
 
     return (
       <Input
@@ -351,28 +363,36 @@ class CKANResourceLocatorField extends Component {
     );
   }
 
-  /**
-   * Renders this field in its entirety
-   *
-   * @returns {DOMElement}
-   */
-  render() {
-    const { uri, validationPending } = this.state;
+  renderUrlInput() {
+    const { uri } = this.state;
+    const { readOnly, TextFieldComponent, name } = this.props;
 
     // Get any invalid message for the URL field
     const invalidMessage = this.getInvalidURLMessage();
     // And determine validity by the existance of that message
     const invalid = !!invalidMessage;
 
-    // Props for the URLInput
     const inputProps = {
+      name: `${name}-uri`,
       title: i18n._t('CKANResourceLocatorField.DATA_SOURCE_URL', 'Data source URL'),
-      extraClass: 'form-field--no-divider stacked',
+      className: classNames('no-change-track', { 'is-invalid': invalid }),
       message: invalidMessage,
-      value: uri,
+      value: uri || '', // Cast falsy values to an empty string
+      readOnly,
       invalid,
       onChange: this.handleChange,
     };
+
+    return <TextFieldComponent {...inputProps} />;
+  }
+
+  /**
+   * Renders this field in its entirety
+   *
+   * @returns {DOMElement}
+   */
+  render() {
+    const { validationPending } = this.state;
 
     const inputContainerClasses = classNames('ckan-resource-locator__uri-input', {
       'ckan-resource-locator__uri-input--loading': validationPending,
@@ -381,7 +401,7 @@ class CKANResourceLocatorField extends Component {
     return (
       <div className="ckan-resource-locator">
         <div className={inputContainerClasses}>
-          <URLInput {...inputProps} />
+          { this.renderUrlInput() }
         </div>
         <div className="ckan-resource-locator__big-slash">/</div>
         <div className="ckan-resource-locator__resource-select">
@@ -410,9 +430,9 @@ CKANResourceLocatorField.propTypes = {
 export { CKANResourceLocatorField as Component };
 
 export default fieldHolder(inject(
-  ['SingleSelectField'],
-  (SelectComponent) => ({
-    SelectComponent,
+  ['SingleSelectField', 'TextField'],
+  (SelectComponent, TextFieldComponent) => ({
+    SelectComponent, TextFieldComponent,
   }),
   () => 'CKAN.ResourceLocatorField'
 )(CKANResourceLocatorField));

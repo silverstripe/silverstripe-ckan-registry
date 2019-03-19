@@ -1,4 +1,9 @@
 en:
+  SilverStripe\CKANRegistry\Forms\GridFieldResourceTitle:
+    EDIT_LINK_TITLE: 'Edit resource'
+  SilverStripe\CKANRegistry\Forms\PresentedOptionsField:
+    SELECT_ALL: 'Select from all options'
+    SELECT_CUSTOM: 'Manually add options'
   SilverStripe\CKANRegistry\Forms\ResourceLocatorField:
     DESCRIPTION: 'Connect to a data source from {site}. Once added and saved you can configure the appearance and add search filters.'
     GENERIC_SITE_NAME: 'a CKAN website'
@@ -6,6 +11,7 @@ en:
     MUST_MATCH: 'Must match'
     MUST_NOT_MATCH: 'Must not match'
   SilverStripe\CKANRegistry\Model\Resource:
+    DEFAULT_FILTER_LABEL: Search
     PLURALNAME: Resources
     PLURALS:
       one: 'A Resource'
@@ -25,6 +31,7 @@ en:
   SilverStripe\CKANRegistry\Model\ResourceFilter:
     ALL_COLUMNS: 'All columns'
     COLUMNS_SOURCES: 'Columns source(s)'
+    FILTERLABEL_DESCRIPTION: 'Provide an appropriate label for the filter. For example, “Search locations”'
     MULTIPLE_COLUMNS: 'Multiple columns'
     PLURALNAME: Texts
     PLURALS:
@@ -32,13 +39,14 @@ en:
       other: '{count} Texts'
     SINGULARNAME: Text
   SilverStripe\CKANRegistry\Model\ResourceFilter\Dropdown:
-    OPTIONS: 'Dropdown options'
+    OPTIONS: 'Presented options'
     PLURALNAME: Dropdowns
     PLURALS:
       one: 'A Dropdown'
       other: '{count} Dropdowns'
     SINGULARNAME: Dropdown
   SilverStripe\CKANRegistry\Page\CKANRegistryPage:
+    DESCRIPTION: 'Display a data set from a CKAN resource'
     IN_DETAIL: 'In Detail'
     IN_RESULTS: 'In Results'
     ITEMS_PER_PAGE: 'Items per page'

@@ -7,6 +7,7 @@ import {
 import fieldHolder from 'components/FieldHolder/FieldHolder';
 import CKANApi from 'lib/CKANApi';
 import i18n from 'i18n';
+import classNames from 'classnames';
 
 
 /**
@@ -143,7 +144,8 @@ class CKANPresentedOptionsField extends Component {
 
       this.setState({
         suggestedOptions,
-        selections: selections.length ? selections : suggestedOptions,
+        // Ensure a clone of options is taken ([...array]) so that suggested options is not altered
+        selections: selections.length ? selections : [...suggestedOptions],
         loading: false,
       });
 
@@ -208,7 +210,7 @@ class CKANPresentedOptionsField extends Component {
   fetchOptionsForField(field) {
     const { data: { endpoint, resource } } = this.props;
 
-    return CKANApi.loadDatastore(endpoint, resource).search([field], null, true)
+    return CKANApi.loadDatastore(endpoint, resource).search([field], null, true, 1000)
       .then(result => {
         let newOptions = [];
 
@@ -334,7 +336,7 @@ class CKANPresentedOptionsField extends Component {
     // If there's no value saved, reset the selected options
     let selections = this.state.selections;
     if (!this.props.value || !this.props.value.selections || !this.props.value.selections.length) {
-      selections = newOptions;
+      selections = [...newOptions];
     }
 
     this.setState({
@@ -364,8 +366,11 @@ class CKANPresentedOptionsField extends Component {
    * @returns {Input|null}
    */
   renderFreetextInput() {
-    // Don't render the free text input field unless we've chosen to specify a custom list
-    if (this.getSelectType() !== SELECT_TYPE_CUSTOM) {
+    const { readOnly } = this.props;
+
+    // Don't render the free text input field unless we've chosen to specify a custom list AND this
+    // field is NOT read only
+    if (!readOnly && this.getSelectType() !== SELECT_TYPE_CUSTOM) {
       return null;
     }
 
@@ -375,6 +380,14 @@ class CKANPresentedOptionsField extends Component {
         'placed on a new line.'
     );
 
+    let value = this.getInputValue();
+
+    // If we're here because we're read only and we're not configuring custom options then our value
+    // will be generated from the options that the user previously chose
+    if (readOnly && this.getSelectType() !== SELECT_TYPE_CUSTOM) {
+      value = this.state.selections.join('\n');
+    }
+
     return (
       <Row>
         <Col lg={9} sm={12}>
@@ -383,10 +396,11 @@ class CKANPresentedOptionsField extends Component {
             className="ckan-presented-options__manual-options"
             name={this.getFieldName('options-custom')}
             onChange={this.handleInputChange}
-            value={this.getInputValue()}
+            value={value}
+            readOnly={readOnly}
           />
         </Col>
-        <Col lg={3} sm={12}>{ description }</Col>
+        <Col lg={3} sm={12}>{ !readOnly && description }</Col>
       </Row>
     );
   }
@@ -394,10 +408,15 @@ class CKANPresentedOptionsField extends Component {
   /**
    * Renders a hidden input containing a JSON serialised set of values for this field
    *
-   * @returns {DOMElement}
+   * @returns {DOMElement|null}
    */
   renderHiddenInput() {
-    const { name } = this.props;
+    const { name, readOnly } = this.props;
+
+    if (readOnly) {
+      return null;
+    }
+
     const { selections, customOptions, separatorDelimiter } = this.state;
     const value = {
       customOptions,
@@ -422,12 +441,12 @@ class CKANPresentedOptionsField extends Component {
    */
   renderCheckboxList() {
     const fieldName = this.getFieldName('options');
-    const { LoadingComponent } = this.props;
+    const { LoadingComponent, readOnly } = this.props;
     const { loading, suggestedOptions } = this.state;
 
     const innerContent = suggestedOptions.length ?
       suggestedOptions.map((option, index) => (
-        <FormGroup key={option} className="ckan-presented-options__option-group">
+        <FormGroup key={option} className="ckan-presented-options__option-group" check>
           <Input
             id={`${fieldName}-${index}`}
             type="checkbox"
@@ -435,6 +454,7 @@ class CKANPresentedOptionsField extends Component {
             onChange={this.handleCheckboxChange}
             checked={this.isCheckboxChecked(option)}
             value={option}
+            readOnly={readOnly}
           />
           <Label for={`${fieldName}-${index}`}>
             { option }
@@ -464,9 +484,15 @@ class CKANPresentedOptionsField extends Component {
    * Renders an input with an attached button where the CMS user can enter a delimiter that is used
    * to split the loaded options
    *
-   * @returns {FormGroup}
+   * @returns {FormGroup|null}
    */
   renderSeparator() {
+    const { readOnly } = this.props;
+
+    if (readOnly) {
+      return null;
+    }
+
     return (
       <FormGroup className="ckan-presented-options__option-separator">
         <Label for="optionSeparator">
@@ -530,8 +556,11 @@ class CKANPresentedOptionsField extends Component {
    * @return {Row}
    */
   renderCheckboxListAndSeparator() {
-    // Don't render the checkbox list unless we've chosen to select from a list of options
-    if (this.getSelectType() !== SELECT_TYPE_ALL) {
+    const { readOnly } = this.props;
+
+    // Don't render the checkbox list unless we've chosen to select from a list of options or if
+    // this field is read only
+    if (readOnly || this.getSelectType() !== SELECT_TYPE_ALL) {
       return null;
     }
 
@@ -547,10 +576,15 @@ class CKANPresentedOptionsField extends Component {
    * Renders a chose for either "select all options" or "manually select options" in a radio
    * input group
    *
-   * @returns {FormGroup[]}
+   * @returns {FormGroup[]|null}
    */
   renderRadioOptions() {
-    const { data: { selectTypes } } = this.props;
+    const { readOnly, data: { selectTypes } } = this.props;
+
+    if (readOnly) {
+      return null;
+    }
+
     const selectedValue = this.getSelectType();
 
     return selectTypes.map((option) => (
@@ -574,7 +608,7 @@ class CKANPresentedOptionsField extends Component {
     const { extraClass } = this.props;
 
     return (
-      <div className={extraClass}>
+      <div className={classNames('ckan-presented-options', extraClass)}>
         { this.renderRadioOptions() }
         { this.renderCheckboxListAndSeparator() }
         { this.renderFreetextInput() }
@@ -601,6 +635,7 @@ CKANPresentedOptionsField.propTypes = {
   extraClass: PropTypes.string,
   name: PropTypes.string,
   value: PropTypes.object,
+  readOnly: PropTypes.bool,
   LoadingComponent: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.func
@@ -612,6 +647,7 @@ CKANPresentedOptionsField.defaultProps = {
   extraClass: '',
   selectedFields: [],
   value: {},
+  readOnly: false,
 };
 
 export { CKANPresentedOptionsField as Component };

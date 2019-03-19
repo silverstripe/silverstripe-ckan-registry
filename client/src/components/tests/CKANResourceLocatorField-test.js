@@ -8,6 +8,7 @@ Enzyme.configure({ adapter: new Adapter() });
 
 describe('CKANResourceLocatorField', () => {
   const MockSelectComponent = () => <div />;
+  const MockTextFieldComponent = () => <input type="text" />;
 
   describe('renderResourceSelect()', () => {
     it('has "Resource name" as the title and is disabled without a value', () => {
@@ -16,6 +17,7 @@ describe('CKANResourceLocatorField', () => {
           name="test-field"
           value={{}}
           SelectComponent={MockSelectComponent}
+          TextFieldComponent={MockTextFieldComponent}
         />
       );
 
@@ -35,6 +37,7 @@ describe('CKANResourceLocatorField', () => {
           name="test-field"
           value={null}
           SelectComponent={MockSelectComponent}
+          TextFieldComponent={MockTextFieldComponent}
         />
       );
       wrapper.instance().handleNotificationOfChanges();
@@ -49,6 +52,7 @@ describe('CKANResourceLocatorField', () => {
           name="test-field"
           value={{ endpoint: 'https://example.com' }}
           SelectComponent={MockSelectComponent}
+          TextFieldComponent={MockTextFieldComponent}
         />
       );
       wrapper.instance().handleNotificationOfChanges();
@@ -63,6 +67,7 @@ describe('CKANResourceLocatorField', () => {
           name="test-field"
           value={{ endpoint: 'https://example.com' }}
           SelectComponent={MockSelectComponent}
+          TextFieldComponent={MockTextFieldComponent}
         />
       );
       wrapper.instance().handleNotificationOfChanges();

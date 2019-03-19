@@ -83,6 +83,10 @@ class CKANRegistryDisplay extends Component {
       styleConfig: {
         classNames: {
           Table: 'griddle-table table table-hover',
+          Pagination: 'ckan-registry__pagination form-inline',
+          PageDropdown: 'ckan-registry__pagination-dropdown form-control',
+          PreviousButton: 'ckan-registry__pagination-previous btn btn-default',
+          NextButton: 'ckan-registry__pagination-next btn btn-default',
         },
       },
       events: {
@@ -126,9 +130,14 @@ class CKANRegistryDisplay extends Component {
             defaultValues={filterValues}
           />
         </Col>
+        <Col md={9} lg={10} className="ckan-registry__loading-container">
+          <div className="ckan-registry__loading">
+            { window.i18n._t('CKANRegistryDisplay.LOADING', 'Loading...') }
+          </div>
+        </Col>
         <Col md={9} lg={10} className="ckan-registry__table">
-          <Table />
-          <Pagination />
+          { <Table /> }
+          { <Pagination /> }
         </Col>
       </Row>
     );
@@ -362,6 +371,11 @@ class CKANRegistryDisplay extends Component {
     } = this.props;
     const { currentPage, filterValues, sort } = this.state;
 
+    // If no spec is defined, exit early
+    if (!endpoint || !dataset || !identifier) {
+      return;
+    }
+
     // Define a closure that will convert rows in a response from CKAN into rows that are consumable
     // by Griddle
     const recordMapper = record => {
@@ -500,21 +514,24 @@ class CKANRegistryDisplay extends Component {
   }
 
   /**
-   * Renders a loading message if "loading" is true in the state
+   * Whether the provided fields configuration is valid
    *
-   * @returns {HTMLElement|null}
+   * @returns {boolean}
    */
-  renderLoading() {
-    const { loading } = this.state;
-    if (!loading) {
-      return null;
+  hasValidConfig() {
+    const { fields } = this.props;
+
+    if (!fields || !fields.length) {
+      // The fields prop wasn't passed
+      return false;
     }
 
-    return (
-      <p className="ckan-registry__loading">
-        { window.i18n._t('CKANRegistryDisplay.LOADING', 'Loading...') }
-      </p>
-    );
+    if (!fields.filter(field => field.ShowInResultsView).length) {
+      // None are set to be displayed in results view
+      return false;
+    }
+
+    return true;
   }
 
   /**
@@ -524,6 +541,11 @@ class CKANRegistryDisplay extends Component {
    */
   renderDownloadLink() {
     const { spec: { endpoint, identifier } } = this.props;
+
+    // If the spec isn't provided then do not provide a download link for an empty result set
+    if (!endpoint || !identifier || !this.hasValidConfig()) {
+      return null;
+    }
 
     return (
       <div className="ckan-registry__export">
@@ -588,22 +610,19 @@ class CKANRegistryDisplay extends Component {
   }
 
   render() {
-    const { spec: { identifier }, basePath, className, fields } = this.props;
-    const { selectedRow } = this.state;
-
-    // If no resource is configured then show nothing
-    if (!identifier) {
-      return null;
-    }
+    const { basePath, className } = this.props;
+    const { selectedRow, loading } = this.state;
 
     // Send the user off to the right detail view if they've clicked on a row
     if (selectedRow !== null) {
       return <Redirect to={`${basePath}/view/${selectedRow}`} />;
     }
 
-    const invalidConfig = !fields || !fields.length;
+    const invalidConfig = !this.hasValidConfig();
+
     const classes = classnames(
-      'ckan-registry',
+      'ckan-registry__results',
+      { 'ckan-registry__results--loading': loading },
       { 'ckan-registry__error': invalidConfig },
       className
     );
@@ -627,7 +646,6 @@ class CKANRegistryDisplay extends Component {
 
     return (
       <div className={classes}>
-        { this.renderLoading() }
         { this.renderDataGrid() }
         <div className="ckan-registry__other-actions">
           { this.renderDatasetLink() }

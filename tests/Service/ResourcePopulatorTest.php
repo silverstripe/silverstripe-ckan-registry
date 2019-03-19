@@ -52,14 +52,10 @@ class ResourcePopulatorTest extends SapphireTest
         $this->client->expects($this->once())->method('getSearchData')->willReturn([
             'result' => [
                 'fields' => [
-                    [
-                        'id' => 'field_a',
-                        'type' => 'text',
-                    ],
-                    [
-                        'id' => 'field_bar-^captain',
-                        'type' => 'select',
-                    ]
+                    ['id' => 'field_a', 'type' => 'text'],
+                    ['id' => 'field_bar-^captain', 'type' => 'select'],
+                    ['id' => 'City/Town', 'type' => 'text'],
+                    ['id' => 'City / Town', 'type' => 'text'],
                 ],
             ],
         ]);
@@ -68,13 +64,19 @@ class ResourcePopulatorTest extends SapphireTest
 
         $this->assertCount(0, $this->resource->Fields(), 'Resource has no fields before population');
         $populator->populateFields($this->resource);
-        $this->assertCount(2, $this->resource->Fields(), 'Fields should be populated');
+        $fields = $this->resource->Fields();
+        $this->assertCount(4, $fields, 'Fields should be populated');
+
+        // Test that positions were assigned incrementally
+        $this->assertEquals(1, $fields[0]->Position);
+        $this->assertEquals(2, $fields[1]->Position);
+
 
         // Test that the readable names were generated correctly
-        $this->assertSame('Field a', $this->resource->Fields()->first()->ReadableLabel);
-        $this->assertEquals(1, $this->resource->Fields()->first()->Position);
-        $this->assertSame('Field bar captain', $this->resource->Fields()->last()->ReadableLabel);
-        $this->assertEquals(2, $this->resource->Fields()->last()->Position);
+        $this->assertSame('Field a', $fields[0]->ReadableLabel);
+        $this->assertSame('Field bar captain', $fields[1]->ReadableLabel);
+        $this->assertSame('City/town', $fields[2]->ReadableLabel);
+        $this->assertSame('City/town', $fields[3]->ReadableLabel);
     }
 
     public function testPopulateMetadata()

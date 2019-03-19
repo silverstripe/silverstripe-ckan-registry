@@ -10,7 +10,7 @@ class PresentedOptionsFieldTest extends SapphireTest
 {
     public function testConstruct()
     {
-        $field = new PresentedOptionsField('my-field', new Resource);
+        $field = new PresentedOptionsField('my-field', new Resource());
         $this->assertTrue(
             $field->hasClass('ckan-presented-options__container'),
             'Necessary class name for React binding is missing'
