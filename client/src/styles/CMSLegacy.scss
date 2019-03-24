@@ -41,13 +41,6 @@
     font-style: italic;
   }
 
-  // Used in a composite field in ResourceFilter (data filters)
-  &__sources {
-    .form-group.checkbox {
-      margin-left: 0;
-    }
-  }
-
   // Composite fields have no top padding - this matches the label for it
   &__all-columns.field {
     padding-top: $input-padding-y;
