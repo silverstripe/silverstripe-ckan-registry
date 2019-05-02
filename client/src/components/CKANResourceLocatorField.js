@@ -424,7 +424,7 @@ CKANResourceLocatorField.propTypes = {
 
   // ## Provided by Injector:
   // The component to be used for a Select DOM node
-  SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func])
+  SelectComponent: PropTypes.oneOfType([PropTypes.string, PropTypes.func])
 };
 
 export { CKANResourceLocatorField as Component };

@@ -205,10 +205,10 @@ CKANResultConditionsField.propTypes = {
   }),
   readOnly: PropTypes.bool,
   TextFieldComponent: PropTypes.oneOfType([
-    React.PropTypes.string,
-    React.PropTypes.func
+    PropTypes.string,
+    PropTypes.func
   ]).isRequired,
-  SelectComponent: PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.func]).isRequired,
+  SelectComponent: PropTypes.oneOfType([PropTypes.string, PropTypes.func]).isRequired,
 };
 
 CKANResultConditionsField.defaultProps = {
