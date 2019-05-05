@@ -21,8 +21,8 @@
     ],
     "require": {
         "guzzlehttp/guzzle": "^6.0",
-        "silverstripe/cms": "^4.3",
-        "silverstripe/admin": "^1.3",
+        "silverstripe/cms": "^4.4",
+        "silverstripe/admin": "^1.4",
         "silverstripe/vendor-plugin": "^1",
         "symbiote/silverstripe-gridfieldextensions": "^3.2",
         "ext-json": "*"
