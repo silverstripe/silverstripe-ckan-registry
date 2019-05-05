@@ -5,7 +5,7 @@ jest.mock('lib/CKANApi/DataStore');
 import DataStore from 'lib/CKANApi/DataStore';
 import React from 'react';
 import Enzyme, { shallow } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-15.4/build/index';
+import Adapter from 'enzyme-adapter-react-16';
 import CKANRegistryDisplay from '../CKANRegistryDisplay';
 import i18n from 'i18n';
 import Query from 'lib/CKANApi/DataStore/Query';
@@ -498,8 +498,7 @@ describe('CKANRegistryDisplay', () => {
       const wrapper = shallow(
         <CKANRegistryDisplay
           location={{ search: '' }}
-        />,
-        { disableLifecycleMethods: true }
+        />
       );
       const mock = mockLoadData(wrapper);
 
