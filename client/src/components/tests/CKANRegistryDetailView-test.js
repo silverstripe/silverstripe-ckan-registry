@@ -1,7 +1,7 @@
 /* global window */
 import React from 'react';
 import Enzyme, { shallow } from 'enzyme';
-import Adapter from 'enzyme-adapter-react-15.4/build/index';
+import Adapter from 'enzyme-adapter-react-16';
 import CKANRegistryDetailView from '../CKANRegistryDetailView';
 import i18n from 'i18n';
 import { Link } from 'react-router-dom';
