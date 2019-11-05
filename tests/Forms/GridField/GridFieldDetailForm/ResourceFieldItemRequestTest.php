@@ -1,4 +1,5 @@
 <?php
+
 namespace SilverStripe\CKANRegistry\Tests\Forms\GridField\GridFieldDetailForm;
 
 use SilverStripe\Admin\LeftAndMain;
