@@ -1,4 +1,5 @@
 <?php
+
 namespace SilverStripe\CKANRegistry\Forms;
 
 use InvalidArgumentException;
@@ -140,7 +141,6 @@ class ResourceLocatorField extends FormField
         // used.
         return json_encode($this->Value());
     }
-
 
     public function saveInto(DataObjectInterface $dataObject)
     {
