@@ -1,0 +1,58 @@
+eo:
+  SilverStripe\CKANRegistry\Forms\GridFieldResourceTitle:
+    EDIT_LINK_TITLE: 'Redakti rimedon'
+  SilverStripe\CKANRegistry\Forms\PresentedOptionsField:
+    SELECT_ALL: 'Eleki el ĉiuj ebloj'
+    SELECT_CUSTOM: 'Mane aldoni eblojn'
+  SilverStripe\CKANRegistry\Forms\ResourceLocatorField:
+    DESCRIPTION: 'Konektu al datumfonto el {site}. Aldoninte kaj konservinte, vi povas agordi la aspekton kaj aldoni serĉajn filtrilojn.'
+    GENERIC_SITE_NAME: CKAN-retejo
+  SilverStripe\CKANRegistry\Forms\ResultConditionsField:
+    MUST_MATCH: 'Devas kongrui'
+    MUST_NOT_MATCH: 'Devas ne kongrui'
+  SilverStripe\CKANRegistry\Model\Resource:
+    DEFAULT_FILTER_LABEL: Serĉi
+    PLURALNAME: Rimedoj
+    PLURALS:
+      one: 'Unu rimedo'
+      other: '{count} rimedoj'
+    SINGULARNAME: Rimedo
+  SilverStripe\CKANRegistry\Model\ResourceField:
+    ORDER_DENOMINATOR: 'de {count} rimedoj'
+    ORDER_LABEL: 'Prezenta ordo'
+    ORIGINAL_LABEL_DESCRIPTION: 'Titolo de ĉi tiu kampo, kiel provizita de la CKAN-rimedo'
+    PLURALNAME: 'Rimedaj kampoj'
+    PLURALS:
+      one: 'Unu rimeda kampo'
+      other: '{count} rimedaj kampoj'
+    REMOVE_DUPLICATES_LABEL: 'Vidigu nur unu valoron se ekzistas duobloj '
+    RESULT_CONDITIONS: 'Rezultaj kondiĉoj'
+    SINGULARNAME: 'Rimeda kampo'
+  SilverStripe\CKANRegistry\Model\ResourceFilter:
+    ALL_COLUMNS: 'Ĉiuj kolumnoj'
+    COLUMNS_SOURCES: 'Fonto(j) de kolumnoj'
+    FILTERLABEL_DESCRIPTION: 'Donu taŭgan etikedon por la filtrilo. Ekzemple, "Serĉaj lokoj"'
+    MULTIPLE_COLUMNS: 'Pluraj kolumnoj'
+    PLURALNAME: Tekstoj
+    PLURALS:
+      one: 'Unu teksto'
+      other: '{count} tekstoj'
+    SINGULARNAME: Teksto
+  SilverStripe\CKANRegistry\Model\ResourceFilter\Dropdown:
+    OPTIONS: 'Prezentitaj ebloj'
+    PLURALNAME: Fallistoj
+    PLURALS:
+      one: 'Unu fallisto'
+      other: '{count} fallistoj'
+    SINGULARNAME: Fallisto
+  SilverStripe\CKANRegistry\Page\CKANRegistryPage:
+    DESCRIPTION: 'Vidigi datumaron el CKAN-rimedo'
+    IN_DETAIL: 'En detaloj'
+    IN_RESULTS: 'En rezultoj'
+    ITEMS_PER_PAGE: 'Elementoj en paĝo'
+    PLURALNAME: 'Paĝoj de CKAN-registraĵo'
+    PLURALS:
+      one: 'Unu paĝo de CKAN-registraĵo'
+      other: '{count} paĝoj de CKAN-registraĵo'
+    POS: Loko
+    SINGULARNAME: 'Paĝo de CKAN-registraĵo'
