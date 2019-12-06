@@ -1,5 +1,7 @@
+---
 title: CKAN Registry
 summary: Display data from an external CKAN resource
+---
 
 ## Features
 
@@ -15,10 +17,10 @@ website visitors.
 
 [CKAN](https://ckan.org/) (Comprehensive Knowledge Archive Network) is a powerful data management system that makes collections of data accessible – by providing tools to streamline publishing, sharing, finding and using data. It is used by national and local governments, research institutions, and other organisations who collect a lot of data.
 
-<div class="note" markdown="1">
+[note]
 For the purpose of this user guide we will reference [data.govt.nz](https://catalogue.data.govt.nz) as our CKAN
 instance. This could easily be any CKAN instance that has API access enabled.
-</div>
+[/note]
 
 After creating a new **CKAN Registry Page**, the normal page editing options are available to the content author,
 along with a new tab called **_Data_**. This tab will allow one to paste a CKAN datastore resource URL into the **Data
@@ -42,10 +44,10 @@ will allow frontend website users to filter the CKAN data, and will be discussed
 To change the resource after the page has been saved, click the button **_Edit_** shown as a pencil icon next to the
 dataset title.
 
-<div class="note" markdown="1">
+[note]
 Changing the resource and saving the page will replace the existing resource and discard any existing configuration
 previously set by a content author.
-</div>
+[/note]
 
 ![Changing the resource data is pulled from](_images/change-resource.png)
 
@@ -55,10 +57,10 @@ The list of fields has two checkboxes: **Results** and **Detail**. The former di
 enabled by default for all records. These options control whether the column will be displayed in the list results
 view and detail view respectively, and will be explained in detail in the next section.
 
-<div class="note" markdown="1">
+[note]
 There must be at least one record with the <strong>"Results"</strong> column ticked, or no data will be displayed to
 visitors.
-</div>
+[/note]
 
 ![Configuring fields to show in the results](_images/in-results-enabled.png)
 
