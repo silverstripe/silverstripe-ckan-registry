@@ -17,17 +17,17 @@ class PresentedOptionsField extends TextField
     /**
      * @var int
      */
-    const SELECT_TYPE_ALL = 0;
+    public const SELECT_TYPE_ALL = 0;
 
     /**
      * @var int
      */
-    const SELECT_TYPE_CUSTOM = 1;
+    public const SELECT_TYPE_CUSTOM = 1;
 
     /**
      * @var int
      */
-    const SELECT_TYPE_DEFAULT = self::SELECT_TYPE_ALL;
+    public const SELECT_TYPE_DEFAULT = self::SELECT_TYPE_ALL;
 
     protected $schemaComponent = 'PresentedOptions';
 

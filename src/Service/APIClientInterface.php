@@ -15,7 +15,7 @@ interface APIClientInterface
      *
      * @var int
      */
-    const API_VERSION = 3;
+    public const API_VERSION = 3;
 
     /**
      * Performs a request to the CKAN API for the given {@link Resource} and returns the raw data result

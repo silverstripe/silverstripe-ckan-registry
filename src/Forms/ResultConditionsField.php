@@ -14,17 +14,17 @@ class ResultConditionsField extends TextField
     /**
      * @var int
      */
-    const MATCH_TYPE_MUST = 1;
+    public const MATCH_TYPE_MUST = 1;
 
     /**
      * @var int
      */
-    const MATCH_TYPE_MUST_NOT = 0;
+    public const MATCH_TYPE_MUST_NOT = 0;
 
     /**
      * @var int
      */
-    const MATCH_TYPE_DEFAULT = self::MATCH_TYPE_MUST;
+    public const MATCH_TYPE_DEFAULT = self::MATCH_TYPE_MUST;
 
     protected $schemaComponent = 'ResultConditions';
 
