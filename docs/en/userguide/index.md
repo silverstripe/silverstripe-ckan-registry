@@ -129,7 +129,7 @@ Directory_ we can see a _`SERVICE_TARGET_AUDIENCES`_ column that contains multip
 a comma (e.g. "Children,Youth").
 
 To get these values to display as both "Children" and "Youth" we can enter a comma into the **Delimiter** box; after
-clicking **_Update_** the list of options to will update to be separated appropriately.
+clicking **_Update_** the list of options will update to be separated appropriately.
 
 ![Dropdown filter configuration using Delimiter](_images/delimiter-use.png)
 
