@@ -32,7 +32,7 @@ class APIClientTest extends SapphireTest
      */
     protected $resource;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,12 +42,10 @@ class APIClientTest extends SapphireTest
         $this->resource = new Resource();
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage CKAN API is not available. Error code 123
-     */
     public function testExceptionThrownOnInvalidHttpStatusCode()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('CKAN API is not available. Error code 123');
         $this->guzzleClient->expects($this->once())->method('send')->willReturn($this->response);
         $this->response->expects($this->once())->method('getStatusCode')->willReturn(123);
 
@@ -56,12 +54,10 @@ class APIClientTest extends SapphireTest
         $client->getData($this->resource);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage CKAN API returns an invalid response: Content-Type is not JSON
-     */
     public function testExceptionThrownOnNonJsonResponse()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('CKAN API returns an invalid response: Content-Type is not JSON');
         $this->guzzleClient->expects($this->once())->method('send')->willReturn($this->response);
         $this->response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $this->response->expects($this->once())->method('getHeader')->with('Content-Type')->willReturn(['junk']);
@@ -71,12 +67,10 @@ class APIClientTest extends SapphireTest
         $client->getData($this->resource);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage CKAN API returns an invalid response: Responded as invalid
-     */
     public function testExceptionThrownOnUnsuccessfulResponse()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('CKAN API returns an invalid response: Responded as invalid');
         $this->guzzleClient->expects($this->once())->method('send')->willReturn($this->response);
         $this->response->expects($this->once())->method('getStatusCode')->willReturn(200);
         $this->response->expects($this->once())->method('getHeader')->willReturn(['application/json']);

@@ -11,12 +11,10 @@ class ResourceFilterTest extends SapphireTest
 {
     protected $usesDatabase = true;
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage SilverStripe\Control\HTTPResponse is not a FormField
-     */
     public function testForTemplateThrowsExceptionWithNonFormFieldType()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('SilverStripe\Control\HTTPResponse is not a FormField');
         $filter = new ResourceFilterTest\InvalidResourceFilter();
         $filter->forTemplate();
     }
@@ -65,7 +63,11 @@ class ResourceFilterTest extends SapphireTest
         $field2 = new ResourceField();
         $filter->FilterFields()->add($field2);
 
-        $this->assertContains('Multiple columns', $filter->getColumns(), 'Should return "multiple columns"');
+        $this->assertStringContainsString(
+            'Multiple columns',
+            $filter->getColumns(),
+            'Should return "multiple columns"'
+        );
     }
 
     public function testGetColumnsAllColumns()
@@ -73,7 +75,7 @@ class ResourceFilterTest extends SapphireTest
         $filter = new ResourceFilter();
         $filter->AllColumns = true;
 
-        $this->assertContains('All columns', $filter->getColumns(), 'Should return "all columns"');
+        $this->assertStringContainsString('All columns', $filter->getColumns(), 'Should return "all columns"');
     }
 
     public function testDefaultValues()

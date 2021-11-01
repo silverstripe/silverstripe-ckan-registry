@@ -2,7 +2,7 @@
 
 namespace SilverStripe\CKANRegistry\Tests\Service;
 
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use RuntimeException;
 use SilverStripe\CKANRegistry\Model\Resource;
 use SilverStripe\CKANRegistry\Service\APIClient;
@@ -23,7 +23,7 @@ class ResourcePopulatorTest extends SapphireTest
      */
     protected $client;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -32,16 +32,14 @@ class ResourcePopulatorTest extends SapphireTest
         $this->resource->DataSet = 'foo-bar';
         $this->resource->Identifier = '123-456';
 
-        /** @var PHPUnit_Framework_MockObject_MockObject|APIClient $client */
+        /** @var MockObject|APIClient $client */
         $this->client = $this->createMock(APIClient::class);
     }
 
-    /**
-     * @expectedException RuntimeException
-     * @expectedExceptionMessage Could not fetch fields for a resource that is not fully configured
-     */
     public function testThrowsExceptionWhenResourceIsNotConfigured()
     {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Could not fetch fields for a resource that is not fully configured');
         $resource = new Resource();
         $populator = new ResourcePopulator();
         $populator->populateFields($resource);

@@ -23,12 +23,12 @@ class GridFieldResourceTitleTest extends SapphireTest
             $result['my-target-fragment'],
             'Should be assigned to the specified fragment'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Ministry of Silly Walks | Face the Press',
             $result['my-target-fragment'],
             'Should contain title'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             'Edit resource',
             $result['my-target-fragment'],
             'Edit button should exist'
