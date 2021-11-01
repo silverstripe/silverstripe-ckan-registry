@@ -14,7 +14,7 @@ class ResourceTest extends SapphireTest
 {
     protected static $fixture_file = 'ResourceTest.yml';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $populator = $this->createMock(ResourcePopulator::class);
         Injector::inst()->registerService($populator, ResourcePopulatorInterface::class);

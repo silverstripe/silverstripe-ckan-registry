@@ -12,7 +12,7 @@ class CKANRegistryPageControllerFunctionalTest extends FunctionalTest
 
     protected static $use_draft_site = true;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // Mock the field populator, in case an action we perform in a unit test tries to contact the mock API.
         // Done before parent::setUp() so write hooks don't run during fixture population.

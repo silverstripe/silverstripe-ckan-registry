@@ -2,7 +2,7 @@
 
 namespace SilverStripe\CKANRegistry\Tests\Page;
 
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use SilverStripe\CKANRegistry\Page\CKANRegistryPage;
 use SilverStripe\CKANRegistry\Page\CKANRegistryPageController;
 use SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface;
@@ -11,9 +11,10 @@ use SilverStripe\Dev\SapphireTest;
 
 class CKANRegistryPageControllerTest extends SapphireTest
 {
+
     protected static $fixture_file = 'CKANRegistryPageControllerTest.yml';
 
-    protected function setUp()
+    protected function setUp(): void
     {
         // Mock the field populator, in case an action we perform in a unit test tries to contact the mock API.
         // Done before parent::setUp() so write hooks don't run during fixture population.
@@ -50,17 +51,16 @@ class CKANRegistryPageControllerTest extends SapphireTest
         $config = $controller->getCKANClientConfig($page);
 
         $this->assertNotEmpty($config['fields']);
-        $this->assertContains([
-            'OriginalLabel' => 'city',
-            'ReadableLabel' => 'City',
-            'ShowInResultsView' => 1,
-            'ShowInDetailView' => 1,
-            'DisplayConditions' => [
-                ['match-select' => '1', 'match-text' => 'Auckland']
-            ],
-            'RemoveDuplicates' => 0,
-            'Type' => 'text',
-        ], $config['fields'], 'DisplayConditions are decoded from stored JSON format');
+        $f = $config['fields'][0];
+        $this->assertSame('city', $f['OriginalLabel']);
+        $this->assertSame('City', $f['ReadableLabel']);
+        $this->assertSame(true, $f['ShowInResultsView']);
+        $this->assertSame(true, $f['ShowInDetailView']);
+        $this->assertSame(false, $f['RemoveDuplicates']);
+        $this->assertSame('text', $f['Type']);
+        $dc = $f['DisplayConditions'][0];
+        $this->assertSame('1', $dc['match-select']);
+        $this->assertSame('Auckland', $dc['match-text']);
     }
 
     /**
@@ -70,7 +70,7 @@ class CKANRegistryPageControllerTest extends SapphireTest
      */
     public function testGetBasePath($relativeLink, $expected)
     {
-        /** @var CKANRegistryPage|PHPUnit_Framework_MockObject_MockObject $page */
+        /** @var CKANRegistryPage|MockObject $page */
         $page = $this->createMock(CKANRegistryPage::class);
         $page->expects($this->once())->method('RelativeLink')->willReturn($relativeLink);
 

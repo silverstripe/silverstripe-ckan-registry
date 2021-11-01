@@ -20,7 +20,7 @@ class ResourceLocatorFieldTest extends SapphireTest
      */
     protected $field;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -41,7 +41,7 @@ class ResourceLocatorFieldTest extends SapphireTest
         $field = new ResourceLocatorField('my-field', 'My field', null, 'http://example.com');
 
         $this->assertSame('http://example.com', $field->getDefaultEndpoint());
-        $this->assertContains('Connect to a data source from', $field->getDescription());
+        $this->assertStringContainsString('Connect to a data source from', $field->getDescription());
     }
 
     public function testSetValueWithArray()
@@ -125,7 +125,7 @@ class ResourceLocatorFieldTest extends SapphireTest
         $result = $this->field->dataValue();
 
         $this->assertJson($result, 'dataValue() should return JSON');
-        $this->assertContains('foo-bar', $result, 'Serialised result should contain value');
+        $this->assertStringContainsString('foo-bar', $result, 'Serialised result should contain value');
     }
 
     public function testSaveIntoWithNoNameReturnsEarly()
@@ -134,12 +134,10 @@ class ResourceLocatorFieldTest extends SapphireTest
         $this->assertNull($this->field->saveInto($this->getPage()));
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessageRegExp /Could not determine where to save the value of/
-     */
     public function testSaveIntoWithInvalidRelationshipNameThrowsException()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Could not determine where to save the value of/');
         $this->field->setName('UnicornRelationship');
         $this->field->saveInto($this->getPage());
     }
