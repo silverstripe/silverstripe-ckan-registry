@@ -1,2 +1,2 @@
 // An example React app that consumes a CKAN registry
-require('legacy/CKANExampleApp-loader.js');
+require('legacy/CKANExampleApp-loader');
