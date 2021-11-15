@@ -41,7 +41,8 @@
     "autoload": {
         "psr-4": {
             "SilverStripe\\CKANRegistry\\": "src/",
-            "SilverStripe\\CKANRegistry\\Tests\\": "tests/"
+            "SilverStripe\\CKANRegistry\\Tests\\": "tests/",
+            "SilverStripe\\CKANRegistry\\Tests\\Behat\\Context\\": "tests/behat/src/"
         }
     },
     "minimum-stability": "dev",
