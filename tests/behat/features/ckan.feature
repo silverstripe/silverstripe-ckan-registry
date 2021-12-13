@@ -22,10 +22,10 @@ Feature: Use CKAN
     And I press the "Save" button
     Then I should see a "Saved" success toast
     When I click the "Data" CMS tab
-    When I fill in "DataResource-uri" with "https://catalogue.data.govt.nz/dataset/family-services-directory"
+    When I fill in "DataResource-uri" with "https://catalogue.data.govt.nz/dataset/directory-of-educational-institutions"
     And I wait for 5 seconds
-    And I should see "Family Services Directory"
-    When I select "FSD_provider_DIA_RPT.csv" from the ".ckan-resource-locator__resource-select select" field
+    And I should see "Early Childhood Services (ECE) Directory"
+    When I select "New Zealand Schools" from the ".ckan-resource-locator__resource-select select" field
     And I wait for 5 seconds
     And I press the "Save" button
     Then I should see a "Saved" success toast
@@ -36,6 +36,6 @@ Feature: Use CKAN
     And I check "Form_DataColumns_GridFieldEditableColumns_4_ShowInResultsView"
     And I press the "Save" button
     And I go to "/my-ckan-registry-page?stage=Stage"
-    Then I should see "http://www.homebuilderstrust.co.nz"
-    And I should see "Homebuilders West Coast Trust"
+    Then I should see "Te Ranga School"
+    And I should see "07 573 8032"
     And I should see "Search"
