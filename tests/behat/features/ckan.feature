@@ -36,6 +36,9 @@ Feature: Use CKAN
     And I check "Form_DataColumns_GridFieldEditableColumns_4_ShowInResultsView"
     And I press the "Save" button
     And I go to "/my-ckan-registry-page?stage=Stage"
-    Then I should see "Te Ranga School"
-    And I should see "07 573 8032"
+    Then I should see "School id"
+    And I should see "Org name"
+    And I should see "Telephone"
     And I should see "Search"
+    When I click on the ".griddle-table-heading-cell:nth-of-type(2)" element
+    Then I should see "Abbotsford School"

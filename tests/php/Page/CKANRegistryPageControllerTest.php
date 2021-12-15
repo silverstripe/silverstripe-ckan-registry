@@ -11,7 +11,6 @@ use SilverStripe\Dev\SapphireTest;
 
 class CKANRegistryPageControllerTest extends SapphireTest
 {
-
     protected static $fixture_file = 'CKANRegistryPageControllerTest.yml';
 
     protected function setUp(): void
