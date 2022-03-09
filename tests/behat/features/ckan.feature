@@ -41,4 +41,5 @@ Feature: Use CKAN
     And I should see "Telephone"
     And I should see "Search"
     When I click on the ".griddle-table-heading-cell:nth-of-type(2)" element
-    Then I should see "Abbotsford School"
+    And I wait for 2 seconds
+    Then I should see "Albury School"
