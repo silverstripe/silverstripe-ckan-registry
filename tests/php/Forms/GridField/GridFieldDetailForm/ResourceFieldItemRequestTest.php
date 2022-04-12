@@ -143,7 +143,7 @@ class ResourceFieldItemRequestTest extends SapphireTest
             '. Actual: ' . print_r($actual, true);
 
         foreach ($actual as $key => $value) {
-            $expectedKey = key($expected);
+            $expectedKey = key($expected ?? []);
             $expectedValue = array_shift($expected);
             $this->assertSame($expectedKey, $key, $message);
             $this->assertEquals($expectedValue, $value, $message);

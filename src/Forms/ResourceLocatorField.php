@@ -132,7 +132,7 @@ class ResourceLocatorField extends FormField
 
     public function setSubmittedValue($value, $data = null)
     {
-        return $this->setValue(json_decode($value, true));
+        return $this->setValue(json_decode($value ?? '', true));
     }
 
     public function dataValue()

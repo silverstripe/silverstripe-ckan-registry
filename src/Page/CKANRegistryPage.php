@@ -111,9 +111,9 @@ class CKANRegistryPage extends Page
                         $columns['Position'] = _t(__CLASS__ . '.POS', 'Pos.', 'Abbreviated version of position');
 
                         $editable = array_flip(['ShowInResultsView', 'ShowInDetailView']);
-                        $component->setDisplayFields(array_diff_key($columns, $editable));
+                        $component->setDisplayFields(array_diff_key($columns ?? [], $editable));
                         // set this way so that title translations are preserved
-                        $editableColumns->setDisplayFields(array_intersect_key($columns, $editable));
+                        $editableColumns->setDisplayFields(array_intersect_key($columns ?? [], $editable));
                     }
                 }
                 $columnsConfig->addComponent($editableColumns, $before);

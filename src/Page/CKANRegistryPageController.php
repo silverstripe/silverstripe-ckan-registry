@@ -68,7 +68,7 @@ class CKANRegistryPageController extends PageController
                         'ReadableLabel' => $field->ReadableLabel,
                         'ShowInResultsView' => (bool) $field->ShowInResultsView,
                         'ShowInDetailView' => (bool) $field->ShowInDetailView,
-                        'DisplayConditions' => json_decode($field->DisplayConditions, true),
+                        'DisplayConditions' => json_decode($field->DisplayConditions ?? '', true),
                         'RemoveDuplicates' => (bool) $field->RemoveDuplicates,
                         'Type' => $field->Type,
                     ];
@@ -77,7 +77,7 @@ class CKANRegistryPageController extends PageController
                     'ShowInResultsView' => true,
                     'ShowInDetailView' => true,
                     'RemoveDuplicates' => true,
-                ])->Sort('Position', 'ASC')->toArray()
+                ])->Sort('Position', 'ASC')->toArray() ?? []
             ),
             'filters' => array_map(
                 function (ResourceFilter $filter) {
@@ -86,7 +86,7 @@ class CKANRegistryPageController extends PageController
                         'type' => array_pop($explodedClassName),
                     ] + $filter->getClientConfig();
                 },
-                $resource->Filters()->sort('Order')->toArray()
+                $resource->Filters()->sort('Order')->toArray() ?? []
             )
         ];
 
@@ -121,6 +121,6 @@ class CKANRegistryPageController extends PageController
         }
 
         $link = $holder->RelativeLink();
-        return Director::baseURL() . trim($link, '/');
+        return Director::baseURL() . trim($link ?? '', '/');
     }
 }

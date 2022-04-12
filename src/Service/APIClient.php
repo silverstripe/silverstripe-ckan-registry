@@ -44,7 +44,7 @@ class APIClient implements APIClientInterface
     {
         $endpoint = sprintf(
             '%s/api/%s/action/%s?id=%s',
-            trim($resource->Endpoint, '/'),
+            trim($resource->Endpoint ?? '', '/'),
             APIClientInterface::API_VERSION,
             $action,
             $resource->{$id}
@@ -63,11 +63,11 @@ class APIClient implements APIClientInterface
             throw new RuntimeException('CKAN API is not available. Error code ' . $statusCode);
         }
 
-        if (!count(preg_grep('#application/json#', $response->getHeader('Content-Type')))) {
+        if (!count(preg_grep('#application/json#', $response->getHeader('Content-Type') ?? []) ?? [])) {
             throw new RuntimeException('CKAN API returns an invalid response: Content-Type is not JSON');
         }
 
-        $responseBody = json_decode($response->getBody()->getContents(), true);
+        $responseBody = json_decode($response->getBody()->getContents() ?? '', true);
 
         if (!$responseBody || !isset($responseBody['success']) || !$responseBody['success']) {
             throw new RuntimeException('CKAN API returns an invalid response: Responded as invalid');
