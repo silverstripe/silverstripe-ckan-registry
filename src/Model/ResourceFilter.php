@@ -99,7 +99,7 @@ class ResourceFilter extends DataObject
             // See https://github.com/silverstripe/silverstripe-framework/issues/8696
             foreach (['AllColumns', 'FilterLabel'] as $fieldName) {
                 $field = $fields->dataFieldByName($fieldName);
-                $field->setTitle(ucfirst(strtolower($field->Title())));
+                $field->setTitle(ucfirst(strtolower($field->Title() ?? '')));
             }
         });
 
@@ -146,7 +146,7 @@ class ResourceFilter extends DataObject
                     'label' => $field->ReadableLabel,
                     'target' => $field->OriginalLabel,
                 ];
-            }, $this->FilterFields()->toArray()),
+            }, $this->FilterFields()->toArray() ?? []),
         ];
     }
 

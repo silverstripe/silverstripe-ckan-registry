@@ -105,7 +105,7 @@ class ResourceField extends DataObject
 
             // See https://github.com/silverstripe/silverstripe-framework/issues/8696
             foreach ([$summary, $detail, $readableLabel, $originalLabel] as $field) {
-                $field->setTitle(ucfirst(strtolower($field->Title())));
+                $field->setTitle(ucfirst(strtolower($field->Title() ?? '')));
             }
         });
         return parent::getCMSFields();

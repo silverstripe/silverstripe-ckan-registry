@@ -116,18 +116,18 @@ class ResourcePopulator implements ResourcePopulatorInterface
     protected function parseName($id)
     {
         // Parse "camelCase" to "space case"
-        $name = strtolower(preg_replace('/(?<=[a-z\d])([A-Z])/', ' \1', $id));
+        $name = strtolower(preg_replace('/(?<=[a-z\d])([A-Z])/', ' \1', $id ?? '') ?? '');
 
         // Swap out certain characters with spaces
-        $name = str_replace(['_', '-'], ' ', $name);
+        $name = str_replace(['_', '-'], ' ', $name ?? '');
 
         // Remove some non-alphanumeric characters
-        $name = trim(preg_replace('/[^\/\w\s]/', '', $name));
+        $name = trim(preg_replace('/[^\/\w\s]/', '', $name ?? '') ?? '');
 
         // Remove extra spaces around slashes
-        $name = str_replace(' / ', '/', $name);
+        $name = str_replace(' / ', '/', $name ?? '');
 
-        return ucfirst($name);
+        return ucfirst($name ?? '');
     }
 
     /**

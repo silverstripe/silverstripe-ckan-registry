@@ -56,7 +56,7 @@ class Dropdown extends ResourceFilter
      */
     protected function getConfiguredOptions()
     {
-        $spec = json_decode($this->Options, true) ?: [];
+        $spec = json_decode($this->Options ?? '', true) ?: [];
 
         if (!isset($spec['selectType'])) {
             return [];
