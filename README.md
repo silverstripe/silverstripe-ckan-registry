@@ -1,6 +1,6 @@
 # SilverStripe CKAN Registry
 
-[![Build Status](https://api.travis-ci.com/silverstripe/silverstripe-ckan-registry.svg?branch=1)](https://travis-ci.com/silverstripe/silverstripe-ckan-registry)
+[![CI](https://github.com/silverstripe/silverstripe-ckan-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-ckan-registry/actions/workflows/ci.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-ckan-registry/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-ckan-registry/?branch=master)
 [![codecov](https://codecov.io/gh/silverstripe/silverstripe-ckan-registry/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-ckan-registry)
 [![License](https://poser.pugx.org/silverstripe/ckan-registry/license.svg)](https://github.com/silverstripe/silverstripe-ckan-registry#license)
