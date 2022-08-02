@@ -1,14 +1,11 @@
-# SilverStripe CKAN Registry
+# Silverstripe CKAN Registry
 
 [![CI](https://github.com/silverstripe/silverstripe-ckan-registry/actions/workflows/ci.yml/badge.svg)](https://github.com/silverstripe/silverstripe-ckan-registry/actions/workflows/ci.yml)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/silverstripe/silverstripe-ckan-registry/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/silverstripe/silverstripe-ckan-registry/?branch=master)
-[![codecov](https://codecov.io/gh/silverstripe/silverstripe-ckan-registry/branch/master/graph/badge.svg)](https://codecov.io/gh/silverstripe/silverstripe-ckan-registry)
-[![License](https://poser.pugx.org/silverstripe/ckan-registry/license.svg)](https://github.com/silverstripe/silverstripe-ckan-registry#license)
-[![SilverStripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
+[![Silverstripe supported module](https://img.shields.io/badge/silverstripe-supported-0071C4.svg)](https://www.silverstripe.org/software/addons/silverstripe-commercially-supported-module-list/)
 
 ## Overview
 
-The SilverStripe CKAN Registry module lets CMS authors easily create pages in their SilverStripe websites which can
+The Silverstripe CKAN Registry module lets CMS authors easily create pages in their Silverstripe websites which can
 pull in and display dynamic data from [CKAN](https://ckan.org/) data sets.
 
 ## Installation
