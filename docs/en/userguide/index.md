@@ -1,5 +1,7 @@
+---
 title: CKAN Registry
 summary: Display data from an external CKAN resource
+---
 
 ## Features
 
