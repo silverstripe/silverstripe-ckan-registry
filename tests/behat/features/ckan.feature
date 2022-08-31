@@ -3,7 +3,7 @@ Feature: Use CKAN
   I want to use CKAN
 
   Background:
-    Given the "group" "EDITOR group" has permissions "CMS_ACCESS_LeftAndMain"
+    Given the "group" "EDITOR" has permissions "CMS_ACCESS_LeftAndMain"
 
   Scenario: Operate CKAN pages
 
@@ -11,8 +11,8 @@ Feature: Use CKAN
     # Bug where neither CMS_ACCESS_LeftAndMain nor CMS_ACCESS_CMSMain cannot view results
     # https://github.com/silverstripe/silverstripe-ckan-registry/issues/253
     # Once issue has been fixed remove ADMIN login above and uncomment EDITOR login below
-    Given I am logged in with "ADMIN" permissions
-    # Given I am logged in with "EDITOR" permissions
+    # Given I am logged in with "ADMIN" permissions
+    Given I am logged in as a member of "EDITOR" group
 
     When I go to "/admin/pages"
     And I press the "Add new" button
