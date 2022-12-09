@@ -91,7 +91,7 @@ class ResourceField extends DataObject
             $fields->removeByName(['ShowInResultsView', 'ShowInDetailView', 'RemoveDuplicates']);
             $visibilityOptions = FieldGroup::create('Visibility', [$summary, $detail, $duplicates])
                 ->addExtraClass('visibility-options');
-            $fields->insertBefore($visibilityOptions, 'Position');
+            $fields->insertBefore('Position', $visibilityOptions);
 
             $fields->removeByName('ResourceID');
 
