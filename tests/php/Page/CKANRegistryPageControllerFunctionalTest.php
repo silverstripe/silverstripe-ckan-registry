@@ -10,8 +10,6 @@ class CKANRegistryPageControllerFunctionalTest extends FunctionalTest
 {
     protected static $fixture_file = 'CKANRegistryPageControllerTest.yml';
 
-    protected static $use_draft_site = true;
-
     protected function setUp(): void
     {
         // Mock the field populator, in case an action we perform in a unit test tries to contact the mock API.
@@ -24,7 +22,8 @@ class CKANRegistryPageControllerFunctionalTest extends FunctionalTest
 
     public function testGetSchemaFromPageUrl()
     {
-        $response = $this->get('animal-centers/schema');
+        $this->logInWithPermission('VIEW_DRAFT_CONTENT');
+        $response = $this->get('animal-centers/schema?stage=Stage');
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertJson($response->getBody());
@@ -32,7 +31,8 @@ class CKANRegistryPageControllerFunctionalTest extends FunctionalTest
 
     public function testGetSchemaFromPageSubUrl()
     {
-        $response = $this->get('animal-centers/view/123/schema');
+        $this->logInWithPermission('VIEW_DRAFT_CONTENT');
+        $response = $this->get('animal-centers/view/123/schema?stage=Stage');
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertJson($response->getBody());
