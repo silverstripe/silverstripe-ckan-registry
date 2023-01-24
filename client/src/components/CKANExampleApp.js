@@ -1,6 +1,6 @@
 /* global document, window */
 import React, { Component } from 'react';
-import { BrowserRouter, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import fetch from 'isomorphic-fetch';
 import CKANRegistryDisplay from 'components/CKANRegistryDisplay';
 import CKANRegistryDetailView from 'components/CKANRegistryDetailView';
@@ -64,22 +64,11 @@ class CKANExampleApp extends Component {
 
     return (
       <div className="ckan-registry__content">
-        <Route
-          path={basePath}
-          exact
-          render={props => <CKANRegistryDisplay {...props} {...passProps} />}
-        />
-
-        <Route
-          path={`${basePath}/view/:item`}
-          render={props => <CKANRegistryDetailView {...props} {...passProps} />}
-        />
-
-        <Route
-          path={`${basePath}/view`}
-          exact
-          render={() => <Redirect to={basePath} />}
-        />
+        <Routes>
+          <Route path={basePath} element={<CKANRegistryDisplay {...passProps} />} />
+          <Route path={`${basePath}/view/:item`} element={<CKANRegistryDetailView {...passProps} />} />
+          <Route path={`${basePath}/view`} element={<Navigate to={basePath} replace />} />
+        </Routes>
       </div>
     );
   }

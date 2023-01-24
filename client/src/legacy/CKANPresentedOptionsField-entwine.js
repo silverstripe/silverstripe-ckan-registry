@@ -1,12 +1,13 @@
 import jQuery from 'jquery';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { loadComponent } from 'lib/Injector';
 
 jQuery.entwine('ss', ($) => {
   $('.ckan-presented-options__container').entwine({
     FieldIDs: [],
     Mounted: false,
+    ReactRoot: null,
 
     renderComponent(value = null) {
       const context = {};
@@ -22,10 +23,12 @@ jQuery.entwine('ss', ($) => {
         ...forwardedProps,
       };
 
-      ReactDOM.render(
-        <PresentedOptionsComponent {...props} />,
-        this[0]
-      );
+      let root = this.getReactRoot();
+      if (!root) {
+        root = createRoot(this[0]);
+        this.setReactRoot(root);
+      }
+      root.render(<PresentedOptionsComponent {...props} />);
 
       this.setMounted(true);
     },
@@ -54,7 +57,11 @@ jQuery.entwine('ss', ($) => {
     },
 
     onunmatch() {
-      ReactDOM.unmountComponentAtNode(this[0]);
+      const root = this.getReactRoot();
+      if (root) {
+        root.unmount();
+        this.setReactRoot(null);
+      }
       this.setMounted(false);
     }
   });

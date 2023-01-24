@@ -22,15 +22,19 @@ expect.extend({
         && expected.resource === parsed.resource;
     }
 
+    const msgReceived = chalk.yellow(received);
+    const msgExpected = chalk.green(JSON.stringify(expected, null, 2));
+    const msgParsed = chalk.red(JSON.stringify(parsed, null, 2));
+
     if (pass) {
       return {
-        message: () => `Expected given URL "${chalk.yellow(received)}" to parse into something other than \n${chalk.green(JSON.stringify(expected, null, 2))}\nBut it didn't`,
+        message: () => `Expected given URL "${msgReceived}" to parse into something other than \n${msgExpected}\nBut it didn't`,
         pass: true,
       };
     }
 
     return {
-      message: () => `Expected given URL "${chalk.yellow(received)}" to parse into \n${chalk.green(JSON.stringify(expected, null, 2))}\nBut it actually parsed into \n${chalk.red(JSON.stringify(parsed, null, 2))}`,
+      message: () => `Expected given URL "${msgReceived}" to parse into \n${msgExpected}\nBut it actually parsed into \n${msgParsed}`,
       pass: false,
     };
   }
@@ -242,7 +246,9 @@ describe('CKANApi', () => {
         });
         done();
       });
+    });
 
+    it('should parse a CKAN response and return the "result" pt2', (done) => {
       fetch.mockImplementation(() => Promise.resolve({
         json: () => Promise.resolve({
           success: true,
@@ -335,7 +341,9 @@ describe('CKANApi', () => {
         expect(response).toBe(false);
         done();
       });
+    });
 
+    it('should return the result of response.ok pt2', (done) => {
       fetch.mockImplementation(() => Promise.resolve({
         ok: true,
         json: () => Promise.resolve({

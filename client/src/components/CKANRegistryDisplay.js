@@ -5,11 +5,11 @@ import Griddle, { ColumnDefinition, RowDefinition, selectors, connect } from 'gr
 import { withHandlers } from 'recompose';
 import { compose } from 'redux';
 import classnames from 'classnames';
-import CKANApi from 'lib/CKANApi';
-import { Row, Col } from 'reactstrap';
 import CKANRegistryFilterContainer from 'components/CKANRegistryFilterContainer';
+import CKANApi from 'lib/CKANApi';
 import Query from 'lib/CKANApi/DataStore/Query';
-import { Redirect } from 'react-router-dom';
+import withGriddleLayout from 'lib/withGriddleLayout';
+import { Navigate } from 'react-router-dom';
 import 'url-search-params-polyfill';
 
 class CKANRegistryDisplay extends Component {
@@ -28,6 +28,8 @@ class CKANRegistryDisplay extends Component {
     this.handleGetPage = this.handleGetPage.bind(this);
     this.handleFilter = this.handleFilter.bind(this);
     this.handleSort = this.handleSort.bind(this);
+
+    this.griddleLayoutHOC = withGriddleLayout(this.props, this.handleFilter, this.state.filterValues);
   }
 
   componentDidMount() {
@@ -50,13 +52,29 @@ class CKANRegistryDisplay extends Component {
    */
   componentDidUpdate(prevProps, prevState) {
     const pageChanged = prevState.currentPage !== this.state.currentPage;
+    const filterValuesChanged = JSON.stringify(prevState.filterValues) !== JSON.stringify(this.state.filterValues);
 
     if (
       pageChanged
+      || filterValuesChanged
       || JSON.stringify(prevState.sort) !== JSON.stringify(this.state.sort)
-      || JSON.stringify(prevState.filterValues) !== JSON.stringify(this.state.filterValues)
     ) {
       this.loadData();
+    }
+
+    let needsNewHoc = filterValuesChanged;
+    if (!needsNewHoc) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const key of Object.keys(CKANRegistryFilterContainer.propTypes)) {
+        if (prevProps[key] !== this.props[key]) {
+          needsNewHoc = true;
+          break;
+        }
+      }
+    }
+
+    if (needsNewHoc) {
+      this.griddleLayoutHOC = withGriddleLayout(this.props, this.handleFilter, this.state.filterValues);
     }
   }
 
@@ -96,7 +114,7 @@ class CKANRegistryDisplay extends Component {
         onSort: newSort => { this.handleSort(newSort); },
       },
       components: {
-        Layout: this.getGriddleLayoutHOC(),
+        Layout: this.griddleLayoutHOC,
         RowEnhancer: compose(
           EnhanceWithRowData,
           withHandlers({
@@ -111,36 +129,6 @@ class CKANRegistryDisplay extends Component {
         sortAscending: sort.sortAscending,
       }]
     };
-  }
-
-  /**
-   * Get an HOC that is used to render the layout of the Griddle components
-   *
-   * @return {function({Table: *, Pagination: *, Filter: *}): *}
-   */
-  getGriddleLayoutHOC() {
-    const { filterValues } = this.state;
-    return ({ Table, Pagination }) => (
-      <Row>
-        <Col md={3} lg={2} className="ckan-registry__filters">
-          <CKANRegistryFilterContainer
-            {...this.props}
-            onFilter={this.handleFilter}
-            allColumns={this.getVisibleFields()}
-            defaultValues={filterValues}
-          />
-        </Col>
-        <Col md={9} lg={10} className="ckan-registry__loading-container">
-          <div className="ckan-registry__loading">
-            { window.i18n._t('CKANRegistryDisplay.LOADING', 'Loading...') }
-          </div>
-        </Col>
-        <Col md={9} lg={10} className="ckan-registry__table">
-          { <Table /> }
-          { <Pagination /> }
-        </Col>
-      </Row>
-    );
   }
 
   /**
@@ -615,7 +603,7 @@ class CKANRegistryDisplay extends Component {
 
     // Send the user off to the right detail view if they've clicked on a row
     if (selectedRow !== null) {
-      return <Redirect to={`${basePath}/view/${selectedRow}`} />;
+      return <Navigate to={`${basePath}/view/${selectedRow}`} replace />;
     }
 
     const invalidConfig = !this.hasValidConfig();

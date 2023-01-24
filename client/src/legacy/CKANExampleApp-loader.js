@@ -1,6 +1,6 @@
 /* global window */
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import CKANExampleApp from 'components/CKANExampleApp';
 
 window.document.addEventListener('DOMContentLoaded', () => {
@@ -13,6 +13,6 @@ window.document.addEventListener('DOMContentLoaded', () => {
     }
     element.classList.add('loaded');
 
-    ReactDOM.render(<CKANExampleApp />, element);
+    createRoot(element).render(<CKANExampleApp />);
   });
 });

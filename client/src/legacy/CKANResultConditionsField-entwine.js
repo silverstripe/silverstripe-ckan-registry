@@ -1,10 +1,12 @@
 import jQuery from 'jquery';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { loadComponent } from 'lib/Injector';
 
 jQuery.entwine('ss', ($) => {
   $('.js-injector-boot .ckan-result-conditions__container').entwine({
+    ReactRoot: null,
+
     onmatch() {
       const context = {};
       const CKANResultConditionsField = loadComponent('CKANResultConditionsField', context);
@@ -23,14 +25,20 @@ jQuery.entwine('ss', ($) => {
         ...this.data('schema'),
       };
 
-      ReactDOM.render(
-        <CKANResultConditionsField {...props} />,
-        this[0]
-      );
+      let root = this.getReactRoot();
+      if (!root) {
+        root = createRoot(this[0]);
+        this.setReactRoot(root);
+      }
+      root.render(<CKANResultConditionsField {...props} />);
     },
 
     onunmatch() {
-      ReactDOM.unmountComponentAtNode(this[0]);
+      const root = this.getReactRoot();
+      if (root) {
+        root.unmount();
+        this.setReactRoot(null);
+      }
     },
   });
 });
