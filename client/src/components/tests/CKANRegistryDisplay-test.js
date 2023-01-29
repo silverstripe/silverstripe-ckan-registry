@@ -9,7 +9,7 @@ import Adapter from 'enzyme-adapter-react-16';
 import CKANRegistryDisplay from '../CKANRegistryDisplay';
 import i18n from 'i18n';
 import Query from 'lib/CKANApi/DataStore/Query';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -677,7 +677,6 @@ describe('CKANRegistryDisplay', () => {
       const historyMock = { push: jest.fn() };
       const wrapper = shallow(
         <CKANRegistryDisplay
-
           fields={testFields}
           filters={[
             { id: 1, allColumns: false, columns: [{ target: 'foo' }] },
@@ -713,14 +712,14 @@ describe('CKANRegistryDisplay', () => {
       expect(wrapper.html()).toContain('There are no columns');
     });
 
-    it('returns a Redirect when switching pages', () => {
+    it('returns a Navigate when switching pages', () => {
       const wrapper = shallow(
         <CKANRegistryDisplay spec={{ identifier: 'something' }} />,
         { disableLifecycleMethods: true }
       );
 
       wrapper.setState({ selectedRow: 123 });
-      expect(wrapper.find(Redirect).length).toBe(1);
+      expect(wrapper.find(Navigate).length).toBe(1);
     });
   });
 

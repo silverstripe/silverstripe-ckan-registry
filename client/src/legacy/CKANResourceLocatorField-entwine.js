@@ -1,10 +1,12 @@
 import jQuery from 'jquery';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { loadComponent } from 'lib/Injector';
 
 jQuery.entwine('ss', ($) => {
   $('.js-injector-boot .ckan-resource-locator__container').entwine({
+    ReactRoot: null,
+
     onmatch() {
       const context = {};
       const CKANResourceLocatorField = loadComponent('CKANResourceLocatorField', context);
@@ -19,14 +21,20 @@ jQuery.entwine('ss', ($) => {
         value: value ? JSON.parse(value) : undefined,
       };
 
-      ReactDOM.render(
-        <CKANResourceLocatorField {...props} />,
-        this[0]
-      );
+      let root = this.getReactRoot();
+      if (!root) {
+        root = createRoot(this[0]);
+        this.setReactRoot(root);
+      }
+      root.render(<CKANResourceLocatorField {...props} />);
     },
 
     onunmatch() {
-      ReactDOM.unmountComponentAtNode(this[0]);
+      const root = this.getReactRoot();
+      if (root) {
+        root.unmount();
+        this.setReactRoot(null);
+      }
     },
   });
 });

@@ -1,6 +1,7 @@
 /* global jest */
 jest.mock('lib/CKANApi');
 
+import { setImmediate } from 'core-js';
 import React from 'react';
 import {
   Component as CKANPresentedOptions,

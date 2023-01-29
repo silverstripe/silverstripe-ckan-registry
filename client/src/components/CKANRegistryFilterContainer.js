@@ -103,6 +103,9 @@ class CKANRegistryFilterContainer extends Component {
 
 CKANRegistryFilterContainer.propTypes = {
   onFilter: PropTypes.func.isRequired,
+  defaultValues: PropTypes.oneOf([PropTypes.array, PropTypes.object]),
+  spec: PropTypes.object,
+  filters: PropTypes.array,
 };
 
 export default CKANRegistryFilterContainer;
