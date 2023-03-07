@@ -1,0 +1,58 @@
+de:
+  SilverStripe\CKANRegistry\Forms\GridFieldResourceTitle:
+    EDIT_LINK_TITLE: ''
+  SilverStripe\CKANRegistry\Forms\PresentedOptionsField:
+    SELECT_ALL: ''
+    SELECT_CUSTOM: ''
+  SilverStripe\CKANRegistry\Forms\ResourceLocatorField:
+    DESCRIPTION: ''
+    GENERIC_SITE_NAME: ''
+  SilverStripe\CKANRegistry\Forms\ResultConditionsField:
+    MUST_MATCH: ''
+    MUST_NOT_MATCH: ''
+  SilverStripe\CKANRegistry\Model\Resource:
+    DEFAULT_FILTER_LABEL: ''
+    PLURALNAME: ''
+    PLURALS:
+      one: ''
+      other: ''
+    SINGULARNAME: ''
+  SilverStripe\CKANRegistry\Model\ResourceField:
+    ORDER_DENOMINATOR: ''
+    ORDER_LABEL: ''
+    ORIGINAL_LABEL_DESCRIPTION: ''
+    PLURALNAME: ''
+    PLURALS:
+      one: ''
+      other: ''
+    REMOVE_DUPLICATES_LABEL: ''
+    RESULT_CONDITIONS: ''
+    SINGULARNAME: ''
+  SilverStripe\CKANRegistry\Model\ResourceFilter:
+    ALL_COLUMNS: ''
+    COLUMNS_SOURCES: ''
+    FILTERLABEL_DESCRIPTION: ''
+    MULTIPLE_COLUMNS: ''
+    PLURALNAME: ''
+    PLURALS:
+      one: ''
+      other: ''
+    SINGULARNAME: ''
+  SilverStripe\CKANRegistry\Model\ResourceFilter\Dropdown:
+    OPTIONS: ''
+    PLURALNAME: ''
+    PLURALS:
+      one: ''
+      other: ''
+    SINGULARNAME: ''
+  SilverStripe\CKANRegistry\Page\CKANRegistryPage:
+    DESCRIPTION: ''
+    IN_DETAIL: ''
+    IN_RESULTS: ''
+    ITEMS_PER_PAGE: 'Elemente pro Seite'
+    PLURALNAME: CKAN-Registrierungsseiten
+    PLURALS:
+      one: 'Eine CKAN-Registrierungsseite'
+      other: '{count} CKAN-Registrierungsseiten'
+    POS: ''
+    SINGULARNAME: CKAN-Registrierungsseite
