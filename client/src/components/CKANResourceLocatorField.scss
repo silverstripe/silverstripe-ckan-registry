@@ -12,9 +12,9 @@
       border: 2px solid lightgray;
       display: block;
       position: absolute;
-      right: $input-padding-x + $grid-gutter-width / 2;
-      top: $input-padding-y + ($input-line-height * $font-size-base - $loading-size) / 2;
-      border-radius: $loading-size / 2;
+      right: $input-padding-x + calc($grid-gutter-width / 2);
+      top: $input-padding-y + calc(($input-line-height * $font-size-base - $loading-size) / 2);
+      border-radius: calc($loading-size / 2);
       border-left-color: black;
       animation: spin 1s linear infinite;
     }
