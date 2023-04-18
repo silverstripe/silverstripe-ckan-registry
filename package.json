@@ -20,6 +20,7 @@
     "lint-sass": "sass-lint client/src"
   },
   "dependencies": {
+    "@testing-library/react": "^14.0.0",
     "bootstrap": "^4.6.2",
     "classnames": "^2.3.2",
     "griddle-react": "^1.13.1",
@@ -40,12 +41,8 @@
     "@silverstripe/webpack-config": "^2.0.0",
     "babel-jest": "^29.2.2",
     "core-js": "^3.26.0",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.6",
     "jest-cli": "^29.2.2",
     "jest-environment-jsdom": "^29.3.1",
-    "react-16": "npm:react@^16.14.0",
-    "react-dom-16": "npm:react-dom@^16.14.0",
     "webpack": "^5.74.0",
     "webpack-cli": "^5.0.0"
   },
