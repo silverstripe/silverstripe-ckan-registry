@@ -10,8 +10,8 @@ pull in and display dynamic data from [CKAN](https://ckan.org/) data sets.
 
 ## Installation
 
-```
-$ composer require silverstripe/ckan-registry 1.0.x-dev
+```sh
+composer require silverstripe/ckan-registry
 ```
 
 ## Documentation
