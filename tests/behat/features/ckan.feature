@@ -24,8 +24,8 @@ Feature: Use CKAN
     When I click the "Data" CMS tab
     When I fill in "DataResource-uri" with "https://catalogue.data.govt.nz/dataset/directory-of-educational-institutions"
     And I wait for 5 seconds
-    And I should see "Early Childhood Services (ECE) Directory"
-    When I select "New Zealand Schools" from the ".ckan-resource-locator__resource-select select" field
+    And I should see "Early Childhood Services (ECEs) Directory"
+    When I select "Schools Directory" from the ".ckan-resource-locator__resource-select select" field
     And I wait for 5 seconds
     And I press the "Save" button
     Then I should see a "Saved" success toast
@@ -36,10 +36,10 @@ Feature: Use CKAN
     And I check "Form_DataColumns_GridFieldEditableColumns_4_ShowInResultsView"
     And I press the "Save" button
     And I go to "/my-ckan-registry-page?stage=Stage"
-    Then I should see "School id"
+    Then I should see "Ece id"
     And I should see "Org name"
     And I should see "Telephone"
     And I should see "Search"
     When I click on the ".griddle-table-heading-cell:nth-of-type(2)" element
     And I wait for 2 seconds
-    Then I should see "Albury School"
+    Then I should see "ABC Educare"

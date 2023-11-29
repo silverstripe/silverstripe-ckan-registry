@@ -11,6 +11,7 @@ use SilverStripe\CKANRegistry\Service\ResourcePopulator;
 use SilverStripe\CKANRegistry\Service\ResourcePopulatorInterface;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Forms\Form;
@@ -123,6 +124,7 @@ class ResourceFieldItemRequestTest extends SapphireTest
         $controllerMock = $this->createMock(Controller::class);
         $controllerMock->method('Link')->willReturn('test');
         $controllerMock->method('getRequest')->willReturn($request);
+        $controllerMock->method('getResponse')->willReturn(new HTTPResponse('test'));
 
         // Create an item request
         $itemRequest = new ResourceFieldItemRequest(
