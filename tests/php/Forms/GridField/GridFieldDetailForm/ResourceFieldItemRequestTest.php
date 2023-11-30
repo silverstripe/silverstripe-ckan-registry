@@ -123,6 +123,7 @@ class ResourceFieldItemRequestTest extends SapphireTest
         $controllerMock = $this->createMock(Controller::class);
         $controllerMock->method('Link')->willReturn('test');
         $controllerMock->method('getRequest')->willReturn($request);
+        $controllerMock->method('getResponse')->willReturn(new HTTPResponse('test'));
 
         // Create an item request
         $itemRequest = new ResourceFieldItemRequest(
